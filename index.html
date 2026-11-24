@@ -41,9 +41,23 @@
     .animate-pop {
       animation: popIn 0.25s ease-out forwards;
     }
+
+    @keyframes slideDownFade {
+      0% { transform: translate(-50%, -16px); opacity: 0; }
+      100% { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .animate-toast {
+      animation: slideDownFade 0.28s ease-out forwards;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-indigo-200">
+
+  <!-- ==================== 浮動同步通知提示 (Toast) ==================== -->
+  <div id="toastNotification" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-slate-900/95 text-white text-sm font-bold shadow-xl flex items-center gap-2.5 animate-toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastText">已同步最新單元開放狀態與學習進度！</span>
+  </div>
 
   <!-- ==================== 頂部導覽列 ==================== -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
@@ -57,7 +71,7 @@
             鳳溪第一小學 小四數學科自主練習平台
           </h1>
           <p class="text-xs text-slate-500 mt-0.5">
-            全學年課題目錄 ｜ 一次登入・跨裝置自動同步學習進度
+            全學年課題目錄 ｜ 一次登入・即時同步 Google Sheet 開放狀態與學習進度
           </p>
         </div>
       </div>
@@ -67,12 +81,12 @@
         <button id="refreshDashboardBtn" type="button"
           class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">
           <span id="refreshIcon">🔄</span>
-          <span>重新整理進度</span>
+          <span>刷新進度</span>
         </button>
 
         <button id="logoutBtn" type="button"
           class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-100 hover:text-rose-700 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold transition">
-          登出切換帳號
+          登出
         </button>
       </div>
     </div>
@@ -98,7 +112,7 @@
             校內帳號 / 學生電郵
           </label>
           <input id="accountInput" type="text" autocomplete="username" required
-            placeholder="例如：B23001@fk1ps.hk 或 teacher"
+            placeholder="例如：B23001@fk1ps.hk"
             class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-base sm:text-lg font-mono transition" />
         </div>
 
@@ -108,13 +122,22 @@
           </label>
           <div class="relative">
             <input id="passwordInput" type="password" autocomplete="current-password" required
-              placeholder="請輸入密碼（如：20171116）"
+              placeholder="請輸入密碼"
               class="w-full pl-4 pr-12 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-base sm:text-lg font-mono transition" />
             <button id="togglePwdBtn" type="button" title="顯示或隱藏密碼"
               class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg">
               👁️
             </button>
           </div>
+        </div>
+
+        <!-- 保持登入狀態勾選框 -->
+        <div class="flex items-center justify-between">
+          <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer select-none">
+            <input id="rememberMeChk" type="checkbox"
+              class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+            <span>在此裝置保持登入狀態</span>
+          </label>
         </div>
 
         <!-- 錯誤提示框 -->
@@ -129,7 +152,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
           </svg>
-          <span>正在連接雲端讀取全學年課題進度...</span>
+          <span>正在連接雲端讀取最新課題開放狀態...</span>
         </div>
 
         <button id="loginSubmitBtn" type="submit"
@@ -143,7 +166,7 @@
   <!-- ==================== 2. 登入後全學年課題目錄主畫面 ==================== -->
   <main id="portalView" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
 
-    <!-- 學生個人資料與全學年總進度橫幅 -->
+    <!-- 學生個人資料與全學年統計橫幅 -->
     <section class="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 text-white rounded-3xl p-6 shadow-md animate-pop">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <!-- 左側：學生班別學號姓名 -->
@@ -160,19 +183,34 @@
             4A 班 (01號) 白祖兒
           </h2>
           <p class="text-sm text-indigo-100">
-            點擊下方「開放中」的課題即可開始或繼續練習，無需重複輸入密碼！
+            點擊下方「開放中」的課題卡片即可直接開始或繼續練習，無需重複輸入密碼！
           </p>
         </div>
 
-        <!-- 右側：全學年完成進度統計卡 / 教師後台捷徑 -->
-        <div class="flex flex-wrap items-center gap-3">
-          <div class="bg-white/15 backdrop-blur-xs border border-white/20 rounded-2xl px-5 py-3.5 min-w-[210px]">
-            <div class="text-xs font-bold text-indigo-100">🏆 全學年已完成課題</div>
-            <div class="flex items-baseline gap-2 mt-1">
-              <span id="completedUnitsCount" class="text-3xl font-black font-mono">0</span>
-              <span id="openUnitsTotalText" class="text-sm font-bold text-indigo-100">/ 1 個開放單元</span>
+        <!-- 右側：三項統計卡片與教師總表捷徑 -->
+        <div class="flex flex-wrap items-stretch gap-3">
+          <!-- 已開放單元數 -->
+          <div class="bg-white/15 backdrop-blur-xs border border-white/20 rounded-2xl px-4 py-3 min-w-[120px]">
+            <div class="text-xs font-bold text-indigo-100">🟢 已開放單元</div>
+            <div id="statOpenUnits" class="text-2xl sm:text-3xl font-black font-mono mt-1">0</div>
+            <div class="text-[11px] text-indigo-200 mt-0.5">全學年共 <span id="statTotalUnits">14</span> 單元</div>
+          </div>
+
+          <!-- 進行中單元數 -->
+          <div class="bg-white/15 backdrop-blur-xs border border-white/20 rounded-2xl px-4 py-3 min-w-[120px]">
+            <div class="text-xs font-bold text-amber-200">⏳ 進行中單元</div>
+            <div id="statInProgressUnits" class="text-2xl sm:text-3xl font-black font-mono text-amber-300 mt-1">0</div>
+            <div class="text-[11px] text-indigo-200 mt-0.5">可隨時點擊續做</div>
+          </div>
+
+          <!-- 已完成單元數與總進度條 -->
+          <div class="bg-white/15 backdrop-blur-xs border border-white/20 rounded-2xl px-4 py-3 min-w-[175px]">
+            <div class="text-xs font-bold text-emerald-200">✅ 已完成單元</div>
+            <div class="flex items-baseline gap-1.5 mt-1">
+              <span id="statCompletedUnits" class="text-2xl sm:text-3xl font-black font-mono text-emerald-300">0</span>
+              <span id="statCompletedRatio" class="text-xs font-bold text-indigo-100">/ 0 已開放</span>
             </div>
-            <div class="w-full bg-black/20 rounded-full h-2 mt-2 overflow-hidden">
+            <div class="w-full bg-black/25 rounded-full h-2 mt-2 overflow-hidden">
               <div id="overallProgressBar" class="bg-emerald-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
           </div>
@@ -181,74 +219,79 @@
           <a id="teacherSheetBtn"
             href="https://docs.google.com/spreadsheets/d/1etKThsKMXzTkDkte68SNTXjojnrb4ZuhbUs_AK9PQ0I/edit"
             target="_blank" rel="noopener noreferrer"
-            class="hidden px-5 py-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-black text-sm shadow-md transition flex items-center gap-2">
+            class="hidden px-5 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-black text-sm shadow-md transition flex items-center gap-2">
             <span>📊</span>
-            <span>開啟 Google Sheet<br/>全級進度總表 ↗</span>
+            <span>Google Sheet<br/>全級總表 ↗</span>
           </a>
         </div>
       </div>
     </section>
 
-    <!-- 冊別篩選分頁標籤 -->
+    <!-- 冊別與開放狀態篩選分頁標籤 -->
     <section class="flex flex-wrap items-center justify-between gap-3">
       <div id="termFilterTabs" class="flex flex-wrap items-center gap-2">
-        <button type="button" data-term="ALL" onclick="setTermFilter('ALL', this)"
-          class="term-tab px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-xs transition">
+        <button type="button" data-filter="ALL" onclick="setUnitFilter('ALL', this)"
+          class="filter-tab px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-xs transition">
           全部課題 (14)
         </button>
-        <button type="button" data-term="4上A" onclick="setTermFilter('4上A', this)"
-          class="term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
-          4上A冊 (4)
+        <button type="button" data-filter="OPEN_ONLY" onclick="setUnitFilter('OPEN_ONLY', this)"
+          class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-sm transition">
+          🟢 只看已開放
         </button>
-        <button type="button" data-term="4上B" onclick="setTermFilter('4上B', this)"
-          class="term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
-          4上B冊 (4)
+        <button type="button" data-filter="4上A" onclick="setUnitFilter('4上A', this)"
+          class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
+          4上A 冊
         </button>
-        <button type="button" data-term="4下A" onclick="setTermFilter('4下A', this)"
-          class="term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
-          4下A冊 (3)
+        <button type="button" data-filter="4上B" onclick="setUnitFilter('4上B', this)"
+          class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
+          4上B 冊
         </button>
-        <button type="button" data-term="4下B" onclick="setTermFilter('4下B', this)"
-          class="term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
-          4下B冊 (3)
+        <button type="button" data-filter="4下A" onclick="setUnitFilter('4下A', this)"
+          class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
+          4下A 冊
+        </button>
+        <button type="button" data-filter="4下B" onclick="setUnitFilter('4下B', this)"
+          class="filter-tab px-4 py-2 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
+          4下B 冊
         </button>
       </div>
 
       <div id="syncStatusLabel" class="text-xs font-bold text-slate-500">
-        ☁️ 進度已與雲端同步
+        ☁️ 已與 Google Sheet 即時同步
       </div>
     </section>
 
     <!-- 課題卡片網格區 -->
     <section id="unitsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <!-- 由 JS 動態生成 14 張單元卡片 -->
+      <!-- 由 JS 100% 根據雲端 Units 狀態動態生成 -->
     </section>
 
   </main>
 
   <!-- 頁尾版權宣告 -->
   <footer class="bg-white border-t border-slate-200 py-4 px-4 text-center text-xs text-slate-400 mt-8">
-    鳳溪第一小學 數學科電子學習資源 ｜ 支援跨瀏覽器雲端進度同步
+    鳳溪第一小學 數學科電子學習資源 ｜ 100% 雲端動態同步課程開放狀態與學習進度
   </footer>
 
   <script>
     // =========================================================================
-    // 1. 雲端 API 設定與單一登入 (SSO) 常數
+    // 1. 雲端 API 設定、SSO 儲存鍵值及全學年 14 個單元檔名對照表
     // =========================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
-    const SSO_STORAGE_KEY = "FK1PS_P4_MATH_USER";
+    const SSO_PRIMARY_KEY = "fk1ps_math_user";
+    const SSO_COMPAT_KEYS = ["fk1ps_math_user", "FK1PS_P4_MATH_USER", "p4_math_user"];
 
-    // 全學年 14 個單元對應的前台 HTML 檔案路由表
-    const UNIT_ROUTES = {
+    // 預先綁定全部 14 個單元 ID 對應的前台 HTML 檔案名稱
+    const UNIT_FILE_MAP = {
       "4A_U1": "4A_U1_multiply.html",
       "4A_U2": "4A_U2_quadrilaterals.html",
       "4A_U3": "4A_U3_divide.html",
       "4A_E1": "4A_E1_classification.html",
       "4B_U4": "4B_U4_direction.html",
       "4B_U5": "4B_U5_multiples_factors.html",
-      "4B_U6": "4B_U6_dissection.html",
+      "4B_U6": "4B_U6_dissecting_forming.html",
       "4B_E2": "4B_E2_eulerian_path.html",
-      "4BA_U1": "4BA_U1_four_operations.html",
+      "4BA_U1": "4BA_U1_mixed_operations.html",
       "4BA_U2": "4BA_U2_perimeter.html",
       "4BA_U3": "4BA_U3_fractions.html",
       "4BB_U4": "4BB_U4_area.html",
@@ -256,10 +299,10 @@
       "4BB_U6": "4BB_U6_bar_charts.html"
     };
 
-    // 內置預設 14 個單元目錄備援陣列（當 API 尚未回傳時或離線參考使用）
-    const DEFAULT_UNITS = [
+    // 備援單元結構（僅當網絡斷線無法取得雲端 Units 時使用）
+    const FALLBACK_UNITS = [
       { unitId: "4A_U1", term: "4上A", unitName: "單元一：乘法", topicCode: "4N1 乘法(二)", lessons: "第1–3課", totalQuestions: 30, status: "開放中" },
-      { unitId: "4A_U2", term: "4上A", unitName: "單元二：四邊形", topicCode: "4S1 四邊形(三)", lessons: "第4–5課", totalQuestions: 20, status: "籌備中" },
+      { unitId: "4A_U2", term: "4上A", unitName: "單元二：四邊形", topicCode: "4S1 四邊形(三)", lessons: "第4–5課", totalQuestions: 18, status: "開放中" },
       { unitId: "4A_U3", term: "4上A", unitName: "單元三：除法", topicCode: "4N2 除法(二)", lessons: "第6–9課", totalQuestions: 30, status: "籌備中" },
       { unitId: "4A_E1", term: "4上A", unitName: "增潤：分類圖表", topicCode: "4E2 分類圖表", lessons: "第10課", totalQuestions: 15, status: "籌備中" },
       { unitId: "4B_U4", term: "4上B", unitName: "單元四：方向", topicCode: "4S3 方向和位置(三)", lessons: "第11–12課", totalQuestions: 20, status: "籌備中" },
@@ -274,7 +317,6 @@
       { unitId: "4BB_U6", term: "4下B", unitName: "單元六：棒形圖", topicCode: "4D1 棒形圖(二)", lessons: "第22–23課", totalQuestions: 20, status: "籌備中" }
     ];
 
-    // 冊別徽章顏色對應
     const TERM_BADGE_STYLES = {
       "4上A": "bg-blue-100 text-blue-800 border-blue-200",
       "4上B": "bg-cyan-100 text-cyan-800 border-cyan-200",
@@ -284,13 +326,14 @@
 
     // 全局狀態變數
     let currentUser = null;
-    let portalUnits = [...DEFAULT_UNITS];
+    let portalUnits = [];
     let progressMap = {};
     let completedUnitIds = [];
-    let selectedTerm = "ALL";
+    let activeFilter = "ALL";
+    let toastTimer = null;
 
     // =========================================================================
-    // 2. API 通訊輔助函式（使用 text/plain 避開 CORS preflight）
+    // 2. API 通訊與通知輔助函式
     // =========================================================================
     async function callApi(payload) {
       const response = await fetch(API_URL, {
@@ -306,23 +349,79 @@
       return await response.json();
     }
 
+    function showToast(message, icon = "✅") {
+      const toast = document.getElementById("toastNotification");
+      document.getElementById("toastIcon").textContent = icon;
+      document.getElementById("toastText").textContent = message;
+      toast.classList.remove("hidden");
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 3200);
+    }
+
+    function resolveUnitTargetUrl(unit) {
+      return unit.fileName || UNIT_FILE_MAP[unit.unitId] || `${unit.unitId}.html`;
+    }
+
     // =========================================================================
-    // 3. 頁面載入時檢查 sessionStorage 單一登入狀態
+    // 3. 單一登入 (SSO) Session 與 LocalStorage 管理
     // =========================================================================
-    window.addEventListener("DOMContentLoaded", async () => {
-      const savedUserRaw = sessionStorage.getItem(SSO_STORAGE_KEY);
-      if (savedUserRaw) {
+    function saveUserSession(userObj, rememberInLocalStorage) {
+      const jsonStr = JSON.stringify(userObj);
+      // 同步寫入所有相容鍵名，確保所有子單元頁面無縫繼承登入階段
+      SSO_COMPAT_KEYS.forEach((k) => sessionStorage.setItem(k, jsonStr));
+      if (rememberInLocalStorage) {
+        localStorage.setItem(SSO_PRIMARY_KEY, jsonStr);
+      } else {
+        localStorage.removeItem(SSO_PRIMARY_KEY);
+      }
+    }
+
+    function loadExistingUserSession() {
+      // 1. 優先從 sessionStorage 讀取
+      for (const k of SSO_COMPAT_KEYS) {
+        const raw = sessionStorage.getItem(k);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.account) return parsed;
+          } catch (e) {}
+        }
+      }
+      // 2. 若勾選過「保持登入狀態」，從 localStorage 讀取並同步回 sessionStorage
+      const localRaw = localStorage.getItem(SSO_PRIMARY_KEY);
+      if (localRaw) {
         try {
-          const parsedUser = JSON.parse(savedUserRaw);
-          if (parsedUser && parsedUser.account) {
-            currentUser = parsedUser;
-            showPortalScreen();
-            await fetchDashboardData(currentUser.account);
-            return;
+          const parsed = JSON.parse(localRaw);
+          if (parsed && parsed.account) {
+            SSO_COMPAT_KEYS.forEach((k) => sessionStorage.setItem(k, localRaw));
+            return parsed;
           }
         } catch (e) {
-          sessionStorage.removeItem(SSO_STORAGE_KEY);
+          localStorage.removeItem(SSO_PRIMARY_KEY);
         }
+      }
+      return null;
+    }
+
+    function clearAllUserSessions() {
+      SSO_COMPAT_KEYS.forEach((k) => {
+        sessionStorage.removeItem(k);
+        localStorage.removeItem(k);
+      });
+    }
+
+    // =========================================================================
+    // 4. 頁面初始化與事件監聽
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", async () => {
+      const existingUser = loadExistingUserSession();
+      if (existingUser) {
+        currentUser = existingUser;
+        showPortalView();
+        await fetchLatestDashboardData(currentUser.account, false);
       }
     });
 
@@ -343,6 +442,7 @@
       e.preventDefault();
       const account = document.getElementById("accountInput").value.trim();
       const password = document.getElementById("passwordInput").value.trim();
+      const rememberMe = document.getElementById("rememberMeChk").checked;
       if (!account || !password) return;
 
       const errBox = document.getElementById("loginErrorBox");
@@ -371,16 +471,16 @@
           return;
         }
 
-        // 登入成功：儲存至 sessionStorage 供所有單元網頁無縫免登入使用
         currentUser = res.user;
-        sessionStorage.setItem(SSO_STORAGE_KEY, JSON.stringify(currentUser));
+        saveUserSession(currentUser, rememberMe);
 
-        portalUnits = (res.units && res.units.length > 0) ? res.units : [...DEFAULT_UNITS];
+        // 100% 採用從 Google Sheet Units 工作表即時回傳的目錄與開放狀態
+        portalUnits = (res.units && res.units.length > 0) ? res.units : [...FALLBACK_UNITS];
         progressMap = res.progressMap || {};
         completedUnitIds = res.completedUnitIds || [];
 
-        showPortalScreen();
-        renderPortalContent();
+        showPortalView();
+        renderPortalGridAndStats();
       } catch (err) {
         errText.textContent = "無法連接雲端伺服器，請檢查網絡連線後再試。";
         errBox.classList.remove("hidden");
@@ -391,29 +491,34 @@
       }
     });
 
-    // 登出切換帳號
+    // 登出按鈕
     document.getElementById("logoutBtn").addEventListener("click", function () {
-      sessionStorage.removeItem(SSO_STORAGE_KEY);
+      clearAllUserSessions();
       currentUser = null;
+      portalUnits = [];
       progressMap = {};
       completedUnitIds = [];
+
       document.getElementById("headerControls").classList.add("hidden");
       document.getElementById("portalView").classList.add("hidden");
       document.getElementById("loginView").classList.remove("hidden");
       document.getElementById("passwordInput").value = "";
     });
 
-    // 重新整理進度按鈕
+    // 頂部「刷新進度」按鈕
     document.getElementById("refreshDashboardBtn").addEventListener("click", async function () {
       if (!currentUser) return;
-      await fetchDashboardData(currentUser.account);
+      await fetchLatestDashboardData(currentUser.account, true);
     });
 
-    async function fetchDashboardData(account) {
+    async function fetchLatestDashboardData(account, notifyUser) {
       const syncLabel = document.getElementById("syncStatusLabel");
       const refreshIcon = document.getElementById("refreshIcon");
-      syncLabel.textContent = "⏳ 正在從雲端同步最新學習進度...";
+      const refreshBtn = document.getElementById("refreshDashboardBtn");
+
+      syncLabel.textContent = "⏳ 正在向 Google Sheet 讀取最新單元開放狀態與進度...";
       refreshIcon.classList.add("animate-spin");
+      refreshBtn.disabled = true;
 
       try {
         const res = await callApi({
@@ -422,26 +527,33 @@
         });
 
         if (res.status === "success") {
-          portalUnits = (res.units && res.units.length > 0) ? res.units : [...DEFAULT_UNITS];
+          portalUnits = (res.units && res.units.length > 0) ? res.units : [...FALLBACK_UNITS];
           progressMap = res.progressMap || {};
           completedUnitIds = res.completedUnitIds || [];
-          renderPortalContent();
-          syncLabel.textContent = "☁️ 進度已與雲端同步";
+          renderPortalGridAndStats();
+          syncLabel.textContent = "☁️ 已與 Google Sheet 即時同步";
+          if (notifyUser) {
+            showToast("已同步最新單元開放狀態與學習進度！", "✅");
+          }
         } else {
           syncLabel.textContent = "⚠️ 無法更新進度，請稍後再試";
+          if (notifyUser) showToast("同步失敗，請稍後再試", "⚠️");
         }
       } catch (err) {
-        syncLabel.textContent = "⚠️ 網絡連線不穩，目前顯示快取目錄";
-        renderPortalContent();
+        if (portalUnits.length === 0) portalUnits = [...FALLBACK_UNITS];
+        renderPortalGridAndStats();
+        syncLabel.textContent = "⚠️ 網絡連線不穩，目前顯示離線目錄";
+        if (notifyUser) showToast("網絡連線不穩，未能連接雲端", "⚠️");
       } finally {
         refreshIcon.classList.remove("animate-spin");
+        refreshBtn.disabled = false;
       }
     }
 
     // =========================================================================
-    // 4. 顯示目錄畫面與渲染課題卡片
+    // 5. 顯示個人歡迎橫幅、篩選分頁與 100% 動態單元卡片渲染
     // =========================================================================
-    function showPortalScreen() {
+    function showPortalView() {
       document.getElementById("loginView").classList.add("hidden");
       document.getElementById("headerControls").classList.remove("hidden");
       document.getElementById("portalView").classList.remove("hidden");
@@ -466,61 +578,106 @@
       }
     }
 
-    function setTermFilter(term, btnEl) {
-      selectedTerm = term;
-      document.querySelectorAll(".term-tab").forEach((btn) => {
-        btn.className = "term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition";
+    function setUnitFilter(filterKey, btnEl) {
+      activeFilter = filterKey;
+      document.querySelectorAll(".filter-tab").forEach((btn) => {
+        if (btn.dataset.filter === "OPEN_ONLY") {
+          btn.className = "filter-tab px-4 py-2 rounded-xl bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-sm transition";
+        } else {
+          btn.className = "filter-tab px-4 py-2 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition";
+        }
       });
+
       if (btnEl) {
-        btnEl.className = "term-tab px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-xs transition";
+        if (filterKey === "OPEN_ONLY") {
+          btnEl.className = "filter-tab px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-xs transition";
+        } else {
+          btnEl.className = "filter-tab px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-xs transition";
+        }
       }
-      renderPortalContent();
+      renderPortalGridAndStats();
     }
 
-    function renderPortalContent() {
-      // 更新頂部全學年完成進度統計
-      const openUnits = portalUnits.filter((u) => u.status === "開放中");
-      const totalOpen = openUnits.length || 1;
-      const doneOpenCount = openUnits.filter(
-        (u) => completedUnitIds.includes(u.unitId) || (progressMap[u.unitId] && progressMap[u.unitId].isCompleted)
-      ).length;
+    function renderPortalGridAndStats() {
+      const isTeacher = currentUser && currentUser.role === "teacher";
 
-      document.getElementById("completedUnitsCount").textContent = doneOpenCount;
-      document.getElementById("openUnitsTotalText").textContent = `/ ${totalOpen} 個開放單元`;
-      const pct = Math.min(100, Math.round((doneOpenCount / totalOpen) * 100));
+      // 1. 動態統計頂部 KPI 數字（完全依據雲端回傳的 unit.status）
+      const openUnits = portalUnits.filter((u) => String(u.status || "").trim() === "開放中");
+      const openCount = openUnits.length;
+
+      let completedOpenCount = 0;
+      let inProgressCount = 0;
+
+      portalUnits.forEach((u) => {
+        const uId = u.unitId;
+        const pInfo = progressMap[uId] || null;
+        const isDone = completedUnitIds.includes(uId) || (pInfo && pInfo.isCompleted === true);
+        const isDoing = !isDone && pInfo && Number(pInfo.currentQ) > 1;
+
+        if (isDone && String(u.status || "").trim() === "開放中") {
+          completedOpenCount++;
+        }
+        if (isDoing) {
+          inProgressCount++;
+        }
+      });
+
+      document.getElementById("statOpenUnits").textContent = openCount;
+      document.getElementById("statTotalUnits").textContent = portalUnits.length;
+      document.getElementById("statInProgressUnits").textContent = inProgressCount;
+      document.getElementById("statCompletedUnits").textContent = completedOpenCount;
+      document.getElementById("statCompletedRatio").textContent = `/ ${openCount} 已開放`;
+
+      const pct = openCount > 0 ? Math.min(100, Math.round((completedOpenCount / openCount) * 100)) : 0;
       document.getElementById("overallProgressBar").style.width = `${pct}%`;
 
-      // 篩選要顯示的單元
-      const filteredUnits = selectedTerm === "ALL"
-        ? portalUnits
-        : portalUnits.filter((u) => u.term === selectedTerm);
+      // 2. 篩選要顯示的單元
+      let filteredUnits = portalUnits;
+      if (activeFilter === "OPEN_ONLY") {
+        filteredUnits = portalUnits.filter((u) => String(u.status || "").trim() === "開放中");
+      } else if (activeFilter !== "ALL") {
+        filteredUnits = portalUnits.filter((u) => String(u.term || "").trim() === activeFilter);
+      }
 
+      // 3. 動態渲染每張單元卡片
       const grid = document.getElementById("unitsGrid");
       grid.innerHTML = "";
 
+      if (filteredUnits.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white rounded-3xl p-10 text-center border border-slate-200 text-slate-500 font-bold">
+            目前沒有符合此篩選條件的課題卡片。
+          </div>
+        `;
+        return;
+      }
+
       filteredUnits.forEach((unit) => {
-        const uId = unit.unitId;
-        const routeFile = UNIT_ROUTES[uId] || `${uId}.html`;
+        const uId = String(unit.unitId || "").trim();
+        const unitStatus = String(unit.status || "").trim();
+        const isOpenInSheet = unitStatus === "開放中";
+        const targetHref = resolveUnitTargetUrl(unit);
+
         const pInfo = progressMap[uId] || null;
-        const isCompleted = completedUnitIds.includes(uId) || (pInfo && pInfo.isCompleted);
+        const isCompleted = completedUnitIds.includes(uId) || (pInfo && pInfo.isCompleted === true);
         const isInProgress = !isCompleted && pInfo && Number(pInfo.currentQ) > 1;
-        const isOpen = unit.status === "開放中";
-        const isTeacher = currentUser && currentUser.role === "teacher";
 
         const termBadgeClass = TERM_BADGE_STYLES[unit.term] || "bg-slate-100 text-slate-700 border-slate-200";
         const totalQ = Number(unit.totalQuestions) || 30;
 
         const card = document.createElement("article");
 
-        // 決定卡片邊框、狀態徽章與底部操作按鈕
-        let cardBorderClass = "bg-white border-slate-200 hover:shadow-lg hover:-translate-y-0.5";
+        let cardBorderClass = "";
         let statusBadgeHtml = "";
         let progressBarHtml = "";
         let actionBtnHtml = "";
 
         if (isCompleted) {
+          // ✅ 已完成
           cardBorderClass = "bg-white border-emerald-300 ring-1 ring-emerald-100 hover:shadow-lg hover:-translate-y-0.5";
-          const scoreLine = pInfo && pInfo.score ? `<div class="text-xs font-bold text-emerald-700 mt-1">🏆 ${pInfo.score}</div>` : "";
+          const scoreLine = pInfo && pInfo.score
+            ? `<div class="text-xs font-bold text-emerald-700 mt-1.5">🏆 最新成績：${pInfo.score}</div>`
+            : "";
           statusBadgeHtml = `
             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">
               ✅ 已完成
@@ -528,19 +685,20 @@
             ${scoreLine}
           `;
           actionBtnHtml = `
-            <a href="${routeFile}"
-              class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm text-center shadow-xs transition block">
-              進入重温 / 再次練習
+            <a href="${targetHref}"
+              class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm text-center shadow-xs transition block">
+              重溫／再挑戰 →
             </a>
           `;
         } else if (isInProgress) {
+          // ⏳ 進行中
           const curQ = Math.min(Number(pInfo.currentQ) || 1, totalQ);
           const doneCount = Math.max(0, curQ - 1);
           const progPct = Math.round((doneCount / totalQ) * 100);
           cardBorderClass = "bg-white border-amber-300 ring-1 ring-amber-100 hover:shadow-lg hover:-translate-y-0.5";
           statusBadgeHtml = `
             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">
-              ⏳ 進行中（已做至第 ${curQ} 題）
+              ⏳ 進行中（做到第 ${curQ} / ${totalQ} 題）
             </span>
           `;
           progressBarHtml = `
@@ -550,55 +708,56 @@
                 <span class="font-mono text-amber-700">${doneCount} / ${totalQ} 題 (${progPct}%)</span>
               </div>
               <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div class="bg-amber-500 h-2 rounded-full" style="width: ${progPct}%"></div>
+                <div class="bg-amber-500 h-2 rounded-full transition-all duration-300" style="width: ${progPct}%"></div>
               </div>
             </div>
           `;
           actionBtnHtml = `
-            <a href="${routeFile}"
-              class="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm text-center shadow-xs transition block">
+            <a href="${targetHref}"
+              class="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white font-bold text-sm text-center shadow-xs transition block">
               繼續練習 →
             </a>
           `;
-        } else if (isOpen) {
+        } else if (isOpenInSheet) {
+          // 🟢 開放中（100% 由 Google Sheet Units 分頁 Status === "開放中" 驅動解鎖）
           cardBorderClass = "bg-white border-indigo-200 hover:border-indigo-400 hover:shadow-lg hover:-translate-y-0.5";
           statusBadgeHtml = `
             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-black">
-              📖 尚未開始
+              🟢 開放中
             </span>
           `;
           actionBtnHtml = `
-            <a href="${routeFile}"
-              class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm text-center shadow-sm shadow-indigo-200 transition block">
+            <a href="${targetHref}"
+              class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm text-center shadow-sm shadow-indigo-200 transition block">
               開始練習 →
             </a>
           `;
         } else {
-          // 狀態為「籌備中」
+          // 🔒 籌備中（學生鎖定；教師可點擊進入預覽模式）
           if (isTeacher) {
-            cardBorderClass = "bg-slate-50 border-amber-200 hover:bg-white hover:shadow-md";
+            cardBorderClass = "bg-slate-50 border-amber-200 hover:bg-white hover:shadow-md transition";
             statusBadgeHtml = `
               <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
-                🔒 籌備中（教師預覽可用）
+                🔒 籌備中（教師可預覽）
               </span>
             `;
             actionBtnHtml = `
-              <a href="${routeFile}"
+              <a href="${targetHref}"
                 class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-bold text-sm text-center transition block">
-                👩‍🏫 教師預覽連結 →
+                👩‍🏫 教師預覽模式 →
               </a>
             `;
           } else {
-            cardBorderClass = "bg-slate-50/80 border-slate-200 opacity-75";
+            cardBorderClass = "bg-slate-50/85 border-slate-200 opacity-75";
             statusBadgeHtml = `
               <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-bold">
-                🔒 尚未開放
+                🔒 籌備中
               </span>
             `;
             actionBtnHtml = `
               <button type="button" disabled
                 class="w-full py-3 px-4 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm text-center cursor-not-allowed">
-                敬請期待
+                即將開放
               </button>
             `;
           }
@@ -611,14 +770,14 @@
             <!-- 頂部冊別與學習單位標籤 -->
             <div class="flex flex-wrap items-center justify-between gap-2">
               <span class="px-2.5 py-1 rounded-lg border text-xs font-black ${termBadgeClass}">
-                ${unit.term}冊
+                ${unit.term} 冊
               </span>
               <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
                 ${unit.topicCode}
               </span>
             </div>
 
-            <!-- 單元大標題 -->
+            <!-- 單元標題與課次範圍 -->
             <div>
               <h3 class="text-xl font-black text-slate-900 leading-snug">
                 ${unit.unitName}
@@ -628,7 +787,7 @@
               </p>
             </div>
 
-            <!-- 個人狀態與進度條 -->
+            <!-- 狀態徽章與進度條 -->
             <div class="pt-1 space-y-2">
               <div>${statusBadgeHtml}</div>
               ${progressBarHtml}

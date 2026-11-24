@@ -1,1250 +1,665 @@
 <!DOCTYPE html>
-<html lang="zh-Hant-HK">
+<html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>鳳溪第一小學 小四數學科自主練習平台：單元一 乘法 (4A_U1)</title>
-  <!-- 載入 Tailwind CSS -->
+  <title>小四數學自主練習平台 — 單元一：乘法 (4A_U1)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 載入 Google Fonts 繁體中文及等寬數字字型 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Noto Sans TC"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-        },
-      },
-    };
-  </script>
-
   <style>
-    /* 錯誤搖晃動畫 */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f1f5f9;
+      user-select: none;
+    }
+    .option-card {
+      transition: all 0.18s ease;
+    }
+    .option-card:hover:not(.disabled-opt) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -4px rgba(30, 58, 138, 0.12);
+    }
+    .option-selected {
+      border-color: #4f46e5 !important;
+      background-color: #eef2ff !important;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    .option-correct {
+      border-color: #16a34a !important;
+      background-color: #dcfce7 !important;
+    }
+    .option-wrong {
+      border-color: #dc2626 !important;
+      background-color: #fee2e2 !important;
+      animation: shake 0.35s ease;
+    }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      15%, 55%, 85% { transform: translateX(-8px); }
-      35%, 70% { transform: translateX(8px); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
     }
-    .animate-shake {
-      animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    }
-
-    /* 彈入動畫 */
-    @keyframes popIn {
-      0% { transform: scale(0.96); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .animate-pop {
-      animation: popIn 0.25s ease-out forwards;
-    }
-
-    /* 隱藏數字輸入框上下預設箭咀 */
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    input[type="number"] {
-      -moz-appearance: textfield;
-    }
-
-    /* 手寫草稿畫布格線背景（直式對位輔助） */
-    .canvas-grid {
-      background-image: linear-gradient(#cbd5e1 1px, transparent 1px),
-                        linear-gradient(90deg, #cbd5e1 1px, transparent 1px);
-      background-size: 28px 28px;
-    }
-    #scratchpadCanvas {
+    #scratchpad-canvas {
       touch-action: none;
+      cursor: crosshair;
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-indigo-200">
+<body class="min-h-screen text-slate-800 flex flex-col">
 
-  <!-- ==================== 頂部導覽列（登入後顯示） ==================== -->
-  <header id="appHeader" class="hidden bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+  <!-- 頂部導覽列 -->
+  <header class="bg-gradient-to-r from-indigo-900 via-blue-900 to-indigo-800 text-white shadow-md sticky top-0 z-30">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-      <!-- 校名與單元標題 -->
       <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-black text-2xl shadow-sm shrink-0">
-          ×
-        </div>
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-sm font-bold transition">
+          <span>← 返回課題目錄</span>
+        </a>
         <div>
-          <div class="flex flex-wrap items-center gap-2">
-            <h1 class="font-black text-base sm:text-lg text-slate-900 leading-tight">
-              鳳溪第一小學 小四數學科自主練習平台
-            </h1>
-            <span class="px-2.5 py-0.5 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold">
-              單元一：乘法 (4A_U1)
-            </span>
-          </div>
-          <p class="text-xs text-slate-500 mt-0.5">學習單位：4N1 乘法(二) ｜ 答錯即時訂正重做</p>
+          <span class="text-xs uppercase tracking-wider text-indigo-200 block">4上A ‧ 學習單位 4N1</span>
+          <h1 class="text-lg sm:text-xl font-black tracking-wide">單元一：乘法（乘法一、二、三）</h1>
         </div>
       </div>
 
-      <!-- 雲端同步狀態、用戶徽章、音效與登出 -->
-      <div class="flex items-center gap-2 sm:gap-2.5">
-        <!-- 雲端即時同步狀態指示器 -->
-        <div id="cloudSyncBadge" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold transition-all">
-          <span id="cloudSyncIcon">☁️</span>
-          <span id="cloudSyncText">雲端已連線</span>
+      <div id="user-badge-area" class="hidden flex items-center gap-3">
+        <div class="text-right">
+          <div id="user-display-name" class="text-sm font-bold">學生姓名</div>
+          <div id="user-display-meta" class="text-xs text-indigo-200">班別學號</div>
         </div>
-
-        <!-- 用戶身分顯示 -->
-        <div class="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
-          <span>👤</span>
-          <span id="headerUserDisplay">4A (01) 學生</span>
-        </div>
-
-        <!-- 音效切換按鈕 -->
-        <button id="soundToggleBtn" type="button" title="切換音效"
-          class="p-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition text-sm font-bold">
-          🔊
-        </button>
-
-        <!-- 登出按鈕 -->
-        <button id="logoutBtn" type="button"
-          class="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 text-xs sm:text-sm font-bold transition">
+        <button onclick="logoutUser()" class="px-3 py-1.5 rounded-lg bg-rose-500/80 hover:bg-rose-500 text-xs font-bold transition">
           登出
         </button>
       </div>
     </div>
-
-    <!-- 學生即時進度條（僅學生作答時顯示） -->
-    <div id="studentProgressBarWrapper" class="bg-slate-50 border-t border-slate-100 px-4 py-2">
-      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
-        <div class="flex items-center gap-3 flex-1 min-w-[220px]">
-          <span class="font-bold text-slate-700 whitespace-nowrap">
-            完成進度：<span id="progressCountText" class="text-indigo-600 font-mono">0 / 30</span> 題
-          </span>
-          <div class="w-full max-w-xs bg-slate-200 rounded-full h-2.5 overflow-hidden">
-            <div id="progressBarFill" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-          </div>
-        </div>
-        <div class="flex items-center gap-4 text-slate-600 font-medium">
-          <span>⭐ 首試答對：<strong id="firstTryCountText" class="text-emerald-600 font-mono">0</strong></span>
-          <span>🔄 總嘗試次數：<strong id="totalAttemptsText" class="text-amber-600 font-mono">0</strong></span>
-        </div>
-      </div>
-    </div>
   </header>
 
-  <!-- ==================== 1. 雲端帳號密碼登入頁 ==================== -->
-  <main id="loginView" class="flex-1 flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden animate-pop">
-      <!-- 頂部校徽與主題橫幅 -->
-      <div class="bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-700 p-6 sm:p-7 text-white text-center relative">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-indigo-100 mb-3">
-          <span>☁️</span>
-          <span>雲端同步版・跨裝置紀錄進度</span>
+  <!-- 1. 獨立登入畫面（若未從 index.html SSO 登入則顯示） -->
+  <main id="login-screen" class="flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-7">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-indigo-100 text-indigo-700 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl font-black">
+          ×
         </div>
-        <h2 class="text-xl sm:text-2xl font-black tracking-wide">鳳溪第一小學</h2>
-        <p class="text-lg font-bold text-blue-100 mt-0.5">小四數學科自主練習系統</p>
-        <div class="mt-3 inline-block px-4 py-1.5 rounded-xl bg-amber-400 text-slate-900 font-black text-sm shadow-sm">
-          單元一：乘法（4N1 乘法(二)）
-        </div>
+        <h2 class="text-2xl font-black text-slate-800">單元一：乘法</h2>
+        <p class="text-sm text-slate-500 mt-1">請輸入校內帳號與密碼以同步雲端學習進度</p>
       </div>
 
-      <!-- 登入表單 -->
-      <form id="loginForm" class="p-6 sm:p-8 space-y-5">
+      <form id="login-form" onsubmit="handleManualLogin(event)" class="space-y-4">
         <div>
-          <label for="usernameInput" class="block text-sm font-bold text-slate-700 mb-1.5">
-            學生帳號 / 校內電郵
-          </label>
-          <input id="usernameInput" type="text" autocomplete="username" required
-            placeholder="例如：B23001@fk1ps.hk"
-            class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-base sm:text-lg font-mono transition" />
+          <label class="block text-sm font-bold text-slate-700 mb-1">學生／教師帳號</label>
+          <input type="text" id="login-account" required placeholder="例如：B23001@fk1ps.hk"
+                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-base" />
         </div>
-
         <div>
-          <label for="passwordInput" class="block text-sm font-bold text-slate-700 mb-1.5">
-            登入密碼
-          </label>
-          <div class="relative">
-            <input id="passwordInput" type="password" autocomplete="current-password" required
-              placeholder="請輸入密碼"
-              class="w-full pl-4 pr-12 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-base sm:text-lg font-mono transition" />
-            <button id="togglePasswordBtn" type="button" title="顯示或隱藏密碼"
-              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg">
-              👁️
-            </button>
-          </div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">密碼</label>
+          <input type="password" id="login-password" required placeholder="請輸入密碼"
+                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-base" />
         </div>
-
-        <!-- 登入錯誤訊息提示框 -->
-        <div id="loginErrorMsg" class="hidden p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold flex items-start gap-2">
-          <span class="mt-0.5">⚠️</span>
-          <span id="loginErrorText">帳號或密碼不正確，請重新輸入。</span>
-        </div>
-
-        <!-- 登入載入中提示框 -->
-        <div id="loginLoadingMsg" class="hidden p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm font-bold flex items-center justify-center gap-2.5">
-          <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-          </svg>
-          <span>正在連接雲端資料庫驗證身分...</span>
-        </div>
-
-        <button id="loginSubmitBtn" type="submit"
-          class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-lg shadow-md shadow-indigo-200 transition">
-          登入雲端練習系統 →
+        <div id="login-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium"></div>
+        <button type="submit" id="login-submit-btn"
+                class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base shadow-md transition">
+          登入並開始練習
         </button>
-
-        <p class="text-xs text-center text-slate-400 pt-1">
-          教師請使用教師專用帳號登入以檢視全級學習進度
-        </p>
       </form>
+      <div class="mt-4 text-center">
+        <a href="index.html" class="text-xs text-indigo-600 hover:underline font-medium">前往全學年統一登入主頁 (index.html)</a>
+      </div>
     </div>
   </main>
 
-  <!-- ==================== 2. 學生作答主畫面（左題目＋右互動草稿紙） ==================== -->
-  <main id="quizView" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-5 space-y-5">
+  <!-- 載入中提示 -->
+  <div id="loading-overlay" class="hidden flex-1 flex flex-col items-center justify-center p-8">
+    <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
+    <p id="loading-text" class="text-slate-600 font-bold">正在連接雲端資料庫同步進度...</p>
+  </div>
 
-    <!-- 歡迎與雲端續做提示橫幅 -->
-    <div id="welcomeBanner" class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-2xl p-4 sm:px-6 shadow-sm flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <span class="text-2xl">👋</span>
-        <div>
-          <p id="welcomeGreeting" class="font-black text-base sm:text-lg">歡迎回來，4A (01) 白祖兒！</p>
-          <p id="welcomeSubtext" class="text-xs sm:text-sm text-indigo-100">請細心計算每一題，答錯時請參考小貼士即時訂正重做。</p>
+  <!-- 2. 主練習介面 -->
+  <main id="quiz-screen" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-5 space-y-5">
+
+    <!-- 教師專屬快速選題工具列（僅當 role === 'teacher' 時顯示） -->
+    <div id="teacher-jump-bar" class="hidden p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-md bg-amber-600 text-white text-xs font-black">教師檢視模式</span>
+          <span class="text-sm font-bold text-amber-950">點擊下方題號可直接跳題檢查（不會寫入或覆寫學生紀錄）</span>
+        </div>
+        <span id="teacher-q-indicator" class="text-xs font-bold px-2.5 py-1 bg-amber-200/80 text-amber-950 rounded-lg">目前：第 1 / 20 題</span>
+      </div>
+      <div id="teacher-jump-buttons" class="flex flex-wrap gap-1.5"></div>
+    </div>
+
+    <!-- 頂部進度與統計欄 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3 flex-1 min-w-[240px]">
+        <span class="text-sm font-bold text-slate-600 whitespace-nowrap">
+          完成進度：<span id="progress-text" class="text-indigo-700 font-black text-base">1 / 20</span> 題
+        </span>
+        <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-300" style="width: 5%;"></div>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="studentRestartBtn" type="button"
-          class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs sm:text-sm font-bold backdrop-blur-xs transition">
-          🔄 重新練習本單元
+
+      <div class="flex items-center gap-4 text-sm font-bold">
+        <div class="px-3 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200">
+          ★ 首試答對：<span id="stat-first-try">0</span>
+        </div>
+        <div class="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
+          ↻ 總嘗試次數：<span id="stat-attempts">0</span>
+        </div>
+        <button onclick="toggleScratchpad()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition flex items-center gap-1">
+          <span>✏️ 直式計算草稿紙</span>
         </button>
       </div>
     </div>
 
-    <!-- 題號導覽陣列（已解鎖題目可點擊重溫，未完成題目鎖定） -->
-    <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+    <!-- 互動直式草稿畫板 -->
+    <div id="scratchpad-panel" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <span class="text-xs sm:text-sm font-bold text-slate-700">📋 題目進度導覽（答對當前題目後自動解鎖下一題）：</span>
-        <div class="flex items-center gap-3 text-xs text-slate-500">
-          <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>首試答對</span>
-          <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>重做答對</span>
-          <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span>當前題目</span>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-sm text-slate-700">直式計算草稿畫板：</span>
+          <button type="button" onclick="setPadBg('blank')" id="bg-btn-blank" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white">空白畫紙</button>
+          <button type="button" onclick="setPadBg('grid')" id="bg-btn-grid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">對位方格紙</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="setPenColor('#1e293b')" class="w-6 h-6 rounded-full bg-slate-800 border-2 border-white shadow"></button>
+          <button type="button" onclick="setPenColor('#2563eb')" class="w-6 h-6 rounded-full bg-blue-600 border-2 border-white shadow"></button>
+          <button type="button" onclick="setPenColor('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 border-2 border-white shadow"></button>
+          <button type="button" onclick="clearScratchpad()" class="px-3 py-1 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 text-xs font-bold">清除畫板</button>
         </div>
       </div>
-      <div id="questionGrid" class="grid grid-cols-10 sm:grid-cols-15 gap-1.5">
-        <!-- 由 JS 動態生成 1–30 題按鈕 -->
+      <div class="border border-slate-300 rounded-xl overflow-hidden bg-white flex justify-center">
+        <canvas id="scratchpad-canvas" width="760" height="240" class="w-full max-w-[760px] h-[240px]"></canvas>
       </div>
-    </section>
+    </div>
 
-    <!-- 主作答區與互動草稿紙雙欄佈局 -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    <!-- 題目主卡片 -->
+    <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <span id="q-part-badge" class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-black border border-indigo-200">
+          第 1 課：乘法(一)
+        </span>
+        <span id="q-number-badge" class="text-sm font-bold text-slate-400">第 1 題</span>
+      </div>
 
-      <!-- 左側（7 欄）：題目卡片與作答表單 -->
-      <section id="questionCard" class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 shadow-md border border-slate-200 space-y-6">
-        <!-- 分部標籤與題號 -->
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
-          <div class="flex items-center gap-2.5">
-            <span id="partBadge" class="px-3 py-1 rounded-xl bg-indigo-100 text-indigo-800 font-bold text-xs sm:text-sm">
-              甲部：心算及巧算題
-            </span>
-            <span id="questionNumberBadge" class="text-slate-600 font-bold text-sm">
-              第 1 題 / 共 30 題
-            </span>
-          </div>
+      <h2 id="q-prompt" class="text-xl sm:text-2xl font-black text-slate-800 leading-snug mb-5">
+        題目載入中...
+      </h2>
 
-          <span id="attemptBadge" class="px-3 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs">
-            第 1 次嘗試
-          </span>
+      <!-- 選項區 -->
+      <div id="q-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 max-w-3xl"></div>
+
+      <!-- 填空題輸入區 -->
+      <div id="q-input-area" class="hidden mb-6 max-w-md">
+        <div class="flex items-center gap-3">
+          <input type="text" id="q-text-input" placeholder="請輸入數字答案"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();checkAnswer();}"
+                 class="flex-1 px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-indigo-500 outline-none text-xl font-bold text-center" />
+          <span id="q-input-unit" class="text-lg font-bold text-slate-600"></span>
         </div>
+      </div>
 
-        <!-- 題目文字 / 算式顯示區 -->
-        <div class="py-1">
-          <p id="partInstruction" class="text-sm text-slate-500 mb-3 font-medium">
-            提示：可運用乘法交換性質、結合性質或分配性質進行巧算。
-          </p>
-          <div id="questionPrompt" class="text-2xl sm:text-4xl font-black text-slate-900 tracking-wide leading-relaxed font-mono">
-            40 × 70 = ?
-          </div>
+      <!-- 回饋與提示訊息區 -->
+      <div id="feedback-box" class="hidden mb-6 p-4 rounded-xl border text-base font-medium"></div>
+
+      <!-- 底部操作按鈕 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+        <div class="text-xs text-slate-400" id="sync-status-text">雲端同步就緒</div>
+        <div class="flex items-center gap-3">
+          <button id="submit-btn" onclick="checkAnswer()"
+                  class="px-7 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base shadow-md transition">
+            提交答案
+          </button>
+          <button id="next-btn" onclick="goNextQuestion()"
+                  class="hidden px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base shadow-md transition">
+            下一題 →
+          </button>
         </div>
-
-        <!-- 答案輸入與提交表單 -->
-        <form id="answerForm" class="space-y-4">
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div class="relative flex-1">
-              <input id="studentAnswerInput" type="number" inputmode="numeric" required
-                placeholder="輸入數字答案..."
-                class="w-full px-5 py-4 rounded-2xl border-2 border-slate-300 focus:border-indigo-600 focus:outline-none text-2xl sm:text-3xl font-mono font-bold text-slate-900 bg-slate-50 focus:bg-white transition" />
-              <span id="unitLabel" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-500">
-                本
-              </span>
-            </div>
-
-            <button id="submitAnswerBtn" type="submit"
-              class="px-7 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold text-lg sm:text-xl shadow-md shadow-indigo-200 transition whitespace-nowrap">
-              提交答案 ✓
-            </button>
-
-            <button id="nextQuestionBtn" type="button"
-              class="hidden px-7 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold text-lg sm:text-xl shadow-md shadow-emerald-200 transition whitespace-nowrap">
-              下一題 →
-            </button>
-          </div>
-        </form>
-
-        <!-- 即時回饋橫幅（答對或答錯強制重做提示） -->
-        <div id="feedbackBox" class="hidden rounded-2xl p-4 sm:p-5 border-2 transition-all">
-          <div class="flex items-start gap-3">
-            <div id="feedbackIcon" class="text-2xl sm:text-3xl mt-0.5">❌</div>
-            <div class="flex-1 space-y-1.5">
-              <h3 id="feedbackTitle" class="font-black text-base sm:text-lg">
-                答錯了！請立即再試一次！
-              </h3>
-              <p id="feedbackMessage" class="text-sm sm:text-base leading-relaxed">
-                這題還未答對，請檢查進位或數位對齊，重新計算後再提交。
-              </p>
-              <!-- 解題小貼士（答錯時自動顯示） -->
-              <div id="hintContainer" class="mt-3 p-3.5 rounded-xl bg-white/90 border border-rose-200 text-slate-800 text-sm sm:text-base">
-                <span class="font-bold text-indigo-700">💡 解題小貼士：</span>
-                <span id="hintText">先算 4 × 7 = 28，再在末尾補上兩個 0。</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 右側（5 欄）：HTML5 Canvas 互動手寫草稿紙 -->
-      <aside class="lg:col-span-5 bg-white rounded-3xl p-5 shadow-md border border-slate-200 space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <span class="text-lg">✏️</span>
-            <h3 class="font-black text-slate-800 text-base">互動草稿紙（直式計算區）</h3>
-          </div>
-          <label class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 cursor-pointer select-none">
-            <input id="autoClearCanvasChk" type="checkbox" checked class="rounded text-indigo-600 focus:ring-indigo-500" />
-            <span>換題自動清除</span>
-          </label>
-        </div>
-
-        <!-- 畫筆工具列：顏色、粗幼、格線開關、清除 -->
-        <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
-          <!-- 筆色選擇 -->
-          <div class="flex items-center gap-1.5">
-            <button type="button" onclick="setPenColor('#1e293b', this)" title="黑色筆"
-              class="pen-color-btn w-7 h-7 rounded-full bg-slate-800 ring-2 ring-offset-1 ring-indigo-500 transition"></button>
-            <button type="button" onclick="setPenColor('#2563eb', this)" title="藍色筆"
-              class="pen-color-btn w-7 h-7 rounded-full bg-blue-600 transition"></button>
-            <button type="button" onclick="setPenColor('#dc2626', this)" title="紅色筆（標記進位）"
-              class="pen-color-btn w-7 h-7 rounded-full bg-red-600 transition"></button>
-          </div>
-
-          <!-- 筆畫粗幼 -->
-          <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-slate-200 text-xs font-bold">
-            <button type="button" onclick="setPenSize(2.5, this)" class="pen-size-btn px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">幼</button>
-            <button type="button" onclick="setPenSize(5, this)" class="pen-size-btn px-2 py-0.5 rounded text-slate-600 hover:bg-slate-100">粗</button>
-          </div>
-
-          <!-- 格線輔助與清除 -->
-          <div class="flex items-center gap-1.5">
-            <button id="toggleGridBtn" type="button" onclick="toggleCanvasGrid()"
-              class="px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold hover:bg-indigo-100 transition">
-              格線：開
-            </button>
-            <button type="button" onclick="clearScratchpad()"
-              class="px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold hover:bg-rose-100 transition">
-              清除
-            </button>
-          </div>
-        </div>
-
-        <!-- 手寫畫布 -->
-        <canvas id="scratchpadCanvas" class="w-full h-72 sm:h-80 rounded-2xl border-2 border-slate-300 bg-white canvas-grid cursor-crosshair"></canvas>
-        <p class="text-xs text-slate-400 text-center">可用滑鼠、觸控螢幕或手寫筆在方格內列直式計算</p>
-      </aside>
-
+      </div>
     </div>
   </main>
 
-  <!-- ==================== 3. 完成工作紙成績結算證書頁面 ==================== -->
-  <main id="summaryView" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-lg border-2 border-indigo-100 text-center space-y-5 animate-pop relative overflow-hidden">
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-100 text-5xl shadow-inner">
+  <!-- 3. 完成證書畫面 -->
+  <main id="complete-screen" class="hidden flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 max-w-lg w-full p-8 text-center">
+      <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">
         🏆
       </div>
-      <div>
-        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
-          ☁️ 成績已成功同步至學校雲端紀錄表
-        </span>
-        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
-          單元一：乘法 練習完成證書
-        </h2>
-        <p id="summaryStudentInfo" class="text-slate-600 font-bold text-base sm:text-lg mt-1">
-          學生：4A (01) 白祖兒
-        </p>
-      </div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">恭喜完成單元一：乘法！</h2>
+      <p id="cert-student-info" class="text-slate-600 font-bold mb-6">4A (01) 白祖兒</p>
 
-      <!-- 核心表現數據卡 -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-left">
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-          <div class="text-xs font-bold text-emerald-700">⭐ 首試即答對題數</div>
-          <div id="statFirstTry" class="text-3xl font-black text-emerald-800 mt-1 font-mono">27 / 30</div>
-          <div id="statAccuracyRate" class="text-xs text-emerald-700 font-bold mt-1">首試正確率：90%</div>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+          <div class="text-xs text-indigo-600 font-bold mb-1">首試答對題數</div>
+          <div id="cert-score" class="text-3xl font-black text-indigo-900">20 / 20</div>
         </div>
-
-        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
-          <div class="text-xs font-bold text-amber-700">🔄 總作答嘗試次數</div>
-          <div id="statTotalAttempts" class="text-3xl font-black text-amber-800 mt-1 font-mono">34 次</div>
-          <div id="statRetriedCount" class="text-xs text-amber-700 font-bold mt-1">訂正重做題數：3 題</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
-          <div class="text-xs font-bold text-indigo-700">📌 錯題訂正狀態</div>
-          <div class="text-2xl font-black text-indigo-800 mt-1">100% 達標</div>
-          <div id="statWrongSummary" class="text-xs text-indigo-700 font-medium mt-1 truncate">全數題目已成功完成</div>
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+          <div class="text-xs text-emerald-600 font-bold mb-1">總嘗試次數</div>
+          <div id="cert-attempts" class="text-3xl font-black text-emerald-900">20 次</div>
         </div>
       </div>
 
-      <div class="pt-3 flex flex-wrap justify-center gap-3">
-        <button id="reviewWorksheetBtn" type="button"
-          class="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold transition">
-          返回檢視全部題目
+      <div id="cert-wrong-summary" class="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left text-sm text-slate-700"></div>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="index.html" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow transition">
+          ← 返回課題目錄
+        </a>
+        <button onclick="resetUnitPractice()" class="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+          ↻ 重新練習本單元
         </button>
-        <button id="resetMyProgressBtn" type="button"
-          class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-200 transition">
-          🔄 再練習一次（重設本單元進度）
-        </button>
-      </div>
-    </div>
-
-    <!-- 錯題與逐題表現復習清單 -->
-    <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200">
-      <h3 class="text-lg font-black text-slate-800 mb-4">📊 逐題作答與錯題復習清單</h3>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-sm">
-          <thead>
-            <tr class="border-b-2 border-slate-200 text-slate-500">
-              <th class="py-2.5 px-3">題號</th>
-              <th class="py-2.5 px-3">分部</th>
-              <th class="py-2.5 px-3">題目</th>
-              <th class="py-2.5 px-3">正確答案</th>
-              <th class="py-2.5 px-3">表現狀態</th>
-            </tr>
-          </thead>
-          <tbody id="summaryTableBody" class="divide-y divide-slate-100">
-            <!-- JS 動態生成 -->
-          </tbody>
-        </table>
       </div>
     </div>
   </main>
-
-  <!-- ==================== 4. 教師雲端監察後台（Teacher Dashboard） ==================== -->
-  <main id="teacherView" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
-    <!-- 頂部標題與操作列 -->
-    <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-6 animate-pop">
-      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
-        <div>
-          <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
-            👩‍🏫 教師雲端監察後台（單元一：乘法 4A_U1）
-          </span>
-          <h2 class="text-2xl font-black text-slate-900 mt-2">全級學生即時作答進度與成績總覽</h2>
-          <p class="text-sm text-slate-500">數據即時同步自 Google Sheet 後台（Progress 與 Records 工作表）</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <button id="teacherRefreshBtn" type="button"
-            class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition flex items-center gap-1.5">
-            <span>🔄</span>
-            <span>重新整理數據</span>
-          </button>
-          <button id="teacherPreviewStudentBtn" type="button"
-            class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-sm transition">
-            教師試做預覽模式
-          </button>
-        </div>
-      </div>
-
-      <!-- 4 張統計 KPI 卡片 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200">
-          <div class="text-xs font-bold text-blue-700">⏳ 正在作答（進行中）</div>
-          <div id="kpiInProgress" class="text-3xl font-black text-blue-900 mt-1 font-mono">0 人</div>
-          <div class="text-xs text-blue-600 mt-1">已開始但未滿 30 題</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-          <div class="text-xs font-bold text-emerald-700">✅ 已完成全部 30 題</div>
-          <div id="kpiCompleted" class="text-3xl font-black text-emerald-900 mt-1 font-mono">0 人</div>
-          <div class="text-xs text-emerald-600 mt-1">已寫入正式成績總表</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
-          <div class="text-xs font-bold text-indigo-700">🎯 全級平均首試正確率</div>
-          <div id="kpiAvgAccuracy" class="text-3xl font-black text-indigo-900 mt-1 font-mono">--%</div>
-          <div class="text-xs text-indigo-600 mt-1">一次即答對題數比例</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200">
-          <div class="text-xs font-bold text-rose-700">🔥 全級最常出錯題號</div>
-          <div id="kpiTopWrongQ" class="text-lg font-black text-rose-900 mt-1 truncate">暫無錯題紀錄</div>
-          <div class="text-xs text-rose-600 mt-1">供課堂重點講解參考</div>
-        </div>
-      </div>
-
-      <!-- 篩選器與分頁切換列 -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-        <!-- 雙分頁切換按鈕 -->
-        <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200">
-          <button id="tabProgressBtn" type="button" onclick="switchTeacherTab('progress')"
-            class="px-4 py-2 rounded-lg bg-white text-indigo-700 font-bold text-sm shadow-xs transition">
-            1. 學生即時作答進度 (Progress)
-          </button>
-          <button id="tabRecordsBtn" type="button" onclick="switchTeacherTab('records')"
-            class="px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-sm transition">
-            2. 已完成成績總表 (Records)
-          </button>
-        </div>
-
-        <!-- 班別篩選與關鍵字搜尋 -->
-        <div class="flex flex-wrap items-center gap-2">
-          <select id="teacherClassFilter" onchange="renderTeacherTables()"
-            class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-700 focus:outline-none focus:border-indigo-500">
-            <option value="ALL">全部班別</option>
-            <option value="4A">4A 班</option>
-            <option value="4B">4B 班</option>
-            <option value="4C">4C 班</option>
-            <option value="4D">4D 班</option>
-          </select>
-
-          <input id="teacherSearchInput" type="text" oninput="renderTeacherTables()"
-            placeholder="搜尋姓名、學號或帳號..."
-            class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:border-indigo-500" />
-        </div>
-      </div>
-
-      <!-- 載入中提示 -->
-      <div id="teacherLoadingBanner" class="hidden py-8 text-center text-indigo-600 font-bold">
-        正在從 Google Sheet 讀取最新學生數據...
-      </div>
-
-      <!-- 分頁 1：學生即時作答進度表 (Progress) -->
-      <div id="teacherProgressSection" class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-sm">
-          <thead>
-            <tr class="bg-slate-50 border-y border-slate-200 text-slate-600">
-              <th class="py-3 px-3">班別</th>
-              <th class="py-3 px-3">學號</th>
-              <th class="py-3 px-3">姓名</th>
-              <th class="py-3 px-3">目前進度</th>
-              <th class="py-3 px-3">首試答對</th>
-              <th class="py-3 px-3">首試正確率</th>
-              <th class="py-3 px-3">曾答錯題號</th>
-              <th class="py-3 px-3">最後更新時間</th>
-            </tr>
-          </thead>
-          <tbody id="teacherProgressTbody" class="divide-y divide-slate-100">
-            <!-- JS 動態生成 -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 分頁 2：已完成成績總表 (Records) -->
-      <div id="teacherRecordsSection" class="hidden overflow-x-auto">
-        <table class="w-full text-left border-collapse text-sm">
-          <thead>
-            <tr class="bg-slate-50 border-y border-slate-200 text-slate-600">
-              <th class="py-3 px-3">完成時間</th>
-              <th class="py-3 px-3">班別</th>
-              <th class="py-3 px-3">學號</th>
-              <th class="py-3 px-3">姓名</th>
-              <th class="py-3 px-3">最終成績</th>
-              <th class="py-3 px-3">錯題訂正詳情</th>
-            </tr>
-          </thead>
-          <tbody id="teacherRecordsTbody" class="divide-y divide-slate-100">
-            <!-- JS 動態生成 -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <!-- ==================== 全畫面處理中遮罩（重設進度/提交成績時顯示） ==================== -->
-  <div id="globalLoadingOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl px-6 py-5 shadow-2xl flex items-center gap-3 font-bold text-slate-800">
-      <svg class="animate-spin h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-      </svg>
-      <span id="globalLoadingText">正在同步至 Google Sheet...</span>
-    </div>
-  </div>
-
-  <!-- ==================== 自訂確認對話框（取代 confirm） ==================== -->
-  <div id="customModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 animate-pop">
-      <h3 id="modalTitle" class="text-lg font-black text-slate-900">確認操作</h3>
-      <p id="modalBody" class="text-sm text-slate-600 leading-relaxed">確定要執行此操作嗎？</p>
-      <div class="flex justify-end gap-2 pt-2">
-        <button id="modalCancelBtn" type="button"
-          class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold">
-          取消
-        </button>
-        <button id="modalConfirmBtn" type="button"
-          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold">
-          確定
-        </button>
-      </div>
-    </div>
-  </div>
 
   <script>
-    // =========================================================================
-    // 1. 雲端 API 與本單元設定常數
-    // =========================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
     const UNIT_ID = "4A_U1";
     const UNIT_NAME = "單元一：乘法";
 
-    // =========================================================================
-    // 2. 小學四年級《單元一：乘法》全部 30 道題目題庫（與工作紙完全一致）
-    // =========================================================================
+    let currentUser = null;
+    let currentIndex = 0;
+    let firstTryCorrect = 0;
+    let totalAttempts = 0;
+    let wrongQuestionIds = new Set();
+    let currentQuestionHadWrong = false;
+    let isAnsweredCorrectly = false;
+    let selectedSingle = null;
+
+    // 20 道四年級乘法練習題（涵蓋兩位數×整十／兩位數、三位數×整十／兩位數、乘法交換與結合性質巧算、應用題）
     const QUESTIONS = [
-      // 甲部：心算及巧算題（第 1–10 題）
-      { id: 1, part: '甲部：心算及巧算題', type: 'mental', prompt: '40 × 70 = ?', answer: 2800, hint: '先算 4 × 7 = 28，再在末尾補上兩個 0' },
-      { id: 2, part: '甲部：心算及巧算題', type: 'mental', prompt: '15 × 60 = ?', answer: 900, hint: '先算 15 × 6 = 90，再在末尾補上一個 0' },
-      { id: 3, part: '甲部：心算及巧算題', type: 'mental', prompt: '25 × 19 × 4 = ?', answer: 1900, hint: '運用乘法交換與結合性質，先算 25 × 4 = 100，再乘 19' },
-      { id: 4, part: '甲部：心算及巧算題', type: 'mental', prompt: '125 × 37 × 8 = ?', answer: 37000, hint: '先算 125 × 8 = 1000，再乘 37' },
-      { id: 5, part: '甲部：心算及巧算題', type: 'mental', prompt: '50 × 28 × 2 = ?', answer: 2800, hint: '先算 50 × 2 = 100，再乘 28' },
-      { id: 6, part: '甲部：心算及巧算題', type: 'mental', prompt: '34 × 101 = ?', answer: 3434, hint: '運用分配性質，把 101 拆成 100 + 1，即 34 × 100 + 34 × 1' },
-      { id: 7, part: '甲部：心算及巧算題', type: 'mental', prompt: '48 × 99 + 48 = ?', answer: 4800, hint: '48 × 99 + 48 × 1 = 48 × (99 + 1) = 48 × 100' },
-      { id: 8, part: '甲部：心算及巧算題', type: 'mental', prompt: '63 × 35 + 63 × 65 = ?', answer: 6300, hint: '抽出公因數 63，先算 35 + 65 = 100，再算 63 × 100' },
-      { id: 9, part: '甲部：心算及巧算題', type: 'mental', prompt: '125 × 32 = ?', answer: 4000, hint: '把 32 拆成 8 × 4，先算 125 × 8 = 1000，再乘 4' },
-      { id: 10, part: '甲部：心算及巧算題', type: 'mental', prompt: '25 × 36 = ?', answer: 900, hint: '把 36 拆成 4 × 9，先算 25 × 4 = 100，再乘 9' },
-
-      // 乙部：列直式計算（第 11–24 題）
-      { id: 11, part: '乙部：列直式計算', type: 'vertical', prompt: '34 × 21 = ?', answer: 714, hint: '先算 34 × 1 = 34，再算 34 × 20 = 680，最後兩數相加' },
-      { id: 12, part: '乙部：列直式計算', type: 'vertical', prompt: '56 × 43 = ?', answer: 2408, hint: '先算 56 × 3 = 168，再算 56 × 40 = 2240，最後兩數相加' },
-      { id: 13, part: '乙部：列直式計算', type: 'vertical', prompt: '78 × 65 = ?', answer: 5070, hint: '先算 78 × 5 = 390，再算 78 × 60 = 4680，最後兩數相加' },
-      { id: 14, part: '乙部：列直式計算', type: 'vertical', prompt: '89 × 47 = ?', answer: 4183, hint: '先算 89 × 7 = 623，再算 89 × 40 = 3560，最後兩數相加' },
-      { id: 15, part: '乙部：列直式計算', type: 'vertical', prompt: '64 × 75 = ?', answer: 4800, hint: '先算 64 × 5 = 320，再算 64 × 70 = 4480，最後兩數相加' },
-      { id: 16, part: '乙部：列直式計算', type: 'vertical', prompt: '93 × 58 = ?', answer: 5394, hint: '先算 93 × 8 = 744，再算 93 × 50 = 4650，最後兩數相加' },
-      { id: 17, part: '乙部：列直式計算', type: 'vertical', prompt: '49 × 86 = ?', answer: 4214, hint: '先算 49 × 6 = 294，再算 49 × 80 = 3920，最後兩數相加' },
-      { id: 18, part: '乙部：列直式計算', type: 'vertical', prompt: '132 × 23 = ?', answer: 3036, hint: '先算 132 × 3 = 396，再算 132 × 20 = 2640，最後兩數相加' },
-      { id: 19, part: '乙部：列直式計算', type: 'vertical', prompt: '245 × 34 = ?', answer: 8330, hint: '先算 245 × 4 = 980，再算 245 × 30 = 7350，最後兩數相加' },
-      { id: 20, part: '乙部：列直式計算', type: 'vertical', prompt: '306 × 42 = ?', answer: 12852, hint: '先算 306 × 2 = 612，再算 306 × 40 = 12240，最後兩數相加' },
-      { id: 21, part: '乙部：列直式計算', type: 'vertical', prompt: '470 × 56 = ?', answer: 26320, hint: '先算 470 × 6 = 2820，再算 470 × 50 = 23500，最後兩數相加' },
-      { id: 22, part: '乙部：列直式計算', type: 'vertical', prompt: '518 × 67 = ?', answer: 34706, hint: '先算 518 × 7 = 3626，再算 518 × 60 = 31080，最後兩數相加' },
-      { id: 23, part: '乙部：列直式計算', type: 'vertical', prompt: '609 × 85 = ?', answer: 51765, hint: '先算 609 × 5 = 3045，再算 609 × 80 = 48720，最後兩數相加' },
-      { id: 24, part: '乙部：列直式計算', type: 'vertical', prompt: '784 × 93 = ?', answer: 72912, hint: '先算 784 × 3 = 2352，再算 784 × 90 = 70560，最後兩數相加' },
-
-      // 丙部：應用題（第 25–30 題）
-      { id: 25, part: '丙部：應用題', type: 'word', prompt: '學校圖書館新購入 24 套兒童百科全書，每套有 18 本。圖書館共購入百科全書多少本？', unit: '本', answer: 432, hint: '每套 18 本，共有 24 套，列式：18 × 24' },
-      { id: 26, part: '丙部：應用題', type: 'word', prompt: '麵包店每天烤焗 145 個菠蘿包，14 天共烤焗菠蘿包多少個？', unit: '個', answer: 2030, hint: '每天 145 個，14 天共有：145 × 14' },
-      { id: 27, part: '丙部：應用題', type: 'word', prompt: '四年級共有 5 班，每班有 28 名學生。如果每人需要繳交 $45 參觀費，四年級共需繳交參觀費多少元？', unit: '元', answer: 6300, hint: '先算全級人數 28 × 5 = 140 人，再乘每人 $45；或用 45 × 28 × 5' },
-      { id: 28, part: '丙部：應用題', type: 'word', prompt: '一列高鐵每小時行駛 285 公里，行駛了 12 小時後，距離終點還有 160 公里。這段路程全長多少公里？', unit: '公里', answer: 3580, hint: '先算已行駛路程 285 × 12，再加上未行駛的 160 公里' },
-      { id: 29, part: '丙部：應用題', type: 'word', prompt: '文具店每盒原子筆有 12 枝，每枝售 $16。陳老師買了 25 盒原子筆作為獎勵計劃禮物，共需付款多少元？', unit: '元', answer: 4800, hint: '總枝數為 12 × 25 = 300 枝，再乘每枝 $16' },
-      { id: 30, part: '丙部：應用題', type: 'word', prompt: '某運動場的觀眾席有 36 排，每排有 125 個座位。一場校際田徑比賽有 4120 名觀眾入場，還有多少個空座位？', unit: '個', answer: 380, hint: '先算總座位數 125 × 36，再減去已入場的 4120 名觀眾' }
+      { id: 1, part: '第 1 課：乘法(一)', type: 'input', prompt: '計算：24 × 30 =', answer: '720', hint: '先算 24 × 3 = 72，再在末尾加一個 0，即 720。' },
+      { id: 2, part: '第 1 課：乘法(一)', type: 'single', prompt: '估算 48 × 29 的積最接近下列哪一個數？', answer: 'C', hint: '把 48 估作 50，29 估作 30，50 × 30 = 1500。', options: [
+        { key: 'A', label: '800' }, { key: 'B', label: '1000' }, { key: 'C', label: '1500' }, { key: 'D', label: '2000' }
+      ]},
+      { id: 3, part: '第 1 課：乘法(一)', type: 'input', prompt: '計算：36 × 15 =', answer: '540', hint: '36 × 10 = 360，36 × 5 = 180，360 + 180 = 540。' },
+      { id: 4, part: '第 1 課：乘法(一)', type: 'input', prompt: '學校訂購午餐，每份餐盒售 28 元，訂購 25 份共需多少元？', answer: '700', unit: '元', hint: '28 × 25：可把 25 拆成 100 ÷ 4，28 ÷ 4 × 100 = 700 元。' },
+      { id: 5, part: '第 1 課：乘法(一)', type: 'single', prompt: '計算 64 × 12 的直式時，十位數字「1」乘以 64 代表多少？', answer: 'B', hint: '乘數「12」十位的「1」代表 10，10 × 64 = 640。', options: [
+        { key: 'A', label: '64' }, { key: 'B', label: '640' }, { key: 'C', label: '128' }, { key: 'D', label: '6400' }
+      ]},
+      { id: 6, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：125 × 40 =', answer: '5000', hint: '先算 125 × 4 = 500，再乘以 10 得 5000。' },
+      { id: 7, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：214 × 23 =', answer: '4922', hint: '214 × 3 = 642，214 × 20 = 4280，642 + 4280 = 4922。' },
+      { id: 8, part: '第 2 課：乘法(二)', type: 'single', prompt: '水果店每箱蘋果重 18 kg，運來 105 箱，共有蘋果多少 kg？', answer: 'A', hint: '18 × 105 = 18 × 100 + 18 × 5 = 1800 + 90 = 1890 kg。', options: [
+        { key: 'A', label: '1890 kg' }, { key: 'B', label: '1809 kg' }, { key: 'C', label: '2890 kg' }, { key: 'D', label: '1090 kg' }
+      ]},
+      { id: 9, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：308 × 16 =', answer: '4928', hint: '注意被乘數十位是 0：308 × 6 = 1848，308 × 10 = 3080，相加得 4928。' },
+      { id: 10, part: '第 2 課：乘法(二)', type: 'single', prompt: '估算 396 × 21 的積大約是多少？', answer: 'C', hint: '396 ≈ 400，21 ≈ 20，400 × 20 = 8000。', options: [
+        { key: 'A', label: '6000' }, { key: 'B', label: '7000' }, { key: 'C', label: '8000' }, { key: 'D', label: '10000' }
+      ]},
+      { id: 11, part: '第 3 課：乘法(三)', type: 'single', prompt: '計算 25 × 37 × 4 時，用哪種方法巧算最快？', answer: 'B', hint: '運用乘法交換性質和結合性質，先算 25 × 4 = 100，再算 100 × 37 = 3700。', options: [
+        { key: 'A', label: '先算 37 × 4' }, { key: 'B', label: '先算 25 × 4 = 100' }, { key: 'C', label: '先算 25 + 37' }, { key: 'D', label: '逐一由左直式硬算' }
+      ]},
+      { id: 12, part: '第 3 課：乘法(三)', type: 'input', prompt: '巧算：25 × 19 × 4 =', answer: '1900', hint: '25 × 4 = 100，100 × 19 = 1900。' },
+      { id: 13, part: '第 3 課：乘法(三)', type: 'input', prompt: '巧算：125 × 17 × 8 =', answer: '17000', hint: '125 × 8 = 1000，1000 × 17 = 17000。' },
+      { id: 14, part: '第 3 課：乘法(三)', type: 'single', prompt: '下列哪一組算式的結果「不相等」？', answer: 'D', hint: 'A、B、C 都符合乘法交換／結合性質；D 中 50 × 24 = 1200，50 × 20 + 4 = 1004。', options: [
+        { key: 'A', label: '16 × 25 與 25 × 16' },
+        { key: 'B', label: '(12 × 5) × 6 與 12 × (5 × 6)' },
+        { key: 'C', label: '50 × 24 與 50 × 20 × 1.2' },
+        { key: 'D', label: '50 × 24 與 50 × 20 + 4' }
+      ]},
+      { id: 15, part: '第 3 課：乘法(三)', type: 'input', prompt: '電器店有 15 箱風扇，每箱有 8 部，每部售價 240 元。全部售出共得多少元？', answer: '28800', unit: '元', hint: '先算總部數 15 × 8 = 120 部，再算 240 × 120 = 28800 元。' },
+      { id: 16, part: '第 1–3 課綜合', type: 'input', prompt: '計算：45 × 20 =', answer: '900', hint: '45 × 2 = 90，再在後面添一個 0 得 900。' },
+      { id: 17, part: '第 1–3 課綜合', type: 'input', prompt: '計算：152 × 14 =', answer: '2128', hint: '152 × 4 = 608，152 × 10 = 1520，608 + 1520 = 2128。' },
+      { id: 18, part: '第 1–3 課綜合', type: 'single', prompt: '若 □ × 20 = 1600，那麼 □ 代表哪一個數？', answer: 'C', hint: '1600 ÷ 20 = 160 ÷ 2 = 80。', options: [
+        { key: 'A', label: '8' }, { key: 'B', label: '18' }, { key: 'C', label: '80' }, { key: 'D', label: '800' }
+      ]},
+      { id: 19, part: '第 1–3 課綜合', type: 'input', prompt: '文具店購入 24 盒顏色筆，每盒 12 枝，共有顏色筆多少枝？', answer: '288', unit: '枝', hint: '24 × 12 = 24 × 10 + 24 × 2 = 240 + 48 = 288 枝。' },
+      { id: 20, part: '第 1–3 課綜合', type: 'input', prompt: '巧算：50 × 43 × 2 =', answer: '4300', hint: '50 × 2 = 100，100 × 43 = 4300。' }
     ];
 
-    // =========================================================================
-    // 3. 全局狀態變數與 API 通訊函式
-    // =========================================================================
-    let currentUser = null; // { account, name, className, classNum, role }
-    let currentQIndex = 0;  // 0 ~ 29
-    let soundEnabled = true;
-    let audioCtx = null;
-    let isTeacherPreview = false;
-
-    // 學生作答狀態物件
-    let quizState = {
-      completed: {},        // { [qId]: { attempts: number, firstTryCorrect: boolean } }
-      attemptsTracker: {},  // { [qId]: number }
-      isCompleted: false
-    };
-
-    // 教師後台快取數據
-    let teacherData = {
-      progressList: [],
-      recordsList: []
-    };
-
-    /**
-     * 統一發送 POST 請求至 Google Apps Script（使用 text/plain 避免 CORS preflight）
-     */
-    async function callApi(payload) {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8'
-        },
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP 錯誤狀態碼：${response.status}`);
+    window.addEventListener('DOMContentLoaded', () => {
+      initScratchpad();
+      const ssoRaw = sessionStorage.getItem('fk1ps_math_user');
+      if (ssoRaw) {
+        try {
+          const parsedUser = JSON.parse(ssoRaw);
+          if (parsedUser && parsedUser.account) {
+            currentUser = parsedUser;
+            applyUserHeader();
+            fetchUserProgressFromCloud();
+            return;
+          }
+        } catch (e) {}
       }
-      return await response.json();
-    }
-
-    /**
-     * 更新頂部雲端同步狀態提示徽章
-     */
-    function setCloudSyncStatus(state, customText) {
-      const badge = document.getElementById('cloudSyncBadge');
-      const icon = document.getElementById('cloudSyncIcon');
-      const text = document.getElementById('cloudSyncText');
-
-      badge.classList.remove(
-        'bg-emerald-50', 'border-emerald-200', 'text-emerald-700',
-        'bg-amber-50', 'border-amber-200', 'text-amber-700',
-        'bg-rose-50', 'border-rose-200', 'text-rose-700'
-      );
-
-      if (state === 'syncing') {
-        badge.classList.add('bg-amber-50', 'border-amber-200', 'text-amber-700');
-        icon.textContent = '⏳';
-        text.textContent = customText || '正在同步至雲端...';
-      } else if (state === 'error') {
-        badge.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
-        icon.textContent = '⚠️';
-        text.textContent = customText || '雲端同步異常，請檢查網絡';
-      } else {
-        badge.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
-        icon.textContent = '☁️';
-        text.textContent = customText || '已自動儲存至雲端';
-      }
-    }
-
-    // =========================================================================
-    // 4. Web Audio API 合成提示音效（無需外部音檔）
-    // =========================================================================
-    function playTone(type) {
-      if (!soundEnabled) return;
-      try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        if (type === 'correct') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(523.25, now);      // C5
-          osc.frequency.setValueAtTime(659.25, now + 0.09); // E5
-          osc.frequency.setValueAtTime(783.99, now + 0.18); // G5
-          gain.gain.setValueAtTime(0.18, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-          osc.start(now);
-          osc.stop(now + 0.4);
-        } else if (type === 'wrong') {
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(210, now);
-          osc.frequency.linearRampToValueAtTime(165, now + 0.25);
-          gain.gain.setValueAtTime(0.12, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-          osc.start(now);
-          osc.stop(now + 0.3);
-        }
-      } catch (e) {
-        // 忽略自動播放限制
-      }
-    }
-
-    // =========================================================================
-    // 5. 登入與登出邏輯
-    // =========================================================================
-    document.getElementById('togglePasswordBtn').addEventListener('click', function () {
-      const pwdInput = document.getElementById('passwordInput');
-      if (pwdInput.type === 'password') {
-        pwdInput.type = 'text';
-        this.textContent = '🙈';
-      } else {
-        pwdInput.type = 'password';
-        this.textContent = '👁️';
-      }
+      document.getElementById('login-screen').classList.remove('hidden');
     });
 
-    document.getElementById('loginForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const account = document.getElementById('usernameInput').value.trim();
-      const password = document.getElementById('passwordInput').value.trim();
-      if (!account || !password) return;
+    function applyUserHeader() {
+      document.getElementById('user-badge-area').classList.remove('hidden');
+      document.getElementById('user-display-name').textContent = currentUser.name;
+      const numStr = currentUser.classNum ? ` (${currentUser.classNum})` : '';
+      document.getElementById('user-display-meta').textContent = `${currentUser.className}${numStr}`;
+    }
 
-      const errBox = document.getElementById('loginErrorMsg');
-      const errText = document.getElementById('loginErrorText');
-      const loadingBox = document.getElementById('loginLoadingMsg');
-      const submitBtn = document.getElementById('loginSubmitBtn');
+    function logoutUser() {
+      sessionStorage.removeItem('fk1ps_math_user');
+      window.location.href = 'index.html';
+    }
+
+    async function handleManualLogin(e) {
+      e.preventDefault();
+      const acc = document.getElementById('login-account').value.trim();
+      const pwd = document.getElementById('login-password').value.trim();
+      const errBox = document.getElementById('login-error');
+      const btn = document.getElementById('login-submit-btn');
 
       errBox.classList.add('hidden');
-      loadingBox.classList.remove('hidden');
-      submitBtn.disabled = true;
-      submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+      btn.disabled = true;
+      btn.textContent = '驗證中...';
 
       try {
-        const res = await callApi({
-          action: 'login',
-          account: account,
-          password: password,
-          unitId: UNIT_ID
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'login',
+            mode: 'unit',
+            unitId: UNIT_ID,
+            account: acc,
+            password: pwd
+          })
         });
-
-        if (res.status !== 'success') {
-          errText.textContent = res.message || '帳號或密碼不正確，請重新輸入。';
-          errBox.classList.remove('hidden', 'animate-shake');
-          void errBox.offsetWidth;
-          errBox.classList.add('animate-shake');
-          playTone('wrong');
-          return;
-        }
-
-        // 登入成功
-        currentUser = res.user;
-        isTeacherPreview = false;
-
-        const userLabel = formatStudentDisplay(currentUser);
-        document.getElementById('headerUserDisplay').textContent = userLabel;
-        document.getElementById('loginView').classList.add('hidden');
-        document.getElementById('appHeader').classList.remove('hidden');
-        setCloudSyncStatus('ok', '雲端已連線');
-
-        if (currentUser.role === 'teacher') {
-          document.getElementById('studentProgressBarWrapper').classList.add('hidden');
-          await openTeacherDashboard();
+        const data = await res.json();
+        if (data.status === 'success') {
+          currentUser = data.user;
+          sessionStorage.setItem('fk1ps_math_user', JSON.stringify(currentUser));
+          applyUserHeader();
+          document.getElementById('login-screen').classList.add('hidden');
+          applyLoadedProgress(data.progress);
         } else {
-          document.getElementById('studentProgressBarWrapper').classList.remove('hidden');
-          initStudentFromCloudProgress(res.progress);
+          errBox.textContent = data.message || '登入失敗，請檢查帳號或密碼。';
+          errBox.classList.remove('hidden');
         }
       } catch (err) {
-        errText.textContent = '無法連接雲端伺服器，請檢查網絡連線後再試。';
+        errBox.textContent = '網絡連線異常，請稍後再試。';
         errBox.classList.remove('hidden');
       } finally {
-        loadingBox.classList.add('hidden');
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
-      }
-    });
-
-    function formatStudentDisplay(user) {
-      if (!user) return '';
-      if (user.role === 'teacher') return `👩‍🏫 ${user.name || '數學科老師'}`;
-      const cls = user.className || '';
-      const num = user.classNum ? `(${user.classNum})` : '';
-      return `${cls} ${num} ${user.name}`.trim();
-    }
-
-    document.getElementById('logoutBtn').addEventListener('click', function () {
-      currentUser = null;
-      isTeacherPreview = false;
-      document.getElementById('appHeader').classList.add('hidden');
-      document.getElementById('quizView').classList.add('hidden');
-      document.getElementById('summaryView').classList.add('hidden');
-      document.getElementById('teacherView').classList.add('hidden');
-      document.getElementById('loginView').classList.remove('hidden');
-      document.getElementById('passwordInput').value = '';
-    });
-
-    document.getElementById('soundToggleBtn').addEventListener('click', function () {
-      soundEnabled = !soundEnabled;
-      this.textContent = soundEnabled ? '🔊' : '🔇';
-    });
-
-    // =========================================================================
-    // 6. 雲端進度還原與學生作答核心邏輯
-    // =========================================================================
-    function parseWrongListString(wrongStr) {
-      // 解析例如 "第5題, 第19題" 或 "5,19" 為題號陣列
-      if (!wrongStr) return [];
-      const matches = wrongStr.match(/\d+/g);
-      return matches ? matches.map(Number) : [];
-    }
-
-    function initStudentFromCloudProgress(cloudProgress) {
-      quizState = {
-        completed: {},
-        attemptsTracker: {},
-        isCompleted: false
-      };
-
-      const welcomeGreeting = document.getElementById('welcomeGreeting');
-      const welcomeSubtext = document.getElementById('welcomeSubtext');
-      welcomeGreeting.textContent = `歡迎你，${formatStudentDisplay(currentUser)}！`;
-
-      if (cloudProgress) {
-        const wrongNums = parseWrongListString(cloudProgress.wrongList);
-        const savedQ = Math.min(Math.max(Number(cloudProgress.currentQ) || 1, 1), QUESTIONS.length);
-
-        if (cloudProgress.isCompleted) {
-          // 已完成全部 30 題：還原狀態並顯示成績結算頁
-          quizState.isCompleted = true;
-          QUESTIONS.forEach((q) => {
-            const wasWrong = wrongNums.includes(q.id);
-            quizState.completed[q.id] = {
-              attempts: wasWrong ? 2 : 1,
-              firstTryCorrect: !wasWrong
-            };
-            quizState.attemptsTracker[q.id] = wasWrong ? 2 : 1;
-          });
-          currentQIndex = QUESTIONS.length - 1;
-          renderProgressStats();
-          openSummaryView(true);
-          return;
-        } else if (savedQ > 1) {
-          // 尚未完成，從上次題號續做（把 1 至 savedQ - 1 還原為已完成）
-          for (let qId = 1; qId < savedQ; qId++) {
-            const wasWrong = wrongNums.includes(qId);
-            quizState.completed[qId] = {
-              attempts: wasWrong ? 2 : 1,
-              firstTryCorrect: !wasWrong
-            };
-            quizState.attemptsTracker[qId] = wasWrong ? 2 : 1;
-          }
-          currentQIndex = savedQ - 1;
-          welcomeSubtext.textContent = `☁️ 已從雲端載入上次進度：第 ${savedQ} 題（前面 ${savedQ - 1} 題已自動保留）`;
-        } else {
-          currentQIndex = 0;
-          welcomeSubtext.textContent = '請細心計算每一題，答錯時請參考小貼士即時訂正重做。';
-        }
-      } else {
-        currentQIndex = 0;
-        welcomeSubtext.textContent = '請細心計算每一題，答錯時請參考小貼士即時訂正重做。';
-      }
-
-      document.getElementById('teacherView').classList.add('hidden');
-      document.getElementById('summaryView').classList.add('hidden');
-      document.getElementById('quizView').classList.remove('hidden');
-
-      resizeCanvas();
-      renderProgressStats();
-      renderQuestionGrid();
-      loadQuestion(currentQIndex);
-    }
-
-    function getHighestUnlockedIndex() {
-      for (let i = 0; i < QUESTIONS.length; i++) {
-        if (!quizState.completed[QUESTIONS[i].id]) {
-          return i;
-        }
-      }
-      return QUESTIONS.length - 1;
-    }
-
-    function renderQuestionGrid() {
-      const grid = document.getElementById('questionGrid');
-      grid.innerHTML = '';
-      const maxUnlocked = getHighestUnlockedIndex();
-
-      QUESTIONS.forEach((q, idx) => {
-        const record = quizState.completed[q.id];
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = q.id;
-
-        let classes = 'h-9 rounded-lg font-mono font-bold text-xs sm:text-sm transition flex items-center justify-center ';
-
-        if (idx === currentQIndex) {
-          classes += 'bg-indigo-600 text-white ring-2 ring-indigo-300 shadow-xs ';
-        } else if (record) {
-          if (record.firstTryCorrect) {
-            classes += 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 ';
-          } else {
-            classes += 'bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 ';
-          }
-        } else if (idx <= maxUnlocked) {
-          classes += 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 ';
-        } else {
-          classes += 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed ';
-        }
-
-        btn.className = classes;
-        btn.disabled = idx > maxUnlocked;
-        btn.onclick = () => {
-          currentQIndex = idx;
-          renderQuestionGrid();
-          loadQuestion(idx);
-        };
-
-        grid.appendChild(btn);
-      });
-    }
-
-    function computeStatsSummary() {
-      const completedIds = Object.keys(quizState.completed).map(Number);
-      const completedCount = completedIds.length;
-      const firstTryCount = completedIds.filter((id) => quizState.completed[id].firstTryCorrect).length;
-
-      let totalAttempts = 0;
-      const wrongListArr = [];
-      const wrongDetailsArr = [];
-
-      QUESTIONS.forEach((q) => {
-        const att = quizState.attemptsTracker[q.id] || 0;
-        totalAttempts += att;
-        if (att > 1) {
-          wrongListArr.push(`第${q.id}題`);
-          wrongDetailsArr.push(`第${q.id}題(錯${att - 1}次)`);
-        }
-      });
-
-      return {
-        completedCount,
-        firstTryCount,
-        totalAttempts,
-        wrongListStr: wrongListArr.join(', '),
-        wrongDetailsStr: wrongDetailsArr.length > 0 ? wrongDetailsArr.join(', ') : '全對（無錯題）'
-      };
-    }
-
-    function renderProgressStats() {
-      const stats = computeStatsSummary();
-      document.getElementById('progressCountText').textContent = `${stats.completedCount} / 30`;
-      document.getElementById('progressBarFill').style.width = `${(stats.completedCount / 30) * 100}%`;
-      document.getElementById('firstTryCountText').textContent = stats.firstTryCount;
-      document.getElementById('totalAttemptsText').textContent = stats.totalAttempts;
-    }
-
-    function loadQuestion(idx) {
-      const q = QUESTIONS[idx];
-      const record = quizState.completed[q.id];
-      const currentAttempts = quizState.attemptsTracker[q.id] || 0;
-
-      document.getElementById('partBadge').textContent = q.part;
-      document.getElementById('questionNumberBadge').textContent = `第 ${q.id} 題 / 共 30 題`;
-
-      const attemptBadge = document.getElementById('attemptBadge');
-      if (record) {
-        attemptBadge.textContent = record.firstTryCorrect ? '⭐ 首試答對' : `✅ 重做後答對（共 ${record.attempts} 次）`;
-        attemptBadge.className = 'px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs';
-      } else {
-        attemptBadge.textContent = `第 ${currentAttempts + 1} 次嘗試`;
-        attemptBadge.className = 'px-3 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs';
-      }
-
-      const instrEl = document.getElementById('partInstruction');
-      const promptEl = document.getElementById('questionPrompt');
-      const unitEl = document.getElementById('unitLabel');
-
-      if (q.type === 'mental') {
-        instrEl.textContent = '提示：可運用乘法交換性質、結合性質或分配性質進行巧算。';
-        promptEl.className = 'text-3xl sm:text-4xl font-black text-slate-900 tracking-wide font-mono';
-        unitEl.classList.add('hidden');
-      } else if (q.type === 'vertical') {
-        instrEl.textContent = '請在右側草稿紙列直式計算，注意進位及數位對齊：';
-        promptEl.className = 'text-3xl sm:text-4xl font-black text-slate-900 tracking-wide font-mono';
-        unitEl.classList.add('hidden');
-      } else {
-        instrEl.textContent = '應用題：請仔細閱讀題意，在草稿紙列式計算出最終數值：';
-        promptEl.className = 'text-xl sm:text-2xl font-bold text-slate-900 leading-relaxed';
-        unitEl.textContent = q.unit || '';
-        unitEl.classList.remove('hidden');
-      }
-
-      promptEl.textContent = q.prompt;
-
-      const inputEl = document.getElementById('studentAnswerInput');
-      const submitBtn = document.getElementById('submitAnswerBtn');
-      const nextBtn = document.getElementById('nextQuestionBtn');
-      const feedbackBox = document.getElementById('feedbackBox');
-
-      inputEl.classList.remove('border-rose-500', 'bg-rose-50', 'border-emerald-500', 'bg-emerald-50');
-      inputEl.classList.add('border-slate-300', 'bg-slate-50');
-
-      if (record) {
-        inputEl.value = q.answer;
-        inputEl.disabled = true;
-        inputEl.classList.add('border-emerald-500', 'bg-emerald-50');
-        submitBtn.classList.add('hidden');
-        nextBtn.classList.remove('hidden');
-        nextBtn.textContent = idx === QUESTIONS.length - 1 ? '查看總成績單 🏆' : '下一題 →';
-        showFeedback('correct', '此題已完成！', `正確答案是 ${q.answer}。你可以按「${nextBtn.textContent}」繼續。`, null);
-      } else {
-        inputEl.value = '';
-        inputEl.disabled = false;
-        submitBtn.classList.remove('hidden');
-        nextBtn.classList.add('hidden');
-        feedbackBox.classList.add('hidden');
-        setTimeout(() => inputEl.focus(), 50);
-      }
-
-      if (document.getElementById('autoClearCanvasChk').checked) {
-        clearScratchpad();
+        btn.disabled = false;
+        btn.textContent = '登入並開始練習';
       }
     }
 
-    // 提交答案（答錯強制重做；答對背景同步雲端進度）
-    document.getElementById('answerForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const q = QUESTIONS[currentQIndex];
-      if (quizState.completed[q.id]) return;
+    async function fetchUserProgressFromCloud() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('loading-overlay').classList.remove('hidden');
 
-      const inputEl = document.getElementById('studentAnswerInput');
-      const rawVal = inputEl.value.trim();
-      if (rawVal === '') return;
-
-      const studentNum = Number(rawVal);
-
-      // 累加該題嘗試次數
-      quizState.attemptsTracker[q.id] = (quizState.attemptsTracker[q.id] || 0) + 1;
-      const attemptCount = quizState.attemptsTracker[q.id];
-
-      if (studentNum === q.answer) {
-        // ✅ 答對了！
-        playTone('correct');
-        const isFirstTry = attemptCount === 1;
-
-        quizState.completed[q.id] = {
-          attempts: attemptCount,
-          firstTryCorrect: isFirstTry
-        };
-
-        inputEl.disabled = true;
-        inputEl.classList.remove('border-slate-300', 'border-rose-500', 'bg-rose-50');
-        inputEl.classList.add('border-emerald-500', 'bg-emerald-50');
-
-        document.getElementById('submitAnswerBtn').classList.add('hidden');
-        const nextBtn = document.getElementById('nextQuestionBtn');
-        nextBtn.classList.remove('hidden');
-        nextBtn.textContent = currentQIndex === QUESTIONS.length - 1 ? '完成並提交成績 🏆' : '下一題 →';
-        nextBtn.focus();
-
-        const badge = document.getElementById('attemptBadge');
-        badge.textContent = isFirstTry ? '⭐ 首試答對' : `✅ 重做後答對（共 ${attemptCount} 次）`;
-        badge.className = 'px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs';
-
-        showFeedback(
-          'correct',
-          isFirstTry ? '太棒了！一次就答對！' : '訂正成功！終於答對了！',
-          `答案 ${q.answer} 完全正確！請按「${nextBtn.textContent}」繼續。`,
-          null
-        );
-
-        renderProgressStats();
-        renderQuestionGrid();
-
-        // 若非最後一題，背景靜默呼叫 saveProgress 同步至 Google Sheet
-        if (currentQIndex < QUESTIONS.length - 1 && !isTeacherPreview) {
-          syncProgressInBackground(currentQIndex + 2); // 下一題題號（1-based）
-        }
-      } else {
-        // ❌ 答錯了 -> 強制留在本題即時重做！
-        playTone('wrong');
-
-        inputEl.classList.remove('border-slate-300', 'bg-slate-50', 'animate-shake');
-        void inputEl.offsetWidth;
-        inputEl.classList.add('border-rose-500', 'bg-rose-50', 'animate-shake');
-
-        document.getElementById('attemptBadge').textContent = `第 ${attemptCount + 1} 次嘗試（需重做）`;
-        document.getElementById('attemptBadge').className = 'px-3 py-1 rounded-xl bg-rose-100 text-rose-700 font-bold text-xs';
-
-        showFeedback(
-          'wrong',
-          `答錯了！（你剛才輸入的是 ${studentNum}）請立即重做！`,
-          '必須答對本題才可進入下一題。請參考下方的解題小貼士，重新計算並輸入正確答案：',
-          q.hint
-        );
-
-        renderProgressStats();
-        inputEl.value = '';
-        inputEl.focus();
+      if (currentUser.role === 'teacher') {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        startQuizAt(0);
+        return;
       }
-    });
-
-    /**
-     * 背景非同步儲存即時進度（不阻礙學生繼續作答）
-     */
-    async function syncProgressInBackground(nextQuestionNumber) {
-      if (!currentUser || currentUser.role !== 'student') return;
-      const stats = computeStatsSummary();
-      setCloudSyncStatus('syncing', '正在同步進度...');
 
       try {
-        const res = await callApi({
-          action: 'saveProgress',
-          account: currentUser.account,
-          name: currentUser.name,
-          className: currentUser.className,
-          classNum: currentUser.classNum,
-          unitId: UNIT_ID,
-          currentQ: nextQuestionNumber,
-          firstTryCorrect: stats.firstTryCount,
-          totalAttempts: stats.totalAttempts,
-          wrongList: stats.wrongListStr,
-          isCompleted: false
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'getStudentDashboard',
+            account: currentUser.account
+          })
         });
-        if (res.status === 'success') {
-          setCloudSyncStatus('ok', '已自動儲存至雲端');
+        const data = await res.json();
+        document.getElementById('loading-overlay').classList.add('hidden');
+        if (data.status === 'success' && data.progressMap && data.progressMap[UNIT_ID]) {
+          applyLoadedProgress(data.progressMap[UNIT_ID]);
         } else {
-          setCloudSyncStatus('error', '雲端同步失敗');
+          startQuizAt(0);
         }
+      } catch (err) {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        startQuizAt(0);
+      }
+    }
+
+    function applyLoadedProgress(prog) {
+      if (!prog || currentUser.role === 'teacher') {
+        startQuizAt(0);
+        return;
+      }
+      firstTryCorrect = Number(prog.firstTryCorrect) || 0;
+      totalAttempts = Number(prog.totalAttempts) || 0;
+      if (prog.wrongList) {
+        prog.wrongList.split(',').forEach(item => {
+          const num = parseInt(item.replace(/[^\d]/g, ''), 10);
+          if (!isNaN(num)) wrongQuestionIds.add(num);
+        });
+      }
+      if (prog.isCompleted) {
+        showCertificateScreen();
+      } else {
+        const qIdx = Math.max(0, Math.min(QUESTIONS.length - 1, (Number(prog.currentQ) || 1) - 1));
+        startQuizAt(qIdx);
+      }
+    }
+
+    // 教師快速選題工具列
+    function initTeacherJumpBar() {
+      const bar = document.getElementById('teacher-jump-bar');
+      const container = document.getElementById('teacher-jump-buttons');
+      const indicator = document.getElementById('teacher-q-indicator');
+      if (!bar || !container) return;
+
+      if (currentUser && currentUser.role === 'teacher') {
+        bar.classList.remove('hidden');
+        if (indicator) indicator.textContent = `目前：第 ${currentIndex + 1} / ${QUESTIONS.length} 題`;
+        container.innerHTML = '';
+        QUESTIONS.forEach((q, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = q.id;
+          const isCurrent = idx === currentIndex;
+          btn.className = 'w-9 h-9 rounded-xl text-sm font-black border transition cursor-pointer ' +
+            (isCurrent
+              ? 'bg-amber-600 text-white border-amber-700 shadow-sm scale-105'
+              : 'bg-white text-amber-900 border-amber-300 hover:bg-amber-100');
+          btn.onclick = () => {
+            currentIndex = idx;
+            renderQuestion();
+          };
+          container.appendChild(btn);
+        });
+      } else {
+        bar.classList.add('hidden');
+      }
+    }
+
+    function startQuizAt(idx) {
+      currentIndex = idx;
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      document.getElementById('complete-screen').classList.add('hidden');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[currentIndex];
+      currentQuestionHadWrong = false;
+      isAnsweredCorrectly = false;
+      selectedSingle = null;
+
+      initTeacherJumpBar();
+
+      document.getElementById('progress-text').textContent = `${currentIndex + 1} / ${QUESTIONS.length}`;
+      const pct = Math.round(((currentIndex + 1) / QUESTIONS.length) * 100);
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+      document.getElementById('stat-first-try').textContent = firstTryCorrect;
+      document.getElementById('stat-attempts').textContent = totalAttempts;
+
+      document.getElementById('q-part-badge').textContent = q.part;
+      document.getElementById('q-number-badge').textContent = `第 ${q.id} 題 / 共 ${QUESTIONS.length} 題`;
+      document.getElementById('q-prompt').textContent = q.prompt;
+
+      const fb = document.getElementById('feedback-box');
+      fb.classList.add('hidden');
+      document.getElementById('submit-btn').classList.remove('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+
+      const optGrid = document.getElementById('q-options-grid');
+      const inputArea = document.getElementById('q-input-area');
+
+      if (q.type === 'input') {
+        optGrid.classList.add('hidden');
+        optGrid.innerHTML = '';
+        inputArea.classList.remove('hidden');
+        const inp = document.getElementById('q-text-input');
+        inp.value = '';
+        inp.disabled = false;
+        inp.focus();
+        document.getElementById('q-input-unit').textContent = q.unit || '';
+      } else {
+        inputArea.classList.add('hidden');
+        optGrid.classList.remove('hidden');
+        optGrid.innerHTML = '';
+
+        q.options.forEach(opt => {
+          const card = document.createElement('div');
+          card.id = `opt-card-${opt.key}`;
+          card.className = 'option-card cursor-pointer rounded-2xl border-2 border-slate-200 bg-white p-4 flex items-center gap-3';
+          card.onclick = () => {
+            if (isAnsweredCorrectly) return;
+            selectedSingle = opt.key;
+            q.options.forEach(o => {
+              const el = document.getElementById(`opt-card-${o.key}`);
+              el.classList.remove('option-selected', 'option-wrong');
+              if (o.key === opt.key) el.classList.add('option-selected');
+            });
+          };
+          card.innerHTML = `
+            <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">${opt.key}</span>
+            <span class="text-lg font-bold text-slate-800">${opt.label}</span>
+          `;
+          optGrid.appendChild(card);
+        });
+      }
+    }
+
+    function checkAnswer() {
+      if (isAnsweredCorrectly) return;
+      const q = QUESTIONS[currentIndex];
+
+      if (q.type === 'single' && !selectedSingle) {
+        showFeedback('請先點選一個答案選項！', 'warn');
+        return;
+      }
+      if (q.type === 'input' && !document.getElementById('q-text-input').value.trim()) {
+        showFeedback('請先輸入你的答案！', 'warn');
+        return;
+      }
+
+      totalAttempts++;
+      document.getElementById('stat-attempts').textContent = totalAttempts;
+
+      let isCorrect = false;
+      if (q.type === 'single') {
+        isCorrect = (selectedSingle === q.answer);
+      } else {
+        const val = document.getElementById('q-text-input').value.trim().replace(/,/g, '');
+        isCorrect = (val === q.answer);
+      }
+
+      if (isCorrect) {
+        isAnsweredCorrectly = true;
+        if (!currentQuestionHadWrong) {
+          firstTryCorrect++;
+          document.getElementById('stat-first-try').textContent = firstTryCorrect;
+        }
+        if (q.type === 'single') {
+          document.getElementById(`opt-card-${selectedSingle}`).classList.add('option-correct');
+        } else {
+          document.getElementById('q-text-input').disabled = true;
+        }
+        showFeedback(`🎉 答對了！${q.hint}`, 'success');
+        document.getElementById('submit-btn').classList.add('hidden');
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.textContent = (currentIndex === QUESTIONS.length - 1) ? '完成並查看成績 🏆' : '下一題 →';
+        nextBtn.classList.remove('hidden');
+
+        if (currentIndex < QUESTIONS.length - 1) {
+          saveProgressToCloud(currentIndex + 2, false);
+        }
+      } else {
+        currentQuestionHadWrong = true;
+        wrongQuestionIds.add(q.id);
+        if (q.type === 'single') {
+          document.getElementById(`opt-card-${selectedSingle}`).classList.add('option-wrong');
+        }
+        showFeedback(`💡 再想一想！提示：${q.hint}`, 'error');
+      }
+    }
+
+    function showFeedback(msg, type) {
+      const fb = document.getElementById('feedback-box');
+      fb.classList.remove('hidden');
+      if (type === 'success') {
+        fb.className = 'mb-6 p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-base font-bold';
+      } else if (type === 'error') {
+        fb.className = 'mb-6 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 text-base font-bold';
+      } else {
+        fb.className = 'mb-6 p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-base font-bold';
+      }
+      fb.textContent = msg;
+    }
+
+    function goNextQuestion() {
+      if (currentIndex < QUESTIONS.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        submitFinalRecordToCloud();
+        showCertificateScreen();
+      }
+    }
+
+    function showCertificateScreen() {
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('complete-screen').classList.remove('hidden');
+      const numStr = currentUser.classNum ? ` (${currentUser.classNum})` : '';
+      document.getElementById('cert-student-info').textContent = `${currentUser.className}${numStr} ${currentUser.name}`;
+      document.getElementById('cert-score').textContent = `${firstTryCorrect} / ${QUESTIONS.length}`;
+      document.getElementById('cert-attempts').textContent = `${totalAttempts} 次`;
+
+      const wrongArr = Array.from(wrongQuestionIds).sort((a, b) => a - b);
+      const summaryEl = document.getElementById('cert-wrong-summary');
+      if (wrongArr.length === 0) {
+        summaryEl.innerHTML = '🌟 <strong>表現滿分！</strong>所有題目均一次答對，完全掌握乘法運算技巧！';
+      } else {
+        summaryEl.innerHTML = `📝 <strong>曾經答錯並已訂正的題號：</strong>第 ${wrongArr.join('、')} 題。`;
+      }
+    }
+
+    async function saveProgressToCloud(nextQNum, isDone) {
+      if (!currentUser || currentUser.role === 'teacher') {
+        document.getElementById('sync-status-text').textContent = '教師檢視模式（不寫入雲端進度）';
+        return;
+      }
+      const syncEl = document.getElementById('sync-status-text');
+      syncEl.textContent = '正在同步進度...';
+      const wrongStr = Array.from(wrongQuestionIds).sort((a, b) => a - b).map(n => `第${n}題`).join(', ');
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'saveProgress',
+            account: currentUser.account,
+            name: currentUser.name,
+            className: currentUser.className,
+            classNum: currentUser.classNum,
+            unitId: UNIT_ID,
+            currentQ: nextQNum,
+            firstTryCorrect: firstTryCorrect,
+            totalAttempts: totalAttempts,
+            wrongList: wrongStr,
+            isCompleted: isDone
+          })
+        });
+        syncEl.textContent = '✓ 已即時同步至雲端';
       } catch (e) {
-        setCloudSyncStatus('error', '網絡連線不穩');
+        syncEl.textContent = '⚠ 離線暫存中';
       }
     }
 
-    function showFeedback(status, title, message, hintText) {
-      const box = document.getElementById('feedbackBox');
-      const icon = document.getElementById('feedbackIcon');
-      const titleEl = document.getElementById('feedbackTitle');
-      const msgEl = document.getElementById('feedbackMessage');
-      const hintBox = document.getElementById('hintContainer');
-      const hintEl = document.getElementById('hintText');
-
-      box.classList.remove(
-        'hidden',
-        'bg-rose-50', 'border-rose-300', 'text-rose-900',
-        'bg-emerald-50', 'border-emerald-300', 'text-emerald-900'
-      );
-
-      if (status === 'wrong') {
-        box.classList.add('bg-rose-50', 'border-rose-300', 'text-rose-900');
-        icon.textContent = '❌';
-      } else {
-        box.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-900');
-        icon.textContent = '🎉';
-      }
-
-      titleEl.textContent = title;
-      msgEl.textContent = message;
-
-      if (hintText) {
-        hintEl.textContent = hintText;
-        hintBox.classList.remove('hidden');
-      } else {
-        hintBox.classList.add('hidden');
-      }
-    }
-
-    // 點擊「下一題」或「完成並提交成績」
-    document.getElementById('nextQuestionBtn').addEventListener('click', async function () {
-      if (currentQIndex < QUESTIONS.length - 1) {
-        currentQIndex++;
-        renderQuestionGrid();
-        loadQuestion(currentQIndex);
-      } else {
-        await finalizeAndSubmitRecord();
-      }
-    });
-
-    // =========================================================================
-    // 7. 完成全部 30 題：提交正式成績至 Records 並顯示證書
-    // =========================================================================
-    async function finalizeAndSubmitRecord() {
-      const stats = computeStatsSummary();
-      const rate = Math.round((stats.firstTryCount / QUESTIONS.length) * 100);
-      const scoreText = `首試答對 ${stats.firstTryCount}/30 題 (${rate}%)`;
-
-      // 若是學生正式作答且尚未提交過，寫入雲端 Records
-      if (!quizState.isCompleted && currentUser && currentUser.role === 'student' && !isTeacherPreview) {
-        showGlobalLoading('正在提交最終成績至雲端紀錄表...');
-        try {
-          const res = await callApi({
+    async function submitFinalRecordToCloud() {
+      if (!currentUser || currentUser.role === 'teacher') return;
+      const wrongArr = Array.from(wrongQuestionIds).sort((a, b) => a - b);
+      const wrongDetails = wrongArr.length === 0 ? '全對（無錯題）' : `曾錯題號：${wrongArr.map(n => '第' + n + '題').join('、')}`;
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
             action: 'submitRecord',
             account: currentUser.account,
             name: currentUser.name,
@@ -1252,404 +667,83 @@
             classNum: currentUser.classNum,
             unitId: UNIT_ID,
             unitName: UNIT_NAME,
-            currentQ: 30,
-            firstTryCorrect: stats.firstTryCount,
-            totalAttempts: stats.totalAttempts,
-            wrongList: stats.wrongListStr,
-            score: scoreText,
-            wrongDetails: stats.wrongDetailsStr
+            score: `${firstTryCorrect} / ${QUESTIONS.length}`,
+            wrongDetails: wrongDetails,
+            currentQ: QUESTIONS.length,
+            firstTryCorrect: firstTryCorrect,
+            totalAttempts: totalAttempts,
+            wrongList: wrongArr.map(n => `第${n}題`).join(', ')
+          })
+        });
+      } catch (e) {}
+    }
+
+    async function resetUnitPractice() {
+      if (currentUser && currentUser.role !== 'teacher') {
+        try {
+          await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+              action: 'resetProgress',
+              account: currentUser.account,
+              unitId: UNIT_ID
+            })
           });
-          if (res.status === 'success') {
-            quizState.isCompleted = true;
-            setCloudSyncStatus('ok', '成績已寫入雲端');
-          }
-        } catch (err) {
-          setCloudSyncStatus('error', '成績提交時網絡異常');
-        } finally {
-          hideGlobalLoading();
-        }
+        } catch (e) {}
       }
-
-      openSummaryView(false);
+      firstTryCorrect = 0;
+      totalAttempts = 0;
+      wrongQuestionIds.clear();
+      startQuizAt(0);
     }
 
-    function openSummaryView(fromAlreadyCompleted) {
-      document.getElementById('quizView').classList.add('hidden');
-      document.getElementById('summaryView').classList.remove('hidden');
-
-      const stats = computeStatsSummary();
-      const rate = Math.round((stats.firstTryCount / QUESTIONS.length) * 100);
-      const retriedQuestionsCount = QUESTIONS.length - stats.firstTryCount;
-
-      document.getElementById('summaryStudentInfo').textContent =
-        `學生：${formatStudentDisplay(currentUser)}`;
-      document.getElementById('statFirstTry').textContent = `${stats.firstTryCount} / 30 題`;
-      document.getElementById('statAccuracyRate').textContent = `首試正確率：${rate}%`;
-      document.getElementById('statTotalAttempts').textContent = `${stats.totalAttempts} 次`;
-      document.getElementById('statRetriedCount').textContent = `訂正重做題數：${retriedQuestionsCount} 題`;
-      document.getElementById('statWrongSummary').textContent =
-        stats.wrongListStr ? `曾錯題目：${stats.wrongListStr}` : '一次全對，表現優異！';
-
-      const tbody = document.getElementById('summaryTableBody');
-      tbody.innerHTML = '';
-
-      QUESTIONS.forEach((q) => {
-        const rec = quizState.completed[q.id] || { attempts: 1, firstTryCorrect: true };
-        const tr = document.createElement('tr');
-        tr.className = rec.firstTryCorrect ? 'hover:bg-slate-50' : 'bg-amber-50/60 hover:bg-amber-50';
-
-        tr.innerHTML = `
-          <td class="py-2.5 px-3 font-mono font-bold text-slate-700">#${q.id}</td>
-          <td class="py-2.5 px-3 text-xs text-slate-500 whitespace-nowrap">${q.part.split('：')[0]}</td>
-          <td class="py-2.5 px-3 font-medium text-slate-800">${q.prompt}</td>
-          <td class="py-2.5 px-3 font-mono font-bold text-indigo-700">${q.answer}</td>
-          <td class="py-2.5 px-3 whitespace-nowrap">
-            ${rec.firstTryCorrect
-              ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">⭐ 首試答對</span>'
-              : '<span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">🔄 重做後答對</span>'}
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    document.getElementById('reviewWorksheetBtn').addEventListener('click', function () {
-      document.getElementById('summaryView').classList.add('hidden');
-      document.getElementById('quizView').classList.remove('hidden');
-      resizeCanvas();
-      renderQuestionGrid();
-      loadQuestion(currentQIndex);
-    });
-
-    // 重設本單元進度（呼叫雲端 resetProgress）
-    async function handleResetUnitProgress() {
-      showConfirmModal(
-        '重新練習本單元',
-        '確定要清除你目前在「單元一：乘法」的雲端作答進度，並從第 1 題重新開始嗎？',
-        async () => {
-          if (currentUser && currentUser.role === 'student' && !isTeacherPreview) {
-            showGlobalLoading('正在重設雲端練習進度...');
-            try {
-              await callApi({
-                action: 'resetProgress',
-                account: currentUser.account,
-                unitId: UNIT_ID
-              });
-              setCloudSyncStatus('ok', '雲端進度已重設');
-            } catch (e) {
-              setCloudSyncStatus('error', '重設進度時網絡異常');
-            } finally {
-              hideGlobalLoading();
-            }
-          }
-          initStudentFromCloudProgress(null);
-        }
-      );
-    }
-
-    document.getElementById('studentRestartBtn').addEventListener('click', handleResetUnitProgress);
-    document.getElementById('resetMyProgressBtn').addEventListener('click', handleResetUnitProgress);
-
-    // =========================================================================
-    // 8. 教師雲端監察後台邏輯
-    // =========================================================================
-    async function openTeacherDashboard() {
-      document.getElementById('quizView').classList.add('hidden');
-      document.getElementById('summaryView').classList.add('hidden');
-      document.getElementById('teacherView').classList.remove('hidden');
-
-      const loadingBanner = document.getElementById('teacherLoadingBanner');
-      loadingBanner.classList.remove('hidden');
-      setCloudSyncStatus('syncing', '正在讀取全級數據...');
-
-      try {
-        const res = await callApi({
-          action: 'getTeacherSummary',
-          unitId: UNIT_ID
-        });
-
-        if (res.status === 'success') {
-          teacherData.progressList = res.progressList || [];
-          teacherData.recordsList = res.recordsList || [];
-          updateTeacherKPIs();
-          renderTeacherTables();
-          setCloudSyncStatus('ok', '教師數據已同步');
-        }
-      } catch (err) {
-        setCloudSyncStatus('error', '無法讀取教師數據');
-      } finally {
-        loadingBanner.classList.add('hidden');
-      }
-    }
-
-    function updateTeacherKPIs() {
-      const pList = teacherData.progressList;
-      const inProgressCount = pList.filter((item) => !item.isCompleted).length;
-      const completedCount = pList.filter((item) => item.isCompleted).length;
-
-      document.getElementById('kpiInProgress').textContent = `${inProgressCount} 人`;
-      document.getElementById('kpiCompleted').textContent = `${completedCount} 人`;
-
-      // 計算平均首試正確率
-      let totalDoneQ = 0;
-      let totalFirstTry = 0;
-      const wrongFreqMap = {};
-
-      pList.forEach((item) => {
-        const doneQ = item.isCompleted ? 30 : Math.max(0, (Number(item.currentQ) || 1) - 1);
-        totalDoneQ += doneQ;
-        totalFirstTry += Number(item.firstTryCorrect) || 0;
-
-        const wrongNums = parseWrongListString(item.wrongList);
-        wrongNums.forEach((qNum) => {
-          wrongFreqMap[qNum] = (wrongFreqMap[qNum] || 0) + 1;
-        });
-      });
-
-      const avgAcc = totalDoneQ > 0 ? Math.round((totalFirstTry / totalDoneQ) * 100) + '%' : '--%';
-      document.getElementById('kpiAvgAccuracy').textContent = avgAcc;
-
-      // 統計全級最常出錯前 3 題
-      const sortedWrong = Object.entries(wrongFreqMap)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([qNum, cnt]) => `第${qNum}題(${cnt}人)`);
-
-      document.getElementById('kpiTopWrongQ').textContent =
-        sortedWrong.length > 0 ? sortedWrong.join('、') : '暫無錯題紀錄';
-    }
-
-    function switchTeacherTab(tabName) {
-      const tabProgBtn = document.getElementById('tabProgressBtn');
-      const tabRecBtn = document.getElementById('tabRecordsBtn');
-      const progSec = document.getElementById('teacherProgressSection');
-      const recSec = document.getElementById('teacherRecordsSection');
-
-      if (tabName === 'progress') {
-        tabProgBtn.className = 'px-4 py-2 rounded-lg bg-white text-indigo-700 font-bold text-sm shadow-xs transition';
-        tabRecBtn.className = 'px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-sm transition';
-        progSec.classList.remove('hidden');
-        recSec.classList.add('hidden');
-      } else {
-        tabRecBtn.className = 'px-4 py-2 rounded-lg bg-white text-indigo-700 font-bold text-sm shadow-xs transition';
-        tabProgBtn.className = 'px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-sm transition';
-        recSec.classList.remove('hidden');
-        progSec.classList.add('hidden');
-      }
-    }
-
-    function renderTeacherTables() {
-      const classFilter = document.getElementById('teacherClassFilter').value;
-      const keyword = document.getElementById('teacherSearchInput').value.trim().toLowerCase();
-
-      const matchFilter = (item) => {
-        if (classFilter !== 'ALL' && item.className !== classFilter) return false;
-        if (keyword) {
-          const hay = `${item.className} ${item.classNum} ${item.name} ${item.account}`.toLowerCase();
-          if (!hay.includes(keyword)) return false;
-        }
-        return true;
+    // 草稿畫板
+    let padCtx = null, isDrawing = false, penColor = '#1e293b', padBgMode = 'blank';
+    function initScratchpad() {
+      const canvas = document.getElementById('scratchpad-canvas');
+      if (!canvas) return;
+      padCtx = canvas.getContext('2d');
+      padCtx.lineWidth = 2.5; padCtx.lineCap = 'round'; padCtx.lineJoin = 'round';
+      const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.touches ? e.touches[0].clientX : e.clientX;
+        const cy = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
       };
-
-      // 1. 渲染即時作答進度表 (Progress)
-      const progTbody = document.getElementById('teacherProgressTbody');
-      progTbody.innerHTML = '';
-      const filteredProg = teacherData.progressList
-        .filter(matchFilter)
-        .sort((a, b) => `${a.className}${a.classNum}`.localeCompare(`${b.className}${b.classNum}`));
-
-      if (filteredProg.length === 0) {
-        progTbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-medium">暫無符合條件的學生作答紀錄</td></tr>`;
-      } else {
-        filteredProg.forEach((p) => {
-          const doneQ = p.isCompleted ? 30 : Math.max(0, (Number(p.currentQ) || 1) - 1);
-          const acc = doneQ > 0 ? Math.round(((Number(p.firstTryCorrect) || 0) / doneQ) * 100) + '%' : '--';
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50';
-          tr.innerHTML = `
-            <td class="py-3 px-3 font-bold text-slate-700">${p.className}</td>
-            <td class="py-3 px-3 font-mono text-slate-600">${p.classNum || '-'}</td>
-            <td class="py-3 px-3 font-bold text-slate-900">${p.name}</td>
-            <td class="py-3 px-3">
-              ${p.isCompleted
-                ? '<span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold">✅ 已完成 (30/30)</span>'
-                : `<span class="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold">⏳ 第 ${p.currentQ} 題</span>`}
-            </td>
-            <td class="py-3 px-3 font-mono font-bold text-emerald-700">${p.firstTryCorrect} 題</td>
-            <td class="py-3 px-3 font-mono font-bold text-indigo-700">${acc}</td>
-            <td class="py-3 px-3 text-xs text-rose-600 font-medium">${p.wrongList || '—'}</td>
-            <td class="py-3 px-3 text-xs font-mono text-slate-500">${p.updatedAt || '—'}</td>
-          `;
-          progTbody.appendChild(tr);
-        });
-      }
-
-      // 2. 渲染已完成成績總表 (Records)
-      const recTbody = document.getElementById('teacherRecordsTbody');
-      recTbody.innerHTML = '';
-      const filteredRec = teacherData.recordsList.filter(matchFilter);
-
-      if (filteredRec.length === 0) {
-        recTbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">暫無已完成的成績提交紀錄</td></tr>`;
-      } else {
-        filteredRec.forEach((r) => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50';
-          tr.innerHTML = `
-            <td class="py-3 px-3 text-xs font-mono text-slate-500">${r.timestamp}</td>
-            <td class="py-3 px-3 font-bold text-slate-700">${r.className}</td>
-            <td class="py-3 px-3 font-mono text-slate-600">${r.classNum || '-'}</td>
-            <td class="py-3 px-3 font-bold text-slate-900">${r.name}</td>
-            <td class="py-3 px-3 font-bold text-emerald-700">${r.score}</td>
-            <td class="py-3 px-3 text-xs text-slate-600">${r.wrongDetails}</td>
-          `;
-          recTbody.appendChild(tr);
-        });
-      }
+      const start = (e) => { isDrawing = true; const p = getPos(e); padCtx.beginPath(); padCtx.moveTo(p.x, p.y); };
+      const move = (e) => { if (!isDrawing) return; e.preventDefault(); const p = getPos(e); padCtx.strokeStyle = penColor; padCtx.lineTo(p.x, p.y); padCtx.stroke(); };
+      const end = () => { isDrawing = false; };
+      canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+      canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); window.addEventListener('touchend', end);
     }
-
-    document.getElementById('teacherRefreshBtn').addEventListener('click', openTeacherDashboard);
-
-    document.getElementById('teacherPreviewStudentBtn').addEventListener('click', function () {
-      isTeacherPreview = true;
-      document.getElementById('studentProgressBarWrapper').classList.remove('hidden');
-      initStudentFromCloudProgress(null);
-      document.getElementById('welcomeGreeting').textContent = '👩‍🏫 教師試做預覽模式（此模式不會寫入學生成績表）';
-    });
-
-    // =========================================================================
-    // 9. HTML5 Canvas 互動手寫草稿紙（支援筆色、粗幼、對位格線）
-    // =========================================================================
-    const canvas = document.getElementById('scratchpadCanvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
-    let penColor = '#1e293b';
-    let penSize = 2.5;
-    let showGrid = true;
-
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width === 0) return;
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      ctx.lineWidth = penSize;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = penColor;
+    function toggleScratchpad() {
+      const panel = document.getElementById('scratchpad-panel');
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) drawPadBackground();
     }
-
-    function setPenColor(color, btnEl) {
-      penColor = color;
-      ctx.strokeStyle = penColor;
-      document.querySelectorAll('.pen-color-btn').forEach((b) => {
-        b.classList.remove('ring-2', 'ring-offset-1', 'ring-indigo-500');
+    function setPenColor(c) { penColor = c; }
+    function setPadBg(mode) {
+      padBgMode = mode;
+      ['blank', 'grid'].forEach(m => {
+        const btn = document.getElementById(`bg-btn-${m}`);
+        btn.className = (m === mode)
+          ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white'
+          : 'px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
       });
-      if (btnEl) btnEl.classList.add('ring-2', 'ring-offset-1', 'ring-indigo-500');
+      clearScratchpad();
     }
-
-    function setPenSize(size, btnEl) {
-      penSize = size;
-      ctx.lineWidth = penSize;
-      document.querySelectorAll('.pen-size-btn').forEach((b) => {
-        b.classList.remove('bg-indigo-100', 'text-indigo-800');
-        b.classList.add('text-slate-600');
-      });
-      if (btnEl) {
-        btnEl.classList.remove('text-slate-600');
-        btnEl.classList.add('bg-indigo-100', 'text-indigo-800');
+    function drawPadBackground() {
+      const canvas = document.getElementById('scratchpad-canvas');
+      if (!canvas || !padCtx) return;
+      padCtx.clearRect(0, 0, canvas.width, canvas.height);
+      if (padBgMode === 'grid') {
+        padCtx.strokeStyle = '#e2e8f0'; padCtx.lineWidth = 1;
+        for (let x = 20; x < canvas.width; x += 24) { padCtx.beginPath(); padCtx.moveTo(x, 0); padCtx.lineTo(x, canvas.height); padCtx.stroke(); }
+        for (let y = 20; y < canvas.height; y += 24) { padCtx.beginPath(); padCtx.moveTo(0, y); padCtx.lineTo(canvas.width, y); padCtx.stroke(); }
       }
+      padCtx.lineWidth = 2.5;
     }
-
-    function toggleCanvasGrid() {
-      showGrid = !showGrid;
-      const btn = document.getElementById('toggleGridBtn');
-      if (showGrid) {
-        canvas.classList.add('canvas-grid');
-        btn.textContent = '格線：開';
-      } else {
-        canvas.classList.remove('canvas-grid');
-        btn.textContent = '格線：關';
-      }
-    }
-
-    function clearScratchpad() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function getCanvasPos(e) {
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      return {
-        x: clientX - rect.left,
-        y: clientY - rect.top
-      };
-    }
-
-    canvas.addEventListener('mousedown', (e) => {
-      isDrawing = true;
-      const pos = getCanvasPos(e);
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-    });
-    canvas.addEventListener('mousemove', (e) => {
-      if (!isDrawing) return;
-      const pos = getCanvasPos(e);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
-    });
-    window.addEventListener('mouseup', () => { isDrawing = false; });
-
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      isDrawing = true;
-      const pos = getCanvasPos(e);
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-    }, { passive: false });
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      if (!isDrawing) return;
-      const pos = getCanvasPos(e);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
-    }, { passive: false });
-    canvas.addEventListener('touchend', () => { isDrawing = false; });
-
-    window.addEventListener('resize', () => {
-      if (!document.getElementById('quizView').classList.contains('hidden')) {
-        resizeCanvas();
-      }
-    });
-
-    // =========================================================================
-    // 10. 全局載入遮罩與自訂確認對話框
-    // =========================================================================
-    function showGlobalLoading(text) {
-      document.getElementById('globalLoadingText').textContent = text || '處理中...';
-      document.getElementById('globalLoadingOverlay').classList.remove('hidden');
-    }
-
-    function hideGlobalLoading() {
-      document.getElementById('globalLoadingOverlay').classList.add('hidden');
-    }
-
-    function showConfirmModal(title, body, onConfirm) {
-      const modal = document.getElementById('customModal');
-      document.getElementById('modalTitle').textContent = title;
-      document.getElementById('modalBody').textContent = body;
-      modal.classList.remove('hidden');
-
-      const cancelBtn = document.getElementById('modalCancelBtn');
-      const confirmBtn = document.getElementById('modalConfirmBtn');
-
-      const cleanup = () => modal.classList.add('hidden');
-      cancelBtn.onclick = cleanup;
-      confirmBtn.onclick = () => {
-        cleanup();
-        onConfirm();
-      };
-    }
+    function clearScratchpad() { drawPadBackground(); }
   </script>
 </body>
 </html>

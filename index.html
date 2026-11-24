@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>鳳溪第一小學 小四數學科自主練習平台 — 全學年課題目錄</title>
+  <!-- 載入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 載入 Google Fonts 繁體中文及等寬數字字型 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      15%, 55%, 85% { transform: translateX(-8px); }
+      35%, 70% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.96); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop {
+      animation: popIn 0.25s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-indigo-200">
+
+  <!-- ==================== 頂部導覽列 ==================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white flex items-center justify-center font-black text-2xl shadow-sm shrink-0">
+          📐
+        </div>
+        <div>
+          <h1 class="font-black text-base sm:text-xl text-slate-900 leading-tight">
+            鳳溪第一小學 小四數學科自主練習平台
+          </h1>
+          <p class="text-xs text-slate-500 mt-0.5">
+            全學年課題目錄 ｜ 一次登入・跨裝置自動同步學習進度
+          </p>
+        </div>
+      </div>
+
+      <!-- 登入後顯示的操作按鈕區 -->
+      <div id="headerControls" class="hidden flex items-center gap-2 sm:gap-2.5">
+        <button id="refreshDashboardBtn" type="button"
+          class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">
+          <span id="refreshIcon">🔄</span>
+          <span>重新整理進度</span>
+        </button>
+
+        <button id="logoutBtn" type="button"
+          class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-100 hover:text-rose-700 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold transition">
+          登出切換帳號
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 1. 統一入口登入畫面 ==================== -->
+  <main id="loginView" class="flex-1 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden animate-pop">
+      <!-- 頂部校徽與主題橫幅 -->
+      <div class="bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-700 p-7 text-white text-center">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-indigo-100 mb-3">
+          <span>☁️</span>
+          <span>單一帳號通行全學年 14 個數學課題</span>
+        </div>
+        <h2 class="text-2xl font-black tracking-wide">鳳溪第一小學</h2>
+        <p class="text-lg font-bold text-blue-100 mt-0.5">小四數學科自主練習平台</p>
+      </div>
+
+      <!-- 登入表單 -->
+      <form id="loginForm" class="p-6 sm:p-8 space-y-5">
+        <div>
+          <label for="accountInput" class="block text-sm font-bold text-slate-700 mb-1.5">
+            校內帳號 / 學生電郵
+          </label>
+          <input id="accountInput" type="text" autocomplete="username" required
+            placeholder="例如：B23001@fk1ps.hk 或 teacher"
+            class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-base sm:text-lg font-mono transition" />
+        </div>
+
+        <div>
+          <label for="passwordInput" class="block text-sm font-bold text-slate-700 mb-1.5">
+            登入密碼
+          </label>
+          <div class="relative">
+            <input id="passwordInput" type="password" autocomplete="current-password" required
+              placeholder="請輸入密碼（如：20171116）"
+              class="w-full pl-4 pr-12 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-base sm:text-lg font-mono transition" />
+            <button id="togglePwdBtn" type="button" title="顯示或隱藏密碼"
+              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <!-- 錯誤提示框 -->
+        <div id="loginErrorBox" class="hidden p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold flex items-start gap-2">
+          <span class="mt-0.5">⚠️</span>
+          <span id="loginErrorText">帳號或密碼不正確，請重新輸入。</span>
+        </div>
+
+        <!-- 載入中提示框 -->
+        <div id="loginLoadingBox" class="hidden p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm font-bold flex items-center justify-center gap-2.5">
+          <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span>正在連接雲端讀取全學年課題進度...</span>
+        </div>
+
+        <button id="loginSubmitBtn" type="submit"
+          class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-lg shadow-md shadow-indigo-200 transition">
+          登入進入課題目錄 →
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- ==================== 2. 登入後全學年課題目錄主畫面 ==================== -->
+  <main id="portalView" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+
+    <!-- 學生個人資料與全學年總進度橫幅 -->
+    <section class="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 text-white rounded-3xl p-6 shadow-md animate-pop">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <!-- 左側：學生班別學號姓名 -->
+        <div class="space-y-1.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="userRoleBadge" class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-xs text-xs font-bold">
+              🎓 四年級學生
+            </span>
+            <span id="userAccountBadge" class="text-xs font-mono text-indigo-100 bg-black/15 px-2.5 py-0.5 rounded-lg">
+              B23001@fk1ps.hk
+            </span>
+          </div>
+          <h2 id="studentGreeting" class="text-2xl sm:text-3xl font-black tracking-wide">
+            4A 班 (01號) 白祖兒
+          </h2>
+          <p class="text-sm text-indigo-100">
+            點擊下方「開放中」的課題即可開始或繼續練習，無需重複輸入密碼！
+          </p>
+        </div>
+
+        <!-- 右側：全學年完成進度統計卡 / 教師後台捷徑 -->
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="bg-white/15 backdrop-blur-xs border border-white/20 rounded-2xl px-5 py-3.5 min-w-[210px]">
+            <div class="text-xs font-bold text-indigo-100">🏆 全學年已完成課題</div>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="completedUnitsCount" class="text-3xl font-black font-mono">0</span>
+              <span id="openUnitsTotalText" class="text-sm font-bold text-indigo-100">/ 1 個開放單元</span>
+            </div>
+            <div class="w-full bg-black/20 rounded-full h-2 mt-2 overflow-hidden">
+              <div id="overallProgressBar" class="bg-emerald-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- 教師專用 Google Sheet 總表直達按鈕 -->
+          <a id="teacherSheetBtn"
+            href="https://docs.google.com/spreadsheets/d/1etKThsKMXzTkDkte68SNTXjojnrb4ZuhbUs_AK9PQ0I/edit"
+            target="_blank" rel="noopener noreferrer"
+            class="hidden px-5 py-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-black text-sm shadow-md transition flex items-center gap-2">
+            <span>📊</span>
+            <span>開啟 Google Sheet<br/>全級進度總表 ↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 冊別篩選分頁標籤 -->
+    <section class="flex flex-wrap items-center justify-between gap-3">
+      <div id="termFilterTabs" class="flex flex-wrap items-center gap-2">
+        <button type="button" data-term="ALL" onclick="setTermFilter('ALL', this)"
+          class="term-tab px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-xs transition">
+          全部課題 (14)
+        </button>
+        <button type="button" data-term="4上A" onclick="setTermFilter('4上A', this)"
+          class="term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
+          4上A冊 (4)
+        </button>
+        <button type="button" data-term="4上B" onclick="setTermFilter('4上B', this)"
+          class="term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
+          4上B冊 (4)
+        </button>
+        <button type="button" data-term="4下A" onclick="setTermFilter('4下A', this)"
+          class="term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
+          4下A冊 (3)
+        </button>
+        <button type="button" data-term="4下B" onclick="setTermFilter('4下B', this)"
+          class="term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition">
+          4下B冊 (3)
+        </button>
+      </div>
+
+      <div id="syncStatusLabel" class="text-xs font-bold text-slate-500">
+        ☁️ 進度已與雲端同步
+      </div>
+    </section>
+
+    <!-- 課題卡片網格區 -->
+    <section id="unitsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- 由 JS 動態生成 14 張單元卡片 -->
+    </section>
+
+  </main>
+
+  <!-- 頁尾版權宣告 -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-4 text-center text-xs text-slate-400 mt-8">
+    鳳溪第一小學 數學科電子學習資源 ｜ 支援跨瀏覽器雲端進度同步
+  </footer>
+
+  <script>
+    // =========================================================================
+    // 1. 雲端 API 設定與單一登入 (SSO) 常數
+    // =========================================================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
+    const SSO_STORAGE_KEY = "FK1PS_P4_MATH_USER";
+
+    // 全學年 14 個單元對應的前台 HTML 檔案路由表
+    const UNIT_ROUTES = {
+      "4A_U1": "4A_U1_multiply.html",
+      "4A_U2": "4A_U2_quadrilaterals.html",
+      "4A_U3": "4A_U3_divide.html",
+      "4A_E1": "4A_E1_classification.html",
+      "4B_U4": "4B_U4_direction.html",
+      "4B_U5": "4B_U5_multiples_factors.html",
+      "4B_U6": "4B_U6_dissection.html",
+      "4B_E2": "4B_E2_eulerian_path.html",
+      "4BA_U1": "4BA_U1_four_operations.html",
+      "4BA_U2": "4BA_U2_perimeter.html",
+      "4BA_U3": "4BA_U3_fractions.html",
+      "4BB_U4": "4BB_U4_area.html",
+      "4BB_U5": "4BB_U5_decimals.html",
+      "4BB_U6": "4BB_U6_bar_charts.html"
+    };
+
+    // 內置預設 14 個單元目錄備援陣列（當 API 尚未回傳時或離線參考使用）
+    const DEFAULT_UNITS = [
+      { unitId: "4A_U1", term: "4上A", unitName: "單元一：乘法", topicCode: "4N1 乘法(二)", lessons: "第1–3課", totalQuestions: 30, status: "開放中" },
+      { unitId: "4A_U2", term: "4上A", unitName: "單元二：四邊形", topicCode: "4S1 四邊形(三)", lessons: "第4–5課", totalQuestions: 20, status: "籌備中" },
+      { unitId: "4A_U3", term: "4上A", unitName: "單元三：除法", topicCode: "4N2 除法(二)", lessons: "第6–9課", totalQuestions: 30, status: "籌備中" },
+      { unitId: "4A_E1", term: "4上A", unitName: "增潤：分類圖表", topicCode: "4E2 分類圖表", lessons: "第10課", totalQuestions: 15, status: "籌備中" },
+      { unitId: "4B_U4", term: "4上B", unitName: "單元四：方向", topicCode: "4S3 方向和位置(三)", lessons: "第11–12課", totalQuestions: 20, status: "籌備中" },
+      { unitId: "4B_U5", term: "4上B", unitName: "單元五：倍數和因數", topicCode: "4N3 / 4N4 倍數與因數", lessons: "第13–17課", totalQuestions: 30, status: "籌備中" },
+      { unitId: "4B_U6", term: "4上B", unitName: "單元六：圖形分割和拼砌", topicCode: "4S2 圖形分割和拼砌", lessons: "第18–19課", totalQuestions: 20, status: "籌備中" },
+      { unitId: "4B_E2", term: "4上B", unitName: "增潤：一筆畫", topicCode: "4E1 一筆畫", lessons: "第20課", totalQuestions: 15, status: "籌備中" },
+      { unitId: "4BA_U1", term: "4下A", unitName: "單元一：四則運算", topicCode: "4N5 四則運算(二)", lessons: "第1–4課", totalQuestions: 30, status: "籌備中" },
+      { unitId: "4BA_U2", term: "4下A", unitName: "單元二：周界", topicCode: "4M1 周界(一)", lessons: "第5–8課", totalQuestions: 25, status: "籌備中" },
+      { unitId: "4BA_U3", term: "4下A", unitName: "單元三：分數", topicCode: "4N6 分數(二)", lessons: "第9–13課", totalQuestions: 30, status: "籌備中" },
+      { unitId: "4BB_U4", term: "4下B", unitName: "單元四：面積", topicCode: "4M2 面積(一)", lessons: "第14–17課", totalQuestions: 25, status: "籌備中" },
+      { unitId: "4BB_U5", term: "4下B", unitName: "單元五：小數", topicCode: "4N7 / 4N8 小數", lessons: "第18–21課", totalQuestions: 30, status: "籌備中" },
+      { unitId: "4BB_U6", term: "4下B", unitName: "單元六：棒形圖", topicCode: "4D1 棒形圖(二)", lessons: "第22–23課", totalQuestions: 20, status: "籌備中" }
+    ];
+
+    // 冊別徽章顏色對應
+    const TERM_BADGE_STYLES = {
+      "4上A": "bg-blue-100 text-blue-800 border-blue-200",
+      "4上B": "bg-cyan-100 text-cyan-800 border-cyan-200",
+      "4下A": "bg-violet-100 text-violet-800 border-violet-200",
+      "4下B": "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200"
+    };
+
+    // 全局狀態變數
+    let currentUser = null;
+    let portalUnits = [...DEFAULT_UNITS];
+    let progressMap = {};
+    let completedUnitIds = [];
+    let selectedTerm = "ALL";
+
+    // =========================================================================
+    // 2. API 通訊輔助函式（使用 text/plain 避開 CORS preflight）
+    // =========================================================================
+    async function callApi(payload) {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP 錯誤狀態碼：${response.status}`);
+      }
+      return await response.json();
+    }
+
+    // =========================================================================
+    // 3. 頁面載入時檢查 sessionStorage 單一登入狀態
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", async () => {
+      const savedUserRaw = sessionStorage.getItem(SSO_STORAGE_KEY);
+      if (savedUserRaw) {
+        try {
+          const parsedUser = JSON.parse(savedUserRaw);
+          if (parsedUser && parsedUser.account) {
+            currentUser = parsedUser;
+            showPortalScreen();
+            await fetchDashboardData(currentUser.account);
+            return;
+          }
+        } catch (e) {
+          sessionStorage.removeItem(SSO_STORAGE_KEY);
+        }
+      }
+    });
+
+    // 切換顯示/隱藏密碼
+    document.getElementById("togglePwdBtn").addEventListener("click", function () {
+      const pwdInput = document.getElementById("passwordInput");
+      if (pwdInput.type === "password") {
+        pwdInput.type = "text";
+        this.textContent = "🙈";
+      } else {
+        pwdInput.type = "password";
+        this.textContent = "👁️";
+      }
+    });
+
+    // 登入表單送出
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const account = document.getElementById("accountInput").value.trim();
+      const password = document.getElementById("passwordInput").value.trim();
+      if (!account || !password) return;
+
+      const errBox = document.getElementById("loginErrorBox");
+      const errText = document.getElementById("loginErrorText");
+      const loadingBox = document.getElementById("loginLoadingBox");
+      const submitBtn = document.getElementById("loginSubmitBtn");
+
+      errBox.classList.add("hidden");
+      loadingBox.classList.remove("hidden");
+      submitBtn.disabled = true;
+      submitBtn.classList.add("opacity-60", "cursor-not-allowed");
+
+      try {
+        const res = await callApi({
+          action: "login",
+          mode: "portal",
+          account: account,
+          password: password
+        });
+
+        if (res.status !== "success") {
+          errText.textContent = res.message || "帳號或密碼不正確，請重新輸入。";
+          errBox.classList.remove("hidden", "animate-shake");
+          void errBox.offsetWidth;
+          errBox.classList.add("animate-shake");
+          return;
+        }
+
+        // 登入成功：儲存至 sessionStorage 供所有單元網頁無縫免登入使用
+        currentUser = res.user;
+        sessionStorage.setItem(SSO_STORAGE_KEY, JSON.stringify(currentUser));
+
+        portalUnits = (res.units && res.units.length > 0) ? res.units : [...DEFAULT_UNITS];
+        progressMap = res.progressMap || {};
+        completedUnitIds = res.completedUnitIds || [];
+
+        showPortalScreen();
+        renderPortalContent();
+      } catch (err) {
+        errText.textContent = "無法連接雲端伺服器，請檢查網絡連線後再試。";
+        errBox.classList.remove("hidden");
+      } finally {
+        loadingBox.classList.add("hidden");
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-60", "cursor-not-allowed");
+      }
+    });
+
+    // 登出切換帳號
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      sessionStorage.removeItem(SSO_STORAGE_KEY);
+      currentUser = null;
+      progressMap = {};
+      completedUnitIds = [];
+      document.getElementById("headerControls").classList.add("hidden");
+      document.getElementById("portalView").classList.add("hidden");
+      document.getElementById("loginView").classList.remove("hidden");
+      document.getElementById("passwordInput").value = "";
+    });
+
+    // 重新整理進度按鈕
+    document.getElementById("refreshDashboardBtn").addEventListener("click", async function () {
+      if (!currentUser) return;
+      await fetchDashboardData(currentUser.account);
+    });
+
+    async function fetchDashboardData(account) {
+      const syncLabel = document.getElementById("syncStatusLabel");
+      const refreshIcon = document.getElementById("refreshIcon");
+      syncLabel.textContent = "⏳ 正在從雲端同步最新學習進度...";
+      refreshIcon.classList.add("animate-spin");
+
+      try {
+        const res = await callApi({
+          action: "getStudentDashboard",
+          account: account
+        });
+
+        if (res.status === "success") {
+          portalUnits = (res.units && res.units.length > 0) ? res.units : [...DEFAULT_UNITS];
+          progressMap = res.progressMap || {};
+          completedUnitIds = res.completedUnitIds || [];
+          renderPortalContent();
+          syncLabel.textContent = "☁️ 進度已與雲端同步";
+        } else {
+          syncLabel.textContent = "⚠️ 無法更新進度，請稍後再試";
+        }
+      } catch (err) {
+        syncLabel.textContent = "⚠️ 網絡連線不穩，目前顯示快取目錄";
+        renderPortalContent();
+      } finally {
+        refreshIcon.classList.remove("animate-spin");
+      }
+    }
+
+    // =========================================================================
+    // 4. 顯示目錄畫面與渲染課題卡片
+    // =========================================================================
+    function showPortalScreen() {
+      document.getElementById("loginView").classList.add("hidden");
+      document.getElementById("headerControls").classList.remove("hidden");
+      document.getElementById("portalView").classList.remove("hidden");
+
+      const roleBadge = document.getElementById("userRoleBadge");
+      const accBadge = document.getElementById("userAccountBadge");
+      const greeting = document.getElementById("studentGreeting");
+      const teacherSheetBtn = document.getElementById("teacherSheetBtn");
+
+      accBadge.textContent = currentUser.account;
+
+      if (currentUser.role === "teacher") {
+        roleBadge.textContent = "👩‍🏫 教師管理帳號";
+        greeting.textContent = `${currentUser.name || "數學科老師"}，歡迎進入課題總目錄`;
+        teacherSheetBtn.classList.remove("hidden");
+      } else {
+        roleBadge.textContent = "🎓 四年級學生";
+        const clsStr = currentUser.className ? `${currentUser.className} 班 ` : "";
+        const numStr = currentUser.classNum ? `(${currentUser.classNum}號) ` : "";
+        greeting.textContent = `${clsStr}${numStr}${currentUser.name}`.trim();
+        teacherSheetBtn.classList.add("hidden");
+      }
+    }
+
+    function setTermFilter(term, btnEl) {
+      selectedTerm = term;
+      document.querySelectorAll(".term-tab").forEach((btn) => {
+        btn.className = "term-tab px-4 py-2.5 rounded-xl bg-white hover:bg-indigo-50 text-slate-700 border border-slate-200 font-bold text-sm transition";
+      });
+      if (btnEl) {
+        btnEl.className = "term-tab px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-xs transition";
+      }
+      renderPortalContent();
+    }
+
+    function renderPortalContent() {
+      // 更新頂部全學年完成進度統計
+      const openUnits = portalUnits.filter((u) => u.status === "開放中");
+      const totalOpen = openUnits.length || 1;
+      const doneOpenCount = openUnits.filter(
+        (u) => completedUnitIds.includes(u.unitId) || (progressMap[u.unitId] && progressMap[u.unitId].isCompleted)
+      ).length;
+
+      document.getElementById("completedUnitsCount").textContent = doneOpenCount;
+      document.getElementById("openUnitsTotalText").textContent = `/ ${totalOpen} 個開放單元`;
+      const pct = Math.min(100, Math.round((doneOpenCount / totalOpen) * 100));
+      document.getElementById("overallProgressBar").style.width = `${pct}%`;
+
+      // 篩選要顯示的單元
+      const filteredUnits = selectedTerm === "ALL"
+        ? portalUnits
+        : portalUnits.filter((u) => u.term === selectedTerm);
+
+      const grid = document.getElementById("unitsGrid");
+      grid.innerHTML = "";
+
+      filteredUnits.forEach((unit) => {
+        const uId = unit.unitId;
+        const routeFile = UNIT_ROUTES[uId] || `${uId}.html`;
+        const pInfo = progressMap[uId] || null;
+        const isCompleted = completedUnitIds.includes(uId) || (pInfo && pInfo.isCompleted);
+        const isInProgress = !isCompleted && pInfo && Number(pInfo.currentQ) > 1;
+        const isOpen = unit.status === "開放中";
+        const isTeacher = currentUser && currentUser.role === "teacher";
+
+        const termBadgeClass = TERM_BADGE_STYLES[unit.term] || "bg-slate-100 text-slate-700 border-slate-200";
+        const totalQ = Number(unit.totalQuestions) || 30;
+
+        const card = document.createElement("article");
+
+        // 決定卡片邊框、狀態徽章與底部操作按鈕
+        let cardBorderClass = "bg-white border-slate-200 hover:shadow-lg hover:-translate-y-0.5";
+        let statusBadgeHtml = "";
+        let progressBarHtml = "";
+        let actionBtnHtml = "";
+
+        if (isCompleted) {
+          cardBorderClass = "bg-white border-emerald-300 ring-1 ring-emerald-100 hover:shadow-lg hover:-translate-y-0.5";
+          const scoreLine = pInfo && pInfo.score ? `<div class="text-xs font-bold text-emerald-700 mt-1">🏆 ${pInfo.score}</div>` : "";
+          statusBadgeHtml = `
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">
+              ✅ 已完成
+            </span>
+            ${scoreLine}
+          `;
+          actionBtnHtml = `
+            <a href="${routeFile}"
+              class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm text-center shadow-xs transition block">
+              進入重温 / 再次練習
+            </a>
+          `;
+        } else if (isInProgress) {
+          const curQ = Math.min(Number(pInfo.currentQ) || 1, totalQ);
+          const doneCount = Math.max(0, curQ - 1);
+          const progPct = Math.round((doneCount / totalQ) * 100);
+          cardBorderClass = "bg-white border-amber-300 ring-1 ring-amber-100 hover:shadow-lg hover:-translate-y-0.5";
+          statusBadgeHtml = `
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">
+              ⏳ 進行中（已做至第 ${curQ} 題）
+            </span>
+          `;
+          progressBarHtml = `
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs font-bold text-slate-500">
+                <span>完成進度</span>
+                <span class="font-mono text-amber-700">${doneCount} / ${totalQ} 題 (${progPct}%)</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div class="bg-amber-500 h-2 rounded-full" style="width: ${progPct}%"></div>
+              </div>
+            </div>
+          `;
+          actionBtnHtml = `
+            <a href="${routeFile}"
+              class="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm text-center shadow-xs transition block">
+              繼續練習 →
+            </a>
+          `;
+        } else if (isOpen) {
+          cardBorderClass = "bg-white border-indigo-200 hover:border-indigo-400 hover:shadow-lg hover:-translate-y-0.5";
+          statusBadgeHtml = `
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-black">
+              📖 尚未開始
+            </span>
+          `;
+          actionBtnHtml = `
+            <a href="${routeFile}"
+              class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm text-center shadow-sm shadow-indigo-200 transition block">
+              開始練習 →
+            </a>
+          `;
+        } else {
+          // 狀態為「籌備中」
+          if (isTeacher) {
+            cardBorderClass = "bg-slate-50 border-amber-200 hover:bg-white hover:shadow-md";
+            statusBadgeHtml = `
+              <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
+                🔒 籌備中（教師預覽可用）
+              </span>
+            `;
+            actionBtnHtml = `
+              <a href="${routeFile}"
+                class="w-full py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-bold text-sm text-center transition block">
+                👩‍🏫 教師預覽連結 →
+              </a>
+            `;
+          } else {
+            cardBorderClass = "bg-slate-50/80 border-slate-200 opacity-75";
+            statusBadgeHtml = `
+              <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-bold">
+                🔒 尚未開放
+              </span>
+            `;
+            actionBtnHtml = `
+              <button type="button" disabled
+                class="w-full py-3 px-4 rounded-xl bg-slate-200 text-slate-400 font-bold text-sm text-center cursor-not-allowed">
+                敬請期待
+              </button>
+            `;
+          }
+        }
+
+        card.className = `rounded-3xl border-2 p-5 flex flex-col justify-between gap-4 transition-all duration-200 ${cardBorderClass}`;
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <!-- 頂部冊別與學習單位標籤 -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="px-2.5 py-1 rounded-lg border text-xs font-black ${termBadgeClass}">
+                ${unit.term}冊
+              </span>
+              <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                ${unit.topicCode}
+              </span>
+            </div>
+
+            <!-- 單元大標題 -->
+            <div>
+              <h3 class="text-xl font-black text-slate-900 leading-snug">
+                ${unit.unitName}
+              </h3>
+              <p class="text-xs text-slate-500 font-medium mt-1">
+                課次範圍：${unit.lessons || "全單元"} ｜ 題目數量：共 <strong class="font-mono text-slate-700">${totalQ}</strong> 題
+              </p>
+            </div>
+
+            <!-- 個人狀態與進度條 -->
+            <div class="pt-1 space-y-2">
+              <div>${statusBadgeHtml}</div>
+              ${progressBarHtml}
+            </div>
+          </div>
+
+          <!-- 底部操作按鈕 -->
+          <div class="pt-2 border-t border-slate-100">
+            ${actionBtnHtml}
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>

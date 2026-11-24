@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>鳳溪第一小學 小四數學科自主練習平台：單元二 四邊形 (4A_U2)</title>
+  <!-- 載入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 載入 Google Fonts 繁體中文及等寬數字字型 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* 錯誤搖晃動畫 */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      15%, 55%, 85% { transform: translateX(-8px); }
+      35%, 70% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    /* 彈入動畫 */
+    @keyframes popIn {
+      0% { transform: scale(0.96); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop {
+      animation: popIn 0.25s ease-out forwards;
+    }
+
+    /* 隱藏數字輸入框上下預設箭咀 */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    /* 互動幾何草稿畫板背景樣式（空白、方格紙、釘板點陣） */
+    .canvas-blank {
+      background-color: #ffffff;
+    }
+    .canvas-grid {
+      background-color: #ffffff;
+      background-image: linear-gradient(#cbd5e1 1px, transparent 1px),
+                        linear-gradient(90deg, #cbd5e1 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .canvas-dots {
+      background-color: #ffffff;
+      background-image: radial-gradient(#94a3b8 2.2px, transparent 2.2px);
+      background-size: 28px 28px;
+      background-position: 14px 14px;
+    }
+    #scratchpadCanvas {
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-indigo-200">
+
+  <!-- ==================== 頂部導覽列（登入後顯示） ==================== -->
+  <header id="appHeader" class="hidden bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- 校名與單元標題 -->
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-600 to-indigo-600 text-white flex items-center justify-center font-black text-2xl shadow-sm shrink-0">
+          ◆
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="font-black text-base sm:text-lg text-slate-900 leading-tight">
+              鳳溪第一小學 小四數學科自主練習平台
+            </h1>
+            <span class="px-2.5 py-0.5 rounded-lg bg-sky-100 text-sky-800 text-xs font-bold">
+              單元二：四邊形 (4A_U2)
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">學習單位：4S1 四邊形(三) ｜ 看圖辨識與性質探究（答錯即時重做）</p>
+        </div>
+      </div>
+
+      <!-- 返回目錄、雲端狀態、用戶徽章、音效與登出 -->
+      <div class="flex items-center gap-2 sm:gap-2.5">
+        <a href="index.html"
+          class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 text-xs sm:text-sm font-bold transition flex items-center gap-1">
+          <span>←</span>
+          <span>返回課題目錄</span>
+        </a>
+
+        <div id="cloudSyncBadge" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold transition-all">
+          <span id="cloudSyncIcon">☁️</span>
+          <span id="cloudSyncText">雲端已連線</span>
+        </div>
+
+        <div class="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
+          <span>👤</span>
+          <span id="headerUserDisplay">4A (01) 學生</span>
+        </div>
+
+        <button id="soundToggleBtn" type="button" title="切換音效"
+          class="p-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition text-sm font-bold">
+          🔊
+        </button>
+
+        <button id="logoutBtn" type="button"
+          class="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 text-xs sm:text-sm font-bold transition">
+          登出
+        </button>
+      </div>
+    </div>
+
+    <!-- 學生即時進度條 -->
+    <div id="studentProgressBarWrapper" class="bg-slate-50 border-t border-slate-100 px-4 py-2">
+      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+        <div class="flex items-center gap-3 flex-1 min-w-[220px]">
+          <span class="font-bold text-slate-700 whitespace-nowrap">
+            完成進度：<span id="progressCountText" class="text-indigo-600 font-mono">0 / 18</span> 題
+          </span>
+          <div class="w-full max-w-xs bg-slate-200 rounded-full h-2.5 overflow-hidden">
+            <div id="progressBarFill" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 text-slate-600 font-medium">
+          <span>⭐ 首試答對：<strong id="firstTryCountText" class="text-emerald-600 font-mono">0</strong></span>
+          <span>🔄 總嘗試次數：<strong id="totalAttemptsText" class="text-amber-600 font-mono">0</strong></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 1. 雲端帳號密碼登入頁（直接開啟連結時顯示） ==================== -->
+  <main id="loginView" class="flex-1 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden animate-pop">
+      <div class="bg-gradient-to-br from-sky-600 via-indigo-600 to-blue-700 p-6 sm:p-7 text-white text-center relative">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-sky-100 mb-3">
+          <span>☁️</span>
+          <span>雲端同步版・跨裝置紀錄進度</span>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-black tracking-wide">鳳溪第一小學</h2>
+        <p class="text-lg font-bold text-sky-100 mt-0.5">小四數學科自主練習系統</p>
+        <div class="mt-3 inline-block px-4 py-1.5 rounded-xl bg-amber-400 text-slate-900 font-black text-sm shadow-sm">
+          單元二：四邊形（4S1 四邊形(三)）
+        </div>
+      </div>
+
+      <form id="loginForm" class="p-6 sm:p-8 space-y-5">
+        <div>
+          <label for="usernameInput" class="block text-sm font-bold text-slate-700 mb-1.5">
+            學生帳號 / 校內電郵
+          </label>
+          <input id="usernameInput" type="text" autocomplete="username" required
+            placeholder="例如：B23001@fk1ps.hk"
+            class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-base sm:text-lg font-mono transition" />
+        </div>
+
+        <div>
+          <label for="passwordInput" class="block text-sm font-bold text-slate-700 mb-1.5">
+            登入密碼
+          </label>
+          <div class="relative">
+            <input id="passwordInput" type="password" autocomplete="current-password" required
+              placeholder="請輸入密碼"
+              class="w-full pl-4 pr-12 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none text-base sm:text-lg font-mono transition" />
+            <button id="togglePasswordBtn" type="button" title="顯示或隱藏密碼"
+              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-lg">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <div id="loginErrorMsg" class="hidden p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold flex items-start gap-2">
+          <span class="mt-0.5">⚠️</span>
+          <span id="loginErrorText">帳號或密碼不正確，請重新輸入。</span>
+        </div>
+
+        <div id="loginLoadingMsg" class="hidden p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm font-bold flex items-center justify-center gap-2.5">
+          <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span>正在連接雲端資料庫驗證身分...</span>
+        </div>
+
+        <button id="loginSubmitBtn" type="submit"
+          class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-lg shadow-md shadow-indigo-200 transition">
+          登入開始作答 →
+        </button>
+
+        <div class="text-center pt-1">
+          <a href="index.html" class="text-xs font-bold text-indigo-600 hover:underline">
+            ← 返回全學年課題目錄主頁
+          </a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- ==================== 2. 學生作答主畫面 ==================== -->
+  <main id="quizView" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-5 space-y-5">
+
+    <!-- 歡迎與雲端續做提示橫幅 -->
+    <div class="bg-gradient-to-r from-sky-600 to-indigo-600 text-white rounded-2xl p-4 sm:px-6 shadow-sm flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">👋</span>
+        <div>
+          <p id="welcomeGreeting" class="font-black text-base sm:text-lg">歡迎你，4A (01) 白祖兒！</p>
+          <p id="welcomeSubtext" class="text-xs sm:text-sm text-sky-100">細心觀察幾何圖形的邊長、直角與平行線特徵，答錯時請參考小貼士即時訂正重做。</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="toggleScratchpadBtn" type="button"
+          class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 text-xs sm:text-sm font-black shadow-xs transition flex items-center gap-1.5">
+          <span>✏️</span>
+          <span id="toggleScratchpadLabel">打開互動幾何草稿畫板</span>
+        </button>
+        <button id="studentRestartBtn" type="button"
+          class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs sm:text-sm font-bold backdrop-blur-xs transition">
+          🔄 重新練習本單元
+        </button>
+      </div>
+    </div>
+
+    <!-- 題號導覽陣列（1–18 題） -->
+    <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <span class="text-xs sm:text-sm font-bold text-slate-700">📋 題目進度導覽（答對當前題目後自動解鎖下一題）：</span>
+        <div class="flex items-center gap-3 text-xs text-slate-500">
+          <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>首試答對</span>
+          <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>重做答對</span>
+          <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span>當前題目</span>
+        </div>
+      </div>
+      <div id="questionGrid" class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-18 gap-1.5">
+        <!-- JS 動態生成 1–18 題按鈕 -->
+      </div>
+    </section>
+
+    <!-- 可收合式互動幾何草稿畫板（支援空白、方格紙網格、釘板點陣及黑／藍／紅三色畫筆） -->
+    <section id="scratchpadSection" class="hidden bg-white rounded-3xl p-5 shadow-md border-2 border-amber-200 space-y-3 animate-pop">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📐</span>
+          <div>
+            <h3 class="font-black text-slate-800 text-base">互動幾何草稿畫板（輔助比劃平行線與對稱點）</h3>
+            <p class="text-xs text-slate-500">可用滑鼠或手指在畫板上連線，自由切換「空白畫紙」、「方格紙網格」或「釘板點陣」背景</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- 背景切換：空白 / 方格紙網格 / 釘板點陣 -->
+          <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-bold">
+            <button id="bgBlankBtn" type="button" onclick="setCanvasBgMode('blank')"
+              class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition">
+              空白畫紙
+            </button>
+            <button id="bgGridBtn" type="button" onclick="setCanvasBgMode('grid')"
+              class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition">
+              方格紙網格
+            </button>
+            <button id="bgDotsBtn" type="button" onclick="setCanvasBgMode('dots')"
+              class="px-2.5 py-1 rounded-lg bg-white text-indigo-700 shadow-xs transition">
+              釘板點陣
+            </button>
+          </div>
+
+          <!-- 筆色選擇（黑／藍／紅） -->
+          <div class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
+            <button type="button" onclick="setPenColor('#1e293b', this)" title="黑色畫筆"
+              class="pen-color-btn w-6 h-6 rounded-full bg-slate-800 ring-2 ring-offset-1 ring-indigo-500 transition"></button>
+            <button type="button" onclick="setPenColor('#2563eb', this)" title="藍色畫筆"
+              class="pen-color-btn w-6 h-6 rounded-full bg-blue-600 transition"></button>
+            <button type="button" onclick="setPenColor('#dc2626', this)" title="紅色畫筆"
+              class="pen-color-btn w-6 h-6 rounded-full bg-red-600 transition"></button>
+          </div>
+
+          <button type="button" onclick="clearScratchpad()"
+            class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold transition">
+            清除畫板
+          </button>
+          <button type="button" onclick="toggleScratchpad(false)"
+            class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+            收起 ✕
+          </button>
+        </div>
+      </div>
+
+      <canvas id="scratchpadCanvas" class="w-full h-60 rounded-2xl border-2 border-slate-300 canvas-dots cursor-crosshair"></canvas>
+    </section>
+
+    <!-- 當前題目主作答區 -->
+    <section id="questionCard" class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-200 space-y-6">
+      <!-- 分部標籤、題型徽章與嘗試次數 -->
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <span id="partBadge" class="px-3 py-1 rounded-xl bg-sky-100 text-sky-800 font-bold text-xs sm:text-sm">
+            甲部：菱形的認識與性質
+          </span>
+          <span id="questionNumberBadge" class="text-slate-700 font-black text-sm sm:text-base">
+            第 1 題 / 共 18 題
+          </span>
+          <span id="questionTypeBadge" class="px-2.5 py-0.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
+            單選看圖題
+          </span>
+        </div>
+
+        <span id="attemptBadge" class="px-3 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs">
+          第 1 次嘗試
+        </span>
+      </div>
+
+      <!-- 題目文字與主題圖形（若有） -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div id="promptTextCol" class="lg:col-span-12 space-y-3">
+          <h2 id="questionPrompt" class="text-xl sm:text-2xl font-black text-slate-900 leading-relaxed">
+            以下哪個平面圖形是菱形？
+          </h2>
+          <p id="multiSelectNotice" class="hidden inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 text-xs sm:text-sm font-black">
+            <span>☑️</span>
+            <span>多選題：請選出所有正確答案（可選多於一項），選好後按「提交答案」</span>
+          </p>
+        </div>
+
+        <!-- 主題附圖容器 -->
+        <div id="mainDiagramCol" class="hidden lg:col-span-5 flex justify-center">
+          <div id="mainDiagramBox" class="w-full max-w-xs sm:max-w-sm p-4 rounded-2xl bg-slate-50 border-2 border-slate-200 flex items-center justify-center shadow-inner">
+            <!-- JS 注入高清 SVG -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 作答互動區：支援「看圖選項網格」、「文字選項列表」或「數字填充輸入框」 -->
+      <div id="interactionContainer" class="space-y-4">
+        <!-- A. 選項網格（單選或多選） -->
+        <div id="optionsGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- JS 動態生成 A, B, C, D 選項卡片 -->
+        </div>
+
+        <!-- B. 數字填充輸入區（第 2, 3 題） -->
+        <div id="numericInputArea" class="hidden flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-md">
+          <div class="relative flex-1">
+            <input id="numericAnswerInput" type="number" inputmode="numeric"
+              placeholder="輸入數字答案..."
+              class="w-full px-5 py-4 rounded-2xl border-2 border-slate-300 focus:border-indigo-600 focus:outline-none text-2xl sm:text-3xl font-mono font-bold text-slate-900 bg-slate-50 focus:bg-white transition" />
+            <span id="numericUnitLabel" class="absolute right-4 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-500">
+              cm
+            </span>
+          </div>
+        </div>
+
+        <!-- 提交與下一題按鈕列 -->
+        <div class="pt-2 flex flex-wrap items-center gap-3">
+          <button id="submitAnswerBtn" type="button"
+            class="px-8 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold text-lg sm:text-xl shadow-md shadow-indigo-200 transition">
+            提交答案 ✓
+          </button>
+
+          <button id="nextQuestionBtn" type="button"
+            class="hidden px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold text-lg sm:text-xl shadow-md shadow-emerald-200 transition">
+            下一題 ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- 即時回饋橫幅（答對或答錯強制重做提示） -->
+      <div id="feedbackBox" class="hidden rounded-2xl p-4 sm:p-5 border-2 transition-all">
+        <div class="flex items-start gap-3">
+          <div id="feedbackIcon" class="text-2xl sm:text-3xl mt-0.5">❌</div>
+          <div class="flex-1 space-y-1.5">
+            <h3 id="feedbackTitle" class="font-black text-base sm:text-lg">
+              答錯了！請立即再試一次！
+            </h3>
+            <p id="feedbackMessage" class="text-sm sm:text-base leading-relaxed">
+              這題還未答對，請參考下方的幾何概念小貼士，重新觀察圖形後再作答。
+            </p>
+            <div id="hintContainer" class="mt-3 p-3.5 rounded-xl bg-white/90 border border-rose-200 text-slate-800 text-sm sm:text-base">
+              <span class="font-bold text-indigo-700">💡 幾何概念小貼士：</span>
+              <span id="hintText">菱形必須是四邊形，而且四條邊的長度都相等。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== 3. 完成單元成績結算證書頁面 ==================== -->
+  <main id="summaryView" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-lg border-2 border-indigo-100 text-center space-y-5 animate-pop">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-100 text-5xl shadow-inner">
+        🏆
+      </div>
+      <div>
+        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+          ☁️ 成績已成功同步至學校雲端紀錄表
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
+          單元二：四邊形 練習完成證書
+        </h2>
+        <p id="summaryStudentInfo" class="text-slate-600 font-bold text-base sm:text-lg mt-1">
+          學生：4A (01) 白祖兒
+        </p>
+      </div>
+
+      <!-- 核心表現數據卡 -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-left">
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+          <div class="text-xs font-bold text-emerald-700">⭐ 首試即答對題數</div>
+          <div id="statFirstTry" class="text-3xl font-black text-emerald-800 mt-1 font-mono">16 / 18</div>
+          <div id="statAccuracyRate" class="text-xs text-emerald-700 font-bold mt-1">首試正確率：89%</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+          <div class="text-xs font-bold text-amber-700">🔄 總作答嘗試次數</div>
+          <div id="statTotalAttempts" class="text-3xl font-black text-amber-800 mt-1 font-mono">20 次</div>
+          <div id="statRetriedCount" class="text-xs text-amber-700 font-bold mt-1">訂正重做題數：2 題</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+          <div class="text-xs font-bold text-indigo-700">📌 錯題訂正狀態</div>
+          <div class="text-2xl font-black text-indigo-800 mt-1">100% 達標</div>
+          <div id="statWrongSummary" class="text-xs text-indigo-700 font-medium mt-1 truncate">全數題目已成功完成</div>
+        </div>
+      </div>
+
+      <div class="pt-3 flex flex-wrap justify-center gap-3">
+        <a href="index.html"
+          class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md shadow-emerald-200 transition">
+          ← 返回課題目錄（查看總進度）
+        </a>
+        <button id="reviewWorksheetBtn" type="button"
+          class="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold transition">
+          返回檢視全部題目
+        </button>
+        <button id="resetMyProgressBtn" type="button"
+          class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-200 transition">
+          🔄 重新練習本單元
+        </button>
+      </div>
+    </div>
+
+    <!-- 逐題作答與錯題復習清單 -->
+    <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200">
+      <h3 class="text-lg font-black text-slate-800 mb-4">📊 逐題作答與錯題復習清單</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b-2 border-slate-200 text-slate-500">
+              <th class="py-2.5 px-3">題號</th>
+              <th class="py-2.5 px-3">分部</th>
+              <th class="py-2.5 px-3">題目重點</th>
+              <th class="py-2.5 px-3">正確答案</th>
+              <th class="py-2.5 px-3">表現狀態</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTableBody" class="divide-y divide-slate-100">
+            <!-- JS 動態生成 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== 4. 教師雲端監察後台（Teacher Dashboard） ==================== -->
+  <main id="teacherView" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+    <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-6 animate-pop">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div>
+          <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
+            👩‍🏫 教師雲端監察後台（單元二：四邊形 4A_U2）
+          </span>
+          <h2 class="text-2xl font-black text-slate-900 mt-2">全級學生即時作答進度與成績總覽</h2>
+          <p class="text-sm text-slate-500">數據即時同步自 Google Sheet 後台（Progress 與 Records 工作表）</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="teacherRefreshBtn" type="button"
+            class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition flex items-center gap-1.5">
+            <span>🔄</span>
+            <span>重新整理數據</span>
+          </button>
+          <button id="teacherPreviewStudentBtn" type="button"
+            class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-sm transition">
+            教師試做預覽模式
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 張統計 KPI 卡片 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200">
+          <div class="text-xs font-bold text-blue-700">⏳ 正在作答（進行中）</div>
+          <div id="kpiInProgress" class="text-3xl font-black text-blue-900 mt-1 font-mono">0 人</div>
+          <div class="text-xs text-blue-600 mt-1">已開始但未滿 18 題</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+          <div class="text-xs font-bold text-emerald-700">✅ 已完成全部 18 題</div>
+          <div id="kpiCompleted" class="text-3xl font-black text-emerald-900 mt-1 font-mono">0 人</div>
+          <div class="text-xs text-emerald-600 mt-1">已寫入正式成績總表</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+          <div class="text-xs font-bold text-indigo-700">🎯 全級平均首試正確率</div>
+          <div id="kpiAvgAccuracy" class="text-3xl font-black text-indigo-900 mt-1 font-mono">--%</div>
+          <div class="text-xs text-indigo-600 mt-1">一次即答對題數比例</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200">
+          <div class="text-xs font-bold text-rose-700">🔥 全級最常出錯題號</div>
+          <div id="kpiTopWrongQ" class="text-lg font-black text-rose-900 mt-1 truncate">暫無錯題紀錄</div>
+          <div class="text-xs text-rose-600 mt-1">供課堂重點講解參考</div>
+        </div>
+      </div>
+
+      <!-- 篩選器與分頁切換列 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+        <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200">
+          <button id="tabProgressBtn" type="button" onclick="switchTeacherTab('progress')"
+            class="px-4 py-2 rounded-lg bg-white text-indigo-700 font-bold text-sm shadow-xs transition">
+            1. 學生即時作答進度 (Progress)
+          </button>
+          <button id="tabRecordsBtn" type="button" onclick="switchTeacherTab('records')"
+            class="px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-sm transition">
+            2. 已完成成績總表 (Records)
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="teacherClassFilter" onchange="renderTeacherTables()"
+            class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-700 focus:outline-none focus:border-indigo-500">
+            <option value="ALL">全部班別</option>
+            <option value="4A">4A 班</option>
+            <option value="4B">4B 班</option>
+            <option value="4C">4C 班</option>
+            <option value="4D">4D 班</option>
+          </select>
+
+          <input id="teacherSearchInput" type="text" oninput="renderTeacherTables()"
+            placeholder="搜尋姓名、學號或帳號..."
+            class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:border-indigo-500" />
+        </div>
+      </div>
+
+      <div id="teacherLoadingBanner" class="hidden py-8 text-center text-indigo-600 font-bold">
+        正在從 Google Sheet 讀取最新學生數據...
+      </div>
+
+      <!-- 分頁 1：學生即時作答進度表 -->
+      <div id="teacherProgressSection" class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-y border-slate-200 text-slate-600">
+              <th class="py-3 px-3">班別</th>
+              <th class="py-3 px-3">學號</th>
+              <th class="py-3 px-3">姓名</th>
+              <th class="py-3 px-3">目前進度</th>
+              <th class="py-3 px-3">首試答對</th>
+              <th class="py-3 px-3">首試正確率</th>
+              <th class="py-3 px-3">曾答錯題號</th>
+              <th class="py-3 px-3">最後更新時間</th>
+            </tr>
+          </thead>
+          <tbody id="teacherProgressTbody" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+
+      <!-- 分頁 2：已完成成績總表 -->
+      <div id="teacherRecordsSection" class="hidden overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-y border-slate-200 text-slate-600">
+              <th class="py-3 px-3">完成時間</th>
+              <th class="py-3 px-3">班別</th>
+              <th class="py-3 px-3">學號</th>
+              <th class="py-3 px-3">姓名</th>
+              <th class="py-3 px-3">最終成績</th>
+              <th class="py-3 px-3">錯題訂正詳情</th>
+            </tr>
+          </thead>
+          <tbody id="teacherRecordsTbody" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== 全畫面處理中遮罩 ==================== -->
+  <div id="globalLoadingOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl px-6 py-5 shadow-2xl flex items-center gap-3 font-bold text-slate-800">
+      <svg class="animate-spin h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+      <span id="globalLoadingText">正在同步至 Google Sheet...</span>
+    </div>
+  </div>
+
+  <!-- ==================== 自訂確認對話框（取代 confirm） ==================== -->
+  <div id="customModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 animate-pop">
+      <h3 id="modalTitle" class="text-lg font-black text-slate-900">確認操作</h3>
+      <p id="modalBody" class="text-sm text-slate-600 leading-relaxed">確定要執行此操作嗎？</p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="modalCancelBtn" type="button"
+          class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold">
+          取消
+        </button>
+        <button id="modalConfirmBtn" type="button"
+          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold">
+          確定
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. 雲端 API 與本單元設定常數
+    // =========================================================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
+    const UNIT_ID = "4A_U2";
+    const UNIT_NAME = "單元二：四邊形";
+    const SSO_KEYS = ["FK1PS_P4_MATH_USER", "p4_math_user", "fk1ps_math_user", "fk1ps_user", "math_user"];
+
+    // =========================================================================
+    // 2. 高清彩色內聯 SVG 矢量幾何繪圖生成器（100% 對應工作紙 4A_U2）
+    // =========================================================================
+    const SVG_SHAPES = {
+      // 通用幾何多邊形輔助包裝
+      poly: (points, fill = "#dbeafe", stroke = "#1e3a8a", viewBox = "0 0 220 140") => `
+        <svg viewBox="${viewBox}" class="w-full h-32 sm:h-36 mx-auto overflow-visible">
+          <polygon points="${points}" fill="${fill}" stroke="${stroke}" stroke-width="4" stroke-linejoin="round" />
+        </svg>`,
+
+      // 題 1 選項圖：A 八邊星形凹多邊形、B 長方形、C 菱形、D 一般不規則四邊形
+      q1_a: () => `
+        <svg viewBox="0 0 220 140" class="w-full h-32 sm:h-36 mx-auto">
+          <polygon points="35,28 98,52 178,24 146,80 192,114 104,102 48,124 72,72"
+            fill="#fee2e2" stroke="#991b1b" stroke-width="4" stroke-linejoin="round" />
+        </svg>`,
+      q1_b: () => `
+        <svg viewBox="0 0 220 140" class="w-full h-32 sm:h-36 mx-auto">
+          <rect x="32" y="34" width="156" height="74"
+            fill="#e0f2fe" stroke="#075985" stroke-width="4" stroke-linejoin="round" />
+        </svg>`,
+      q1_c: () => `
+        <svg viewBox="0 0 220 140" class="w-full h-32 sm:h-36 mx-auto">
+          <polygon points="110,22 192,70 110,118 28,70"
+            fill="#dbeafe" stroke="#1e3a8a" stroke-width="4" stroke-linejoin="round" />
+        </svg>`,
+      q1_d: () => `
+        <svg viewBox="0 0 220 140" class="w-full h-32 sm:h-36 mx-auto">
+          <polygon points="48,48 140,26 190,68 34,116"
+            fill="#fef3c7" stroke="#92400e" stroke-width="4" stroke-linejoin="round" />
+        </svg>`,
+
+      // 題 2、3 主題圖：菱形 ABCD (AB = 4 cm, AD = 4 cm)
+      q2_abcd: () => `
+        <svg viewBox="0 0 280 175" class="w-full h-auto">
+          <polygon points="140,36 244,88 140,140 36,88"
+            fill="#dbeafe" stroke="#1e3a8a" stroke-width="4.5" stroke-linejoin="round" />
+          <text x="140" y="24" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">A</text>
+          <text x="20" y="94" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">B</text>
+          <text x="140" y="164" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">C</text>
+          <text x="260" y="94" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">D</text>
+          <text x="68" y="48" text-anchor="middle" font-size="16" font-weight="800" fill="#1d4ed8">4 cm</text>
+          <text x="212" y="48" text-anchor="middle" font-size="16" font-weight="800" fill="#1d4ed8">4 cm</text>
+        </svg>`,
+
+      // 題 4、5 主題圖：斜放菱形 PQRS（頂點順時針為 P、S、R、Q）
+      q2_pqrs: () => `
+        <svg viewBox="0 0 290 165" class="w-full h-auto">
+          <polygon points="116,42 246,42 174,126 44,126"
+            fill="#e0f2fe" stroke="#0369a1" stroke-width="4.5" stroke-linejoin="round" />
+          <text x="114" y="28" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">P</text>
+          <text x="26" y="132" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">Q</text>
+          <text x="176" y="150" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">R</text>
+          <text x="264" y="48" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">S</text>
+        </svg>`,
+
+      // 題 6 主題圖：組合圖形 P (直角三角形)、Q (梯形)、R (直角梯形)、S (菱形)
+      q3_comp: () => `
+        <svg viewBox="0 0 250 245" class="w-full h-auto">
+          <!-- R: 左側直角梯形 -->
+          <polygon points="34,46 106,102 106,216 34,176"
+            fill="#fef3c7" stroke="#1e3a8a" stroke-width="4" stroke-linejoin="round" />
+          <!-- S: 右下菱形（四邊等長，傾斜角度） -->
+          <polygon points="106,102 218,80 218,194 106,216"
+            fill="#dbeafe" stroke="#1e3a8a" stroke-width="4" stroke-linejoin="round" />
+          <!-- Q: 頂部梯形 -->
+          <polygon points="34,46 164,28 218,80 106,102"
+            fill="#dcfce7" stroke="#1e3a8a" stroke-width="4" stroke-linejoin="round" />
+          <!-- P: 右上直角三角形 -->
+          <polygon points="164,28 218,20 218,80"
+            fill="#fce7f3" stroke="#1e3a8a" stroke-width="4" stroke-linejoin="round" />
+          <text x="200" y="54" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">P</text>
+          <text x="126" y="70" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">Q</text>
+          <text x="68" y="138" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">R</text>
+          <text x="162" y="156" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">S</text>
+        </svg>`,
+
+      // 題 7 主題圖：6×6 方格紙（頂部 A 點連向左下 B 點與右下 C 點，底部標示四個候選紅點 P, Q, R, S）
+      q4_grid: () => {
+        let lines = '';
+        for (let i = 0; i <= 5; i++) {
+          const pos = 35 + i * 38;
+          lines += `<line x1="35" y1="${pos}" x2="225" y2="${pos}" stroke="#94a3b8" stroke-width="1.5" />`;
+          lines += `<line x1="${pos}" y1="35" x2="${pos}" y2="225" stroke="#94a3b8" stroke-width="1.5" />`;
+        }
+        const cx = (x) => 35 + x * 38;
+        const cy = (y) => 225 - y * 38;
+        return `
+          <svg viewBox="0 0 265 260" class="w-full h-auto">
+            ${lines}
+            <!-- 已知兩條黑線：頂部 A(3,5) 連向左下 B(2,3) 與右下 C(4,3) -->
+            <polyline points="${cx(2)},${cy(3)} ${cx(3)},${cy(5)} ${cx(4)},${cy(3)}"
+              fill="none" stroke="#0f172a" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+            <!-- 標示 A, B, C 頂點 -->
+            <circle cx="${cx(3)}" cy="${cy(5)}" r="5" fill="#0f172a" />
+            <text x="${cx(3)}" y="${cy(5)-10}" text-anchor="middle" font-size="15" font-weight="900" fill="#0f172a">A</text>
+
+            <circle cx="${cx(2)}" cy="${cy(3)}" r="5" fill="#0f172a" />
+            <text x="${cx(2)-15}" y="${cy(3)+5}" text-anchor="middle" font-size="15" font-weight="900" fill="#0f172a">B</text>
+
+            <circle cx="${cx(4)}" cy="${cy(3)}" r="5" fill="#0f172a" />
+            <text x="${cx(4)+15}" y="${cy(3)+5}" text-anchor="middle" font-size="15" font-weight="900" fill="#0f172a">C</text>
+
+            <!-- 底部四個候選紅點 P, Q, R, S -->
+            <circle cx="${cx(2)}" cy="${cy(1)}" r="6.5" fill="#dc2626" />
+            <text x="${cx(2)}" y="${cy(1)+20}" text-anchor="middle" font-size="14" font-weight="900" fill="#dc2626">P</text>
+
+            <circle cx="${cx(3)}" cy="${cy(1)}" r="6.5" fill="#dc2626" />
+            <text x="${cx(3)}" y="${cy(1)+20}" text-anchor="middle" font-size="14" font-weight="900" fill="#dc2626">Q</text>
+
+            <circle cx="${cx(4)}" cy="${cy(1)}" r="6.5" fill="#dc2626" />
+            <text x="${cx(4)}" y="${cy(1)+20}" text-anchor="middle" font-size="14" font-weight="900" fill="#dc2626">R</text>
+
+            <circle cx="${cx(3)}" cy="${cy(0)}" r="6.5" fill="#dc2626" />
+            <text x="${cx(3)+15}" y="${cy(0)+5}" text-anchor="middle" font-size="14" font-weight="900" fill="#dc2626">S</text>
+          </svg>`;
+      },
+
+      // 題 8、9 主題圖：6×6 點陣釘板上的菱形 PQRS
+      q5_geoboard: () => {
+        let dots = '';
+        for (let r = 0; r < 6; r++) {
+          for (let c = 0; c < 6; c++) {
+            dots += `<circle cx="${34 + c * 38}" cy="${34 + r * 38}" r="4" fill="#94a3b8" />`;
+          }
+        }
+        const px = (c) => 34 + c * 38;
+        const py = (r) => 34 + r * 38;
+        return `
+          <svg viewBox="0 0 258 258" class="w-full h-auto">
+            <rect x="14" y="14" width="230" height="230" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="3" />
+            ${dots}
+            <polygon points="${px(3)},${py(1)} ${px(5)},${py(2)} ${px(3)},${py(3)} ${px(1)},${py(2)}"
+              fill="#bae6fd" fill-opacity="0.7" stroke="#0f172a" stroke-width="4" stroke-linejoin="round" />
+            <text x="${px(3)}" y="${py(1)-11}" text-anchor="middle" font-size="17" font-weight="900" fill="#0f172a">P</text>
+            <text x="${px(1)-16}" y="${py(2)+6}" text-anchor="middle" font-size="17" font-weight="900" fill="#0f172a">Q</text>
+            <text x="${px(3)}" y="${py(3)+22}" text-anchor="middle" font-size="17" font-weight="900" fill="#0f172a">R</text>
+            <text x="${px(5)+16}" y="${py(2)+6}" text-anchor="middle" font-size="17" font-weight="900" fill="#0f172a">S</text>
+          </svg>`;
+      },
+
+      // 題 10 主題圖：6×6 點陣釘板六點 P, Q, R, S, T, U（連接 Q, R, T, U 成菱形/正方形）
+      q6_geoboard: () => {
+        let dots = '';
+        for (let r = 0; r < 6; r++) {
+          for (let c = 0; c < 6; c++) {
+            dots += `<circle cx="${34 + c * 38}" cy="${34 + r * 38}" r="4" fill="#94a3b8" />`;
+          }
+        }
+        const px = (c) => 34 + c * 38;
+        const py = (r) => 34 + r * 38;
+        return `
+          <svg viewBox="0 0 258 258" class="w-full h-auto">
+            <rect x="14" y="14" width="230" height="230" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="3" />
+            ${dots}
+            <circle cx="${px(3)}" cy="${py(0)}" r="6.5" fill="#0f172a" />
+            <text x="${px(3)}" y="${py(0)-10}" text-anchor="middle" font-size="16" font-weight="900" fill="#0f172a">P</text>
+
+            <circle cx="${px(3)}" cy="${py(1)}" r="6.5" fill="#0f172a" />
+            <text x="${px(3)}" y="${py(1)+21}" text-anchor="middle" font-size="16" font-weight="900" fill="#0f172a">Q</text>
+
+            <circle cx="${px(1)}" cy="${py(3)}" r="6.5" fill="#0f172a" />
+            <text x="${px(1)}" y="${py(3)-11}" text-anchor="middle" font-size="16" font-weight="900" fill="#0f172a">R</text>
+
+            <circle cx="${px(2)}" cy="${py(3)}" r="6.5" fill="#0f172a" />
+            <text x="${px(2)}" y="${py(3)-11}" text-anchor="middle" font-size="16" font-weight="900" fill="#0f172a">S</text>
+
+            <circle cx="${px(5)}" cy="${py(3)}" r="6.5" fill="#0f172a" />
+            <text x="${px(5)}" y="${py(3)-11}" text-anchor="middle" font-size="16" font-weight="900" fill="#0f172a">U</text>
+
+            <circle cx="${px(3)}" cy="${py(5)}" r="6.5" fill="#0f172a" />
+            <text x="${px(3)}" y="${py(5)-11}" text-anchor="middle" font-size="16" font-weight="900" fill="#0f172a">T</text>
+          </svg>`;
+      },
+
+      // 題 11 選項圖：帶孔幾何條組（傳入孔數陣列）
+      q7_strips: (holesArr) => {
+        let stripsHtml = '';
+        holesArr.forEach((holes, idx) => {
+          const y = 14 + idx * 30;
+          const width = 34 + (holes - 1) * 38;
+          stripsHtml += `<rect x="14" y="${y}" width="${width}" height="21" rx="10.5" fill="#cbd5e1" stroke="#1e293b" stroke-width="3" />`;
+          for (let h = 0; h < holes; h++) {
+            stripsHtml += `<circle cx="${31 + h * 38}" cy="${y + 10.5}" r="4.2" fill="#ffffff" stroke="#1e293b" stroke-width="2.2" />`;
+          }
+        });
+        return `<svg viewBox="0 0 220 140" class="w-full h-32 sm:h-36 mx-auto">${stripsHtml}</svg>`;
+      },
+
+      // 題 13 選項圖：A 梯形、B 旋轉 45° 正方形、C 箏形/鷂形、D 一般平行四邊形
+      q13_a: () => SVG_SHAPES.poly("62,32 158,32 188,112 32,112", "#fef3c7", "#92400e"),
+      q13_b: () => SVG_SHAPES.poly("110,20 162,72 110,124 58,72", "#dbeafe", "#1e3a8a"),
+      q13_c: () => SVG_SHAPES.poly("30,72 134,30 190,72 134,114", "#fce7f3", "#9d174d"),
+      q13_d: () => SVG_SHAPES.poly("86,24 184,72 134,122 36,74", "#dcfce7", "#166534"),
+
+      // 題 14 選項圖：A 斜放長方形、B 梯形、C 一般平行四邊形、D 斜放正方形
+      q14_a: () => SVG_SHAPES.poly("32,62 168,26 188,84 52,120", "#dbeafe", "#1e3a8a"),
+      q14_b: () => SVG_SHAPES.poly("74,30 124,36 192,114 32,102", "#fef3c7", "#92400e"),
+      q14_c: () => SVG_SHAPES.poly("68,32 190,32 152,112 30,112", "#dcfce7", "#166534"),
+      q14_d: () => SVG_SHAPES.poly("38,52 138,22 182,88 82,118", "#e0e7ff", "#3730a3"),
+
+      // 題 15 選項圖：A 水平菱形、B 一般平行四邊形、C 斜放長方形、D 旋轉 45° 正方形
+      q15_a: () => SVG_SHAPES.poly("110,24 190,70 110,116 30,70", "#dbeafe", "#1e3a8a"),
+      q15_b: () => SVG_SHAPES.poly("64,58 190,26 156,82 30,114", "#dcfce7", "#166534"),
+      q15_c: () => SVG_SHAPES.poly("58,24 188,70 162,122 32,76", "#fef3c7", "#92400e"),
+      q15_d: () => SVG_SHAPES.poly("110,20 162,72 110,124 58,72", "#e0e7ff", "#3730a3"),
+
+      // 題 16 選項圖：A 斜放平行四邊形、B 梯形、C 底部呈波浪曲線的非多邊形、D 斜放菱形
+      q16_a: () => SVG_SHAPES.poly("26,30 104,44 194,112 116,98", "#dbeafe", "#1e3a8a"),
+      q16_b: () => SVG_SHAPES.poly("90,30 186,30 172,112 32,112", "#fef3c7", "#92400e"),
+      q16_c: () => `
+        <svg viewBox="0 0 220 140" class="w-full h-32 sm:h-36 mx-auto">
+          <path d="M 32,30 L 188,30 L 188,108 Q 148,125 110,108 Q 72,91 32,108 Z"
+            fill="#fee2e2" stroke="#991b1b" stroke-width="4" stroke-linejoin="round" />
+        </svg>`,
+      q16_d: () => SVG_SHAPES.poly("126,24 192,68 94,116 28,72", "#dcfce7", "#166534"),
+
+      // 題 17 選項圖：A 斜放正方形、B 長方形、C 平行四邊形、D 一般不規則四邊形
+      q17_a: () => SVG_SHAPES.poly("86,24 176,62 134,122 44,84", "#dbeafe", "#1e3a8a"),
+      q17_b: () => SVG_SHAPES.poly("32,34 188,34 188,108 32,108", "#e0f2fe", "#075985"),
+      q17_c: () => SVG_SHAPES.poly("70,34 190,28 150,108 30,114", "#dcfce7", "#166534"),
+      q17_d: () => SVG_SHAPES.poly("48,26 184,68 102,120 36,86", "#fef3c7", "#92400e")
+    };
+
+    // =========================================================================
+    // 3. 完整 18 道看圖互動題庫（100% 對應指定工作紙規格）
+    // =========================================================================
+    const QUESTIONS = [
+      {
+        id: 1,
+        part: '甲部：菱形的認識與性質',
+        type: 'single',
+        prompt: '以下哪個平面圖形是菱形？',
+        answer: 'C',
+        hint: '菱形必須是四邊形（有 4 條直邊），而且四條邊的長度都相等。圖 A 有 8 條邊，圖 B 的鄰邊不相等，圖 D 的四條邊長度不相等。',
+        options: [
+          { key: 'A', label: 'A', svg: SVG_SHAPES.q1_a() },
+          { key: 'B', label: 'B', svg: SVG_SHAPES.q1_b() },
+          { key: 'C', label: 'C', svg: SVG_SHAPES.q1_c() },
+          { key: 'D', label: 'D', svg: SVG_SHAPES.q1_d() }
+        ]
+      },
+      {
+        id: 2,
+        part: '甲部：菱形的認識與性質',
+        type: 'number',
+        prompt: '觀察右圖的菱形 ABCD，不用直尺量度，BC 長多少 cm？',
+        unit: 'cm',
+        answer: 4,
+        mainDiagram: SVG_SHAPES.q2_abcd(),
+        hint: '菱形有一個重要性質：它的四條邊長度都相等！圖中 AB = 4 cm，所以 BC 也是同樣長度。'
+      },
+      {
+        id: 3,
+        part: '甲部：菱形的認識與性質',
+        type: 'number',
+        prompt: '承上題菱形 ABCD（AB = 4 cm，AD = 4 cm），不用直尺量度，DC 長多少 cm？',
+        unit: 'cm',
+        answer: 4,
+        mainDiagram: SVG_SHAPES.q2_abcd(),
+        hint: '因為菱形 ABCD 的四條邊長度全部相等（AB = BC = DC = AD = 4 cm），所以 DC 的長度也是 4 cm。'
+      },
+      {
+        id: 4,
+        part: '甲部：菱形的認識與性質',
+        type: 'single',
+        prompt: '觀察右圖的菱形 PQRS，PS 和哪一條邊互相平行？',
+        answer: 'B',
+        mainDiagram: SVG_SHAPES.q2_pqrs(),
+        hint: '菱形的兩組「對邊」分別平行。在圖中，PS 位於最上方水平位置，與它相對的底邊就是互相平行的對邊。',
+        options: [
+          { key: 'A', label: 'A', text: 'PQ' },
+          { key: 'B', label: 'B', text: 'QR' },
+          { key: 'C', label: 'C', text: 'RS' },
+          { key: 'D', label: 'D', text: 'PR' }
+        ]
+      },
+      {
+        id: 5,
+        part: '甲部：菱形的認識與性質',
+        type: 'single',
+        prompt: '承上題菱形 PQRS，PQ 和哪一條邊互相平行？',
+        answer: 'C',
+        mainDiagram: SVG_SHAPES.q2_pqrs(),
+        hint: 'PQ 是左邊傾斜的那條邊，與它相對（右邊同樣傾斜方向）的對邊就是與它互相平行的邊。',
+        options: [
+          { key: 'A', label: 'A', text: 'PS' },
+          { key: 'B', label: 'B', text: 'QR' },
+          { key: 'C', label: 'C', text: 'SR' },
+          { key: 'D', label: 'D', text: 'QS' }
+        ]
+      },
+      {
+        id: 6,
+        part: '甲部：菱形的認識與性質',
+        type: 'single',
+        prompt: '右圖的組合圖形由 P、Q、R、S 四個部分拼成，哪個平面圖形是菱形？',
+        answer: 'D',
+        mainDiagram: SVG_SHAPES.q3_comp(),
+        hint: '逐個圖形檢查：P 是直角三角形，Q 只有一組對邊平行（梯形），R 是直角梯形，只有 S 的四條邊長度相等且對邊平行！',
+        options: [
+          { key: 'A', label: 'A', text: 'P' },
+          { key: 'B', label: 'B', text: 'Q' },
+          { key: 'C', label: 'C', text: 'R' },
+          { key: 'D', label: 'D', text: 'S' }
+        ]
+      },
+      {
+        id: 7,
+        part: '甲部：菱形的認識與性質',
+        type: 'single',
+        prompt: '右圖方格紙上有兩條已畫好的黑線，起點在頂部 A 點，分別連向左下 B 點與右下 C 點。要與原有的黑線組成一個菱形，第四個頂點應該選哪一點？',
+        answer: 'B',
+        mainDiagram: SVG_SHAPES.q4_grid(),
+        hint: '利用對稱性質：頂部 A 點向下數 2 格到達 B、C 所在的水平線；從該水平線再向下數 2 格與 A 點上下對稱的位置，就能使四條邊長度相等！',
+        options: [
+          { key: 'A', label: 'A', text: 'P 點' },
+          { key: 'B', label: 'B', text: 'Q 點' },
+          { key: 'C', label: 'C', text: 'R 點' },
+          { key: 'D', label: 'D', text: 'S 點' }
+        ]
+      },
+      {
+        id: 8,
+        part: '乙部：釘板與幾何條拼砌',
+        type: 'single',
+        prompt: '嘉言用橡皮圈在釘板上圍出一個四邊形 PQRS，這個四邊形是哪一種圖形？',
+        answer: 'C',
+        mainDiagram: SVG_SHAPES.q5_geoboard(),
+        hint: '數一數釘板格數：從 P 到 Q 是「向左 2 格、向下 1 格」，其餘三條邊也是「橫 2 格、直 1 格」的斜線，四條邊長度完全相等！',
+        options: [
+          { key: 'A', label: 'A', text: '梯形' },
+          { key: 'B', label: 'B', text: '長方形' },
+          { key: 'C', label: 'C', text: '菱形' },
+          { key: 'D', label: 'D', text: '直角三角形' }
+        ]
+      },
+      {
+        id: 9,
+        part: '乙部：釘板與幾何條拼砌',
+        type: 'single',
+        prompt: '承上題釘板上的菱形 PQRS，在這個四邊形中，QR 和哪一條邊互相平行？',
+        answer: 'B',
+        mainDiagram: SVG_SHAPES.q5_geoboard(),
+        hint: 'QR 位於左下方，與它方向相同（皆為橫 2 格、直 1 格向上傾斜）、位於右上方的對邊是哪一條？',
+        options: [
+          { key: 'A', label: 'A', text: 'PQ' },
+          { key: 'B', label: 'B', text: 'PS' },
+          { key: 'C', label: 'C', text: 'RS' },
+          { key: 'D', label: 'D', text: 'PR' }
+        ]
+      },
+      {
+        id: 10,
+        part: '乙部：釘板與幾何條拼砌',
+        type: 'single',
+        prompt: '右面釘板上有六個黑點 P、Q、R、S、T、U，把哪四點用橡皮圈圍起來，會圍出一個菱形？',
+        answer: 'C',
+        mainDiagram: SVG_SHAPES.q6_geoboard(),
+        hint: '試找出四條邊斜度與長度完全相同的四個點：從 Q 向左下數「橫 2 格、直 2 格」到 R，向右下數「橫 2 格、直 2 格」到 U，再連向底部的 T！',
+        options: [
+          { key: 'A', label: 'A', text: 'P、S、T 和 U 點' },
+          { key: 'B', label: 'B', text: 'Q、S、T 和 U 點' },
+          { key: 'C', label: 'C', text: 'Q、R、T 和 U 點' },
+          { key: 'D', label: 'D', text: 'P、R、T 和 U 點' }
+        ]
+      },
+      {
+        id: 11,
+        part: '乙部：釘板與幾何條拼砌',
+        type: 'single',
+        prompt: '以下哪一組幾何條可以拼出一個菱形？',
+        answer: 'C',
+        hint: '菱形的四條邊長度必須「全部相等」，所以需要選擇 4 條孔數（長度）完全相同的幾何條！',
+        options: [
+          { key: 'A', label: 'A 組', svg: SVG_SHAPES.q7_strips([3, 3, 4, 4]) },
+          { key: 'B', label: 'B 組', svg: SVG_SHAPES.q7_strips([3, 3, 4, 5]) },
+          { key: 'C', label: 'C 組', svg: SVG_SHAPES.q7_strips([4, 4, 4, 4]) },
+          { key: 'D', label: 'D 組', svg: SVG_SHAPES.q7_strips([3, 4, 4, 5]) }
+        ]
+      },
+      {
+        id: 12,
+        part: '丙部：四邊形之間的關係',
+        type: 'single',
+        prompt: '比較「菱形」和「正方形」的性質：兩者都具備「四邊長度相等」和「兩組對邊分別平行」，但正方形還多具備「四個角都是直角」。根據這些性質，下列哪一句結論是正確的？',
+        answer: 'B',
+        hint: '正方形具備菱形的全部性質（四邊相等、對邊平行），所以正方形是特殊的菱形；但菱形的角未必是直角，所以並非所有菱形都是正方形！',
+        options: [
+          { key: 'A', label: 'A', text: '所有菱形皆是正方形' },
+          { key: 'B', label: 'B', text: '所有正方形皆是菱形' },
+          { key: 'C', label: 'C', text: '菱形不是平行四邊形' },
+          { key: 'D', label: 'D', text: '正方形只有一組對邊平行' }
+        ]
+      },
+      {
+        id: 13,
+        part: '丙部：四邊形之間的關係',
+        type: 'single',
+        prompt: '觀察以下四個平面圖形，哪一個四邊形是「長方形」的一種？',
+        answer: 'B',
+        hint: '記住：所有正方形都有四個直角和兩組對邊平行，所以「所有正方形皆是長方形的一種」（即使旋轉 45° 斜放也一樣）！',
+        options: [
+          { key: 'A', label: '圖形 A', svg: SVG_SHAPES.q13_a() },
+          { key: 'B', label: '圖形 B', svg: SVG_SHAPES.q13_b() },
+          { key: 'C', label: '圖形 C', svg: SVG_SHAPES.q13_c() },
+          { key: 'D', label: '圖形 D', svg: SVG_SHAPES.q13_d() }
+        ]
+      },
+      {
+        id: 14,
+        part: '丙部：四邊形之間的關係',
+        type: 'multi',
+        prompt: '觀察以下四個四邊形，以下哪些四邊形「不是」長方形的一種？',
+        answer: ['B', 'C'],
+        hint: '長方形（包括正方形）必須有「四個直角」。圖形 A 是斜放長方形，圖形 D 是斜放正方形（也是長方形）；B 是梯形，C 是一般平行四邊形，兩者都沒有直角！',
+        options: [
+          { key: 'A', label: 'A', svg: SVG_SHAPES.q14_a() },
+          { key: 'B', label: 'B', svg: SVG_SHAPES.q14_b() },
+          { key: 'C', label: 'C', svg: SVG_SHAPES.q14_c() },
+          { key: 'D', label: 'D', svg: SVG_SHAPES.q14_d() }
+        ]
+      },
+      {
+        id: 15,
+        part: '丙部：四邊形之間的關係',
+        type: 'multi',
+        prompt: '觀察以下四個四邊形，以下哪些四邊形是「菱形」的一種？',
+        answer: ['A', 'D'],
+        hint: '只要四條邊長度都相等，就是菱形的一種！圖形 A 是水平菱形，而圖形 D 是旋轉 45° 的正方形（所有正方形皆是菱形的一種）。',
+        options: [
+          { key: 'A', label: 'A', svg: SVG_SHAPES.q15_a() },
+          { key: 'B', label: 'B', svg: SVG_SHAPES.q15_b() },
+          { key: 'C', label: 'C', svg: SVG_SHAPES.q15_c() },
+          { key: 'D', label: 'D', svg: SVG_SHAPES.q15_d() }
+        ]
+      },
+      {
+        id: 16,
+        part: '丙部：四邊形之間的關係',
+        type: 'multi',
+        prompt: '觀察以下四個平面圖形，以下哪些平面圖形是「平行四邊形」的一種？',
+        answer: ['A', 'D'],
+        hint: '平行四邊形必須是多邊形（全直邊）且有兩組對邊分別平行。B 是梯形（只有一組對邊平行），C 底部呈波浪曲線（連多邊形都不是）；A 和 D（菱形）都是平行四邊形！',
+        options: [
+          { key: 'A', label: 'A', svg: SVG_SHAPES.q16_a() },
+          { key: 'B', label: 'B', svg: SVG_SHAPES.q16_b() },
+          { key: 'C', label: 'C', svg: SVG_SHAPES.q16_c() },
+          { key: 'D', label: 'D', svg: SVG_SHAPES.q16_d() }
+        ]
+      },
+      {
+        id: 17,
+        part: '丙部：四邊形之間的關係',
+        type: 'single',
+        prompt: '觀察以下四個四邊形，以下哪個四邊形「不是」平行四邊形的一種？',
+        answer: 'D',
+        hint: '所有正方形（A）、長方形（B）和一般平行四邊形（C）都具備兩組對邊平行；只有圖形 D 是一般不規則四邊形！',
+        options: [
+          { key: 'A', label: '圖形 A', svg: SVG_SHAPES.q17_a() },
+          { key: 'B', label: '圖形 B', svg: SVG_SHAPES.q17_b() },
+          { key: 'C', label: '圖形 C', svg: SVG_SHAPES.q17_c() },
+          { key: 'D', label: '圖形 D', svg: SVG_SHAPES.q17_d() }
+        ]
+      },
+      {
+        id: 18,
+        part: '丙部：四邊形之間的關係',
+        type: 'single',
+        prompt: '判斷以下兩句句子是否正確：\n「甲：所有長方形皆是平行四邊形。」\n「乙：所有菱形皆是長方形。」',
+        answer: 'A',
+        hint: '長方形有兩組對邊分別平行，所以「甲」正確；但菱形的四個角不一定是直角，所以並非所有菱形都是長方形，「乙」不正確！',
+        options: [
+          { key: 'A', label: 'A', text: '甲正確，乙不正確' },
+          { key: 'B', label: 'B', text: '甲不正確，乙正確' },
+          { key: 'C', label: 'C', text: '甲和乙都正確' },
+          { key: 'D', label: 'D', text: '甲和乙都不正確' }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 4. 全局狀態變數與雲端 API 通訊函式
+    // =========================================================================
+    let currentUser = null;
+    let currentQIndex = 0;
+    let selectedOptions = [];
+    let soundEnabled = true;
+    let audioCtx = null;
+    let isTeacherPreview = false;
+
+    let quizState = {
+      completed: {},        // { [qId]: { attempts: number, firstTryCorrect: boolean } }
+      attemptsTracker: {},  // { [qId]: number }
+      isCompleted: false
+    };
+
+    let teacherData = {
+      progressList: [],
+      recordsList: []
+    };
+
+    async function callApi(payload) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP 錯誤狀態碼：${response.status}`);
+      }
+      return await response.json();
+    }
+
+    function setCloudSyncStatus(state, customText) {
+      const badge = document.getElementById('cloudSyncBadge');
+      const icon = document.getElementById('cloudSyncIcon');
+      const text = document.getElementById('cloudSyncText');
+
+      badge.classList.remove(
+        'bg-emerald-50', 'border-emerald-200', 'text-emerald-700',
+        'bg-amber-50', 'border-amber-200', 'text-amber-700',
+        'bg-rose-50', 'border-rose-200', 'text-rose-700'
+      );
+
+      if (state === 'syncing') {
+        badge.classList.add('bg-amber-50', 'border-amber-200', 'text-amber-700');
+        icon.textContent = '⏳';
+        text.textContent = customText || '正在同步至雲端...';
+      } else if (state === 'error') {
+        badge.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
+        icon.textContent = '⚠️';
+        text.textContent = customText || '雲端同步異常';
+      } else {
+        badge.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
+        icon.textContent = '☁️';
+        text.textContent = customText || '已自動儲存至雲端';
+      }
+    }
+
+    // =========================================================================
+    // 5. Web Audio API 提示音效
+    // =========================================================================
+    function playTone(type) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.09);
+          osc.frequency.setValueAtTime(783.99, now + 0.18);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(210, now);
+          osc.frequency.linearRampToValueAtTime(165, now + 0.25);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        }
+      } catch (e) {
+        // 忽略自動播放限制
+      }
+    }
+
+    // =========================================================================
+    // 6. 單一登入 (SSO) 自動讀取與獨立登入邏輯
+    // =========================================================================
+    function readSsoUser() {
+      // 1. 優先檢查指定常見鍵名
+      for (const key of SSO_KEYS) {
+        const raw = sessionStorage.getItem(key);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.account) return parsed;
+          } catch (e) {
+            // 忽略無效 JSON
+          }
+        }
+      }
+      // 2. 自動掃描 sessionStorage 內任何包含 account 屬性的 JSON 物件
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const k = sessionStorage.key(i);
+        try {
+          const parsed = JSON.parse(sessionStorage.getItem(k));
+          if (parsed && typeof parsed === 'object' && parsed.account) {
+            return parsed;
+          }
+        } catch (e) {
+          // 忽略非 JSON 項目
+        }
+      }
+      return null;
+    }
+
+    function writeSsoUser(userObj) {
+      const jsonStr = JSON.stringify(userObj);
+      sessionStorage.setItem('FK1PS_P4_MATH_USER', jsonStr);
+      sessionStorage.setItem('p4_math_user', jsonStr);
+      sessionStorage.setItem('fk1ps_math_user', jsonStr);
+    }
+
+    function clearSsoUser() {
+      SSO_KEYS.forEach((k) => sessionStorage.removeItem(k));
+    }
+
+    function formatUserDisplay(user) {
+      if (!user) return '';
+      if (user.role === 'teacher') return `👩‍🏫 ${user.name || '數學科老師'}`;
+      const cls = user.className || '';
+      const num = user.classNum ? `(${user.classNum})` : '';
+      return `${cls} ${num} ${user.name}`.trim();
+    }
+
+    // 頁面載入時自動檢查 SSO 並從雲端拉取進度
+    window.addEventListener('DOMContentLoaded', async function () {
+      const ssoUser = readSsoUser();
+      if (!ssoUser) return;
+
+      currentUser = ssoUser;
+      isTeacherPreview = false;
+
+      document.getElementById('headerUserDisplay').textContent = formatUserDisplay(currentUser);
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('appHeader').classList.remove('hidden');
+
+      if (currentUser.role === 'teacher') {
+        document.getElementById('studentProgressBarWrapper').classList.add('hidden');
+        await openTeacherDashboard();
+      } else {
+        document.getElementById('studentProgressBarWrapper').classList.remove('hidden');
+        showGlobalLoading('正在從雲端同步「單元二：四邊形」進度...');
+        try {
+          const dashRes = await callApi({
+            action: 'getStudentDashboard',
+            account: currentUser.account
+          });
+          const unitProg = (dashRes.status === 'success' && dashRes.progressMap)
+            ? dashRes.progressMap[UNIT_ID]
+            : null;
+          setCloudSyncStatus('ok', '雲端已連線');
+          initStudentFromCloudProgress(unitProg);
+        } catch (err) {
+          setCloudSyncStatus('error', '雲端連線不穩');
+          initStudentFromCloudProgress(null);
+        } finally {
+          hideGlobalLoading();
+        }
+      }
+    });
+
+    document.getElementById('togglePasswordBtn').addEventListener('click', function () {
+      const pwdInput = document.getElementById('passwordInput');
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        this.textContent = '🙈';
+      } else {
+        pwdInput.type = 'password';
+        this.textContent = '👁️';
+      }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const account = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value.trim();
+      if (!account || !password) return;
+
+      const errBox = document.getElementById('loginErrorMsg');
+      const errText = document.getElementById('loginErrorText');
+      const loadingBox = document.getElementById('loginLoadingMsg');
+      const submitBtn = document.getElementById('loginSubmitBtn');
+
+      errBox.classList.add('hidden');
+      loadingBox.classList.remove('hidden');
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+
+      try {
+        const res = await callApi({
+          action: 'login',
+          mode: 'unit',
+          unitId: UNIT_ID,
+          account: account,
+          password: password
+        });
+
+        if (res.status !== 'success') {
+          errText.textContent = res.message || '帳號或密碼不正確，請重新輸入。';
+          errBox.classList.remove('hidden', 'animate-shake');
+          void errBox.offsetWidth;
+          errBox.classList.add('animate-shake');
+          playTone('wrong');
+          return;
+        }
+
+        currentUser = res.user;
+        isTeacherPreview = false;
+        writeSsoUser(currentUser);
+
+        document.getElementById('headerUserDisplay').textContent = formatUserDisplay(currentUser);
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('appHeader').classList.remove('hidden');
+        setCloudSyncStatus('ok', '雲端已連線');
+
+        if (currentUser.role === 'teacher') {
+          document.getElementById('studentProgressBarWrapper').classList.add('hidden');
+          await openTeacherDashboard();
+        } else {
+          document.getElementById('studentProgressBarWrapper').classList.remove('hidden');
+          initStudentFromCloudProgress(res.progress);
+        }
+      } catch (err) {
+        errText.textContent = '無法連接雲端伺服器，請檢查網絡連線後再試。';
+        errBox.classList.remove('hidden');
+      } finally {
+        loadingBox.classList.add('hidden');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+      clearSsoUser();
+      currentUser = null;
+      isTeacherPreview = false;
+      document.getElementById('appHeader').classList.add('hidden');
+      document.getElementById('quizView').classList.add('hidden');
+      document.getElementById('summaryView').classList.add('hidden');
+      document.getElementById('teacherView').classList.add('hidden');
+      document.getElementById('loginView').classList.remove('hidden');
+      document.getElementById('passwordInput').value = '';
+    });
+
+    document.getElementById('soundToggleBtn').addEventListener('click', function () {
+      soundEnabled = !soundEnabled;
+      this.textContent = soundEnabled ? '🔊' : '🔇';
+    });
+
+    // =========================================================================
+    // 7. 雲端進度還原與學生作答核心邏輯
+    // =========================================================================
+    function parseWrongListString(wrongStr) {
+      if (!wrongStr) return [];
+      const matches = wrongStr.match(/\d+/g);
+      return matches ? matches.map(Number) : [];
+    }
+
+    function initStudentFromCloudProgress(cloudProgress) {
+      quizState = {
+        completed: {},
+        attemptsTracker: {},
+        isCompleted: false
+      };
+
+      document.getElementById('welcomeGreeting').textContent = `歡迎你，${formatUserDisplay(currentUser)}！`;
+      const welcomeSubtext = document.getElementById('welcomeSubtext');
+
+      if (cloudProgress) {
+        const wrongNums = parseWrongListString(cloudProgress.wrongList);
+        const savedQ = Math.min(Math.max(Number(cloudProgress.currentQ) || 1, 1), QUESTIONS.length);
+
+        if (cloudProgress.isCompleted) {
+          quizState.isCompleted = true;
+          QUESTIONS.forEach((q) => {
+            const wasWrong = wrongNums.includes(q.id);
+            quizState.completed[q.id] = {
+              attempts: wasWrong ? 2 : 1,
+              firstTryCorrect: !wasWrong
+            };
+            quizState.attemptsTracker[q.id] = wasWrong ? 2 : 1;
+          });
+          currentQIndex = QUESTIONS.length - 1;
+          renderProgressStats();
+          openSummaryView();
+          return;
+        } else if (savedQ > 1) {
+          for (let qId = 1; qId < savedQ; qId++) {
+            const wasWrong = wrongNums.includes(qId);
+            quizState.completed[qId] = {
+              attempts: wasWrong ? 2 : 1,
+              firstTryCorrect: !wasWrong
+            };
+            quizState.attemptsTracker[qId] = wasWrong ? 2 : 1;
+          }
+          currentQIndex = savedQ - 1;
+          welcomeSubtext.textContent = `☁️ 已從雲端載入上次進度：第 ${savedQ} 題（前面 ${savedQ - 1} 題已自動保留）`;
+        } else {
+          currentQIndex = 0;
+          welcomeSubtext.textContent = '細心觀察幾何圖形的邊長、直角與平行線特徵，答錯時請參考小貼士即時訂正重做。';
+        }
+      } else {
+        currentQIndex = 0;
+        welcomeSubtext.textContent = '細心觀察幾何圖形的邊長、直角與平行線特徵，答錯時請參考小貼士即時訂正重做。';
+      }
+
+      document.getElementById('teacherView').classList.add('hidden');
+      document.getElementById('summaryView').classList.add('hidden');
+      document.getElementById('quizView').classList.remove('hidden');
+
+      renderProgressStats();
+      renderQuestionGrid();
+      loadQuestion(currentQIndex);
+    }
+
+    function getHighestUnlockedIndex() {
+      for (let i = 0; i < QUESTIONS.length; i++) {
+        if (!quizState.completed[QUESTIONS[i].id]) {
+          return i;
+        }
+      }
+      return QUESTIONS.length - 1;
+    }
+
+    function renderQuestionGrid() {
+      const grid = document.getElementById('questionGrid');
+      grid.innerHTML = '';
+      const maxUnlocked = getHighestUnlockedIndex();
+
+      QUESTIONS.forEach((q, idx) => {
+        const record = quizState.completed[q.id];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = q.id;
+
+        let classes = 'h-9 rounded-lg font-mono font-bold text-xs sm:text-sm transition flex items-center justify-center ';
+
+        if (idx === currentQIndex) {
+          classes += 'bg-indigo-600 text-white ring-2 ring-indigo-300 shadow-xs ';
+        } else if (record) {
+          if (record.firstTryCorrect) {
+            classes += 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 ';
+          } else {
+            classes += 'bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 ';
+          }
+        } else if (idx <= maxUnlocked) {
+          classes += 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 ';
+        } else {
+          classes += 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed ';
+        }
+
+        btn.className = classes;
+        btn.disabled = idx > maxUnlocked;
+        btn.onclick = () => {
+          currentQIndex = idx;
+          renderQuestionGrid();
+          loadQuestion(idx);
+        };
+
+        grid.appendChild(btn);
+      });
+    }
+
+    function computeStatsSummary() {
+      const completedIds = Object.keys(quizState.completed).map(Number);
+      const completedCount = completedIds.length;
+      const firstTryCount = completedIds.filter((id) => quizState.completed[id].firstTryCorrect).length;
+
+      let totalAttempts = 0;
+      const wrongListArr = [];
+      const wrongDetailsArr = [];
+
+      QUESTIONS.forEach((q) => {
+        const att = quizState.attemptsTracker[q.id] || 0;
+        totalAttempts += att;
+        if (att > 1) {
+          wrongListArr.push(`第${q.id}題`);
+          wrongDetailsArr.push(`第${q.id}題(錯${att - 1}次)`);
+        }
+      });
+
+      return {
+        completedCount,
+        firstTryCount,
+        totalAttempts,
+        wrongListStr: wrongListArr.join(', '),
+        wrongDetailsStr: wrongDetailsArr.length > 0 ? wrongDetailsArr.join(', ') : '全對（無錯題）'
+      };
+    }
+
+    function renderProgressStats() {
+      const stats = computeStatsSummary();
+      document.getElementById('progressCountText').textContent = `${stats.completedCount} / ${QUESTIONS.length}`;
+      document.getElementById('progressBarFill').style.width = `${(stats.completedCount / QUESTIONS.length) * 100}%`;
+      document.getElementById('firstTryCountText').textContent = stats.firstTryCount;
+      document.getElementById('totalAttemptsText').textContent = stats.totalAttempts;
+    }
+
+    function loadQuestion(idx) {
+      const q = QUESTIONS[idx];
+      const record = quizState.completed[q.id];
+      const currentAttempts = quizState.attemptsTracker[q.id] || 0;
+
+      if (record) {
+        selectedOptions = Array.isArray(q.answer) ? [...q.answer] : [String(q.answer)];
+      } else {
+        selectedOptions = [];
+      }
+
+      document.getElementById('partBadge').textContent = q.part;
+      document.getElementById('questionNumberBadge').textContent = `第 ${q.id} 題 / 共 ${QUESTIONS.length} 題`;
+
+      const typeBadge = document.getElementById('questionTypeBadge');
+      const multiNotice = document.getElementById('multiSelectNotice');
+
+      if (q.type === 'multi') {
+        typeBadge.textContent = '☑️ 多選看圖題';
+        typeBadge.className = 'px-2.5 py-0.5 rounded-lg bg-amber-100 border border-amber-300 text-amber-900 text-xs font-black';
+        multiNotice.classList.remove('hidden');
+      } else if (q.type === 'number') {
+        typeBadge.textContent = '🔢 看圖填空題';
+        typeBadge.className = 'px-2.5 py-0.5 rounded-lg bg-sky-100 border border-sky-200 text-sky-800 text-xs font-bold';
+        multiNotice.classList.add('hidden');
+      } else {
+        typeBadge.textContent = '🔘 看圖單選題';
+        typeBadge.className = 'px-2.5 py-0.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold';
+        multiNotice.classList.add('hidden');
+      }
+
+      const attemptBadge = document.getElementById('attemptBadge');
+      if (record) {
+        attemptBadge.textContent = record.firstTryCorrect ? '⭐ 首試答對' : `✅ 重做後答對（共 ${record.attempts} 次）`;
+        attemptBadge.className = 'px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs';
+      } else {
+        attemptBadge.textContent = `第 ${currentAttempts + 1} 次嘗試`;
+        attemptBadge.className = 'px-3 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs';
+      }
+
+      const promptEl = document.getElementById('questionPrompt');
+      promptEl.innerHTML = q.prompt.replace(/\n/g, '<br/>');
+
+      const promptCol = document.getElementById('promptTextCol');
+      const mainDiagCol = document.getElementById('mainDiagramCol');
+      const mainDiagBox = document.getElementById('mainDiagramBox');
+
+      if (q.mainDiagram) {
+        promptCol.className = 'lg:col-span-7 space-y-3';
+        mainDiagCol.classList.remove('hidden');
+        mainDiagBox.innerHTML = q.mainDiagram;
+      } else {
+        promptCol.className = 'lg:col-span-12 space-y-3';
+        mainDiagCol.classList.add('hidden');
+        mainDiagBox.innerHTML = '';
+      }
+
+      const optionsGrid = document.getElementById('optionsGrid');
+      const numericArea = document.getElementById('numericInputArea');
+      const numInput = document.getElementById('numericAnswerInput');
+
+      if (q.type === 'number') {
+        optionsGrid.classList.add('hidden');
+        numericArea.classList.remove('hidden');
+        document.getElementById('numericUnitLabel').textContent = q.unit || 'cm';
+
+        numInput.classList.remove('border-rose-500', 'bg-rose-50', 'border-emerald-500', 'bg-emerald-50');
+        numInput.classList.add('border-slate-300', 'bg-slate-50');
+
+        if (record) {
+          numInput.value = q.answer;
+          numInput.disabled = true;
+          numInput.classList.add('border-emerald-500', 'bg-emerald-50');
+        } else {
+          numInput.value = '';
+          numInput.disabled = false;
+          setTimeout(() => numInput.focus(), 50);
+        }
+      } else {
+        numericArea.classList.add('hidden');
+        optionsGrid.classList.remove('hidden');
+        renderOptionCards(q, Boolean(record));
+      }
+
+      const submitBtn = document.getElementById('submitAnswerBtn');
+      const nextBtn = document.getElementById('nextQuestionBtn');
+      const feedbackBox = document.getElementById('feedbackBox');
+
+      if (record) {
+        submitBtn.classList.add('hidden');
+        nextBtn.classList.remove('hidden');
+        nextBtn.textContent = idx === QUESTIONS.length - 1 ? '查看總成績單 🏆' : '下一題 ➔';
+        const ansDisplay = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+        showFeedback('correct', '此題已完成！', `正確答案是 ${ansDisplay}。你可以按「${nextBtn.textContent}」繼續。`, null);
+      } else {
+        submitBtn.classList.remove('hidden');
+        nextBtn.classList.add('hidden');
+        feedbackBox.classList.add('hidden');
+      }
+    }
+
+    function renderOptionCards(q, isLocked) {
+      const grid = document.getElementById('optionsGrid');
+      grid.innerHTML = '';
+
+      const hasSvg = q.options.some((opt) => Boolean(opt.svg));
+      grid.className = hasSvg
+        ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'
+        : 'grid grid-cols-1 sm:grid-cols-2 gap-3.5';
+
+      q.options.forEach((opt) => {
+        const isSelected = selectedOptions.includes(opt.key);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.disabled = isLocked;
+
+        let cardClasses = 'group relative rounded-2xl border-2 p-4 transition-all text-left flex flex-col justify-between gap-3 ';
+        if (isLocked) {
+          if (isSelected) {
+            cardClasses += 'border-emerald-500 bg-emerald-50/80 ring-2 ring-emerald-200 ';
+          } else {
+            cardClasses += 'border-slate-200 bg-slate-50 opacity-60 ';
+          }
+        } else {
+          if (isSelected) {
+            cardClasses += 'border-indigo-600 bg-indigo-50/70 ring-2 ring-indigo-300 shadow-sm -translate-y-0.5 ';
+          } else {
+            cardClasses += 'border-slate-200 bg-white hover:border-indigo-400 hover:bg-slate-50 hover:shadow-sm ';
+          }
+        }
+        btn.className = cardClasses;
+
+        const checkIndicator = q.type === 'multi'
+          ? (isSelected
+              ? '<span class="w-6 h-6 rounded-md bg-indigo-600 text-white flex items-center justify-center text-sm font-black">✓</span>'
+              : '<span class="w-6 h-6 rounded-md border-2 border-slate-300 bg-white"></span>')
+          : (isSelected
+              ? '<span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-black">●</span>'
+              : '<span class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white"></span>');
+
+        const contentHtml = opt.svg
+          ? `<div class="w-full py-1 flex items-center justify-center">${opt.svg}</div>`
+          : `<div class="text-base sm:text-lg font-bold text-slate-800 py-1">${opt.text}</div>`;
+
+        btn.innerHTML = `
+          <div class="flex items-center justify-between w-full">
+            <span class="px-2.5 py-0.5 rounded-lg font-mono font-black text-sm ${
+              isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'
+            }">${opt.label}</span>
+            ${checkIndicator}
+          </div>
+          ${contentHtml}
+        `;
+
+        btn.onclick = () => {
+          if (isLocked) return;
+          if (q.type === 'multi') {
+            if (selectedOptions.includes(opt.key)) {
+              selectedOptions = selectedOptions.filter((k) => k !== opt.key);
+            } else {
+              selectedOptions.push(opt.key);
+            }
+          } else {
+            selectedOptions = [opt.key];
+          }
+          renderOptionCards(q, false);
+        };
+
+        grid.appendChild(btn);
+      });
+    }
+
+    document.getElementById('numericAnswerInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('submitAnswerBtn').click();
+      }
+    });
+
+    // 提交答案驗證（答錯強制留在本題即時重做！）
+    document.getElementById('submitAnswerBtn').addEventListener('click', function () {
+      const q = QUESTIONS[currentQIndex];
+      if (quizState.completed[q.id]) return;
+
+      let isCorrect = false;
+      let studentAnswerDisplay = '';
+
+      if (q.type === 'number') {
+        const numInput = document.getElementById('numericAnswerInput');
+        const raw = numInput.value.trim();
+        if (raw === '') {
+          showFeedback('wrong', '請先輸入數字答案！', '請在輸入框內填寫數字後再按「提交答案」。', null);
+          numInput.focus();
+          return;
+        }
+        const val = Number(raw);
+        studentAnswerDisplay = `${val} ${q.unit || ''}`.trim();
+        isCorrect = val === q.answer;
+      } else if (q.type === 'single') {
+        if (selectedOptions.length === 0) {
+          showFeedback('wrong', '請先點選一個選項！', '請點擊你認為正確的選項卡片（A、B、C 或 D）後再按「提交答案」。', null);
+          return;
+        }
+        studentAnswerDisplay = selectedOptions[0];
+        isCorrect = selectedOptions[0] === q.answer;
+      } else if (q.type === 'multi') {
+        if (selectedOptions.length === 0) {
+          showFeedback('wrong', '請至少點選一個選項！', '這題是「多選題」，請選出所有符合條件的圖形後再按「提交答案」。', null);
+          return;
+        }
+        const sortedUser = [...selectedOptions].sort();
+        const sortedAns = [...q.answer].sort();
+        studentAnswerDisplay = sortedUser.join('、');
+        isCorrect = sortedUser.length === sortedAns.length && sortedUser.every((v, i) => v === sortedAns[i]);
+      }
+
+      quizState.attemptsTracker[q.id] = (quizState.attemptsTracker[q.id] || 0) + 1;
+      const attemptCount = quizState.attemptsTracker[q.id];
+
+      if (isCorrect) {
+        // ✅ 答對了！
+        playTone('correct');
+        const isFirstTry = attemptCount === 1;
+
+        quizState.completed[q.id] = {
+          attempts: attemptCount,
+          firstTryCorrect: isFirstTry
+        };
+
+        if (q.type === 'number') {
+          const numInput = document.getElementById('numericAnswerInput');
+          numInput.disabled = true;
+          numInput.classList.remove('border-slate-300', 'border-rose-500', 'bg-rose-50');
+          numInput.classList.add('border-emerald-500', 'bg-emerald-50');
+        } else {
+          renderOptionCards(q, true);
+        }
+
+        document.getElementById('submitAnswerBtn').classList.add('hidden');
+        const nextBtn = document.getElementById('nextQuestionBtn');
+        nextBtn.classList.remove('hidden');
+        nextBtn.textContent = currentQIndex === QUESTIONS.length - 1 ? '完成並提交成績 🏆' : '下一題 ➔';
+        nextBtn.focus();
+
+        const badge = document.getElementById('attemptBadge');
+        badge.textContent = isFirstTry ? '⭐ 首試答對' : `✅ 重做後答對（共 ${attemptCount} 次）`;
+        badge.className = 'px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs';
+
+        const ansText = Array.isArray(q.answer) ? q.answer.join('、') : q.answer;
+        showFeedback(
+          'correct',
+          isFirstTry ? '太棒了！一次就答對！' : '訂正成功！終於答對了！',
+          `答案 ${ansText} 完全正確！請按「${nextBtn.textContent}」繼續。`,
+          null
+        );
+
+        renderProgressStats();
+        renderQuestionGrid();
+
+        if (currentQIndex < QUESTIONS.length - 1 && !isTeacherPreview) {
+          syncProgressInBackground(currentQIndex + 2);
+        }
+      } else {
+        // ❌ 答錯了 -> 強制留在本題即時重做！
+        playTone('wrong');
+
+        if (q.type === 'number') {
+          const numInput = document.getElementById('numericAnswerInput');
+          numInput.classList.remove('border-slate-300', 'bg-slate-50', 'animate-shake');
+          void numInput.offsetWidth;
+          numInput.classList.add('border-rose-500', 'bg-rose-50', 'animate-shake');
+          numInput.value = '';
+          numInput.focus();
+        } else {
+          const grid = document.getElementById('optionsGrid');
+          grid.classList.remove('animate-shake');
+          void grid.offsetWidth;
+          grid.classList.add('animate-shake');
+        }
+
+        document.getElementById('attemptBadge').textContent = `第 ${attemptCount + 1} 次嘗試（需重做）`;
+        document.getElementById('attemptBadge').className = 'px-3 py-1 rounded-xl bg-rose-100 text-rose-700 font-bold text-xs';
+
+        showFeedback(
+          'wrong',
+          `答錯了！（你剛才選擇／輸入的是：${studentAnswerDisplay}）請立即重做！`,
+          '必須答對本題才可進入下一題。請參考下方的幾何概念小貼士，重新觀察圖形並修改答案：',
+          q.hint
+        );
+
+        renderProgressStats();
+      }
+    });
+
+    async function syncProgressInBackground(nextQuestionNumber) {
+      if (!currentUser || currentUser.role !== 'student') return;
+      const stats = computeStatsSummary();
+      setCloudSyncStatus('syncing', '正在同步進度...');
+
+      try {
+        const res = await callApi({
+          action: 'saveProgress',
+          account: currentUser.account,
+          name: currentUser.name,
+          className: currentUser.className,
+          classNum: currentUser.classNum,
+          unitId: UNIT_ID,
+          currentQ: nextQuestionNumber,
+          firstTryCorrect: stats.firstTryCount,
+          totalAttempts: stats.totalAttempts,
+          wrongList: stats.wrongListStr,
+          isCompleted: false
+        });
+        if (res.status === 'success') {
+          setCloudSyncStatus('ok', '已自動儲存至雲端');
+        } else {
+          setCloudSyncStatus('error', '雲端同步失敗');
+        }
+      } catch (e) {
+        setCloudSyncStatus('error', '網絡連線不穩');
+      }
+    }
+
+    function showFeedback(status, title, message, hintText) {
+      const box = document.getElementById('feedbackBox');
+      const icon = document.getElementById('feedbackIcon');
+      const titleEl = document.getElementById('feedbackTitle');
+      const msgEl = document.getElementById('feedbackMessage');
+      const hintBox = document.getElementById('hintContainer');
+      const hintEl = document.getElementById('hintText');
+
+      box.classList.remove(
+        'hidden',
+        'bg-rose-50', 'border-rose-300', 'text-rose-900',
+        'bg-emerald-50', 'border-emerald-300', 'text-emerald-900'
+      );
+
+      if (status === 'wrong') {
+        box.classList.add('bg-rose-50', 'border-rose-300', 'text-rose-900');
+        icon.textContent = '❌';
+      } else {
+        box.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-900');
+        icon.textContent = '🎉';
+      }
+
+      titleEl.textContent = title;
+      msgEl.textContent = message;
+
+      if (hintText) {
+        hintEl.textContent = hintText;
+        hintBox.classList.remove('hidden');
+      } else {
+        hintBox.classList.add('hidden');
+      }
+    }
+
+    document.getElementById('nextQuestionBtn').addEventListener('click', async function () {
+      if (currentQIndex < QUESTIONS.length - 1) {
+        currentQIndex++;
+        renderQuestionGrid();
+        loadQuestion(currentQIndex);
+      } else {
+        await finalizeAndSubmitRecord();
+      }
+    });
+
+    // =========================================================================
+    // 8. 完成全部 18 題：提交正式成績至 Records 並顯示證書
+    // =========================================================================
+    async function finalizeAndSubmitRecord() {
+      const stats = computeStatsSummary();
+      const rate = Math.round((stats.firstTryCount / QUESTIONS.length) * 100);
+      const scoreText = `${stats.firstTryCount} / ${QUESTIONS.length} (${rate}%)`;
+
+      if (!quizState.isCompleted && currentUser && currentUser.role === 'student' && !isTeacherPreview) {
+        showGlobalLoading('正在提交最終成績至雲端紀錄表...');
+        try {
+          const res = await callApi({
+            action: 'submitRecord',
+            account: currentUser.account,
+            name: currentUser.name,
+            className: currentUser.className,
+            classNum: currentUser.classNum,
+            unitId: UNIT_ID,
+            unitName: UNIT_NAME,
+            currentQ: QUESTIONS.length,
+            firstTryCorrect: stats.firstTryCount,
+            totalAttempts: stats.totalAttempts,
+            wrongList: stats.wrongListStr,
+            score: scoreText,
+            wrongDetails: stats.wrongDetailsStr
+          });
+          if (res.status === 'success') {
+            quizState.isCompleted = true;
+            setCloudSyncStatus('ok', '成績已寫入雲端');
+          }
+        } catch (err) {
+          setCloudSyncStatus('error', '成績提交時網絡異常');
+        } finally {
+          hideGlobalLoading();
+        }
+      }
+
+      openSummaryView();
+    }
+
+    function openSummaryView() {
+      document.getElementById('quizView').classList.add('hidden');
+      document.getElementById('summaryView').classList.remove('hidden');
+
+      const stats = computeStatsSummary();
+      const rate = Math.round((stats.firstTryCount / QUESTIONS.length) * 100);
+      const retriedQuestionsCount = QUESTIONS.length - stats.firstTryCount;
+
+      document.getElementById('summaryStudentInfo').textContent = `學生：${formatUserDisplay(currentUser)}`;
+      document.getElementById('statFirstTry').textContent = `${stats.firstTryCount} / ${QUESTIONS.length} 題`;
+      document.getElementById('statAccuracyRate').textContent = `首試正確率：${rate}%`;
+      document.getElementById('statTotalAttempts').textContent = `${stats.totalAttempts} 次`;
+      document.getElementById('statRetriedCount').textContent = `訂正重做題數：${retriedQuestionsCount} 題`;
+      document.getElementById('statWrongSummary').textContent =
+        stats.wrongListStr ? `曾錯題目：${stats.wrongListStr}` : '一次全對，表現優異！';
+
+      const tbody = document.getElementById('summaryTableBody');
+      tbody.innerHTML = '';
+
+      QUESTIONS.forEach((q) => {
+        const rec = quizState.completed[q.id] || { attempts: 1, firstTryCorrect: true };
+        const ansText = Array.isArray(q.answer) ? q.answer.join('、') : `${q.answer}${q.unit ? ' ' + q.unit : ''}`;
+        const tr = document.createElement('tr');
+        tr.className = rec.firstTryCorrect ? 'hover:bg-slate-50' : 'bg-amber-50/60 hover:bg-amber-50';
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-mono font-bold text-slate-700">#${q.id}</td>
+          <td class="py-2.5 px-3 text-xs text-slate-500 whitespace-nowrap">${q.part.split('：')[0]}</td>
+          <td class="py-2.5 px-3 font-medium text-slate-800">${q.prompt.replace(/\n/g, ' ')}</td>
+          <td class="py-2.5 px-3 font-mono font-bold text-indigo-700 whitespace-nowrap">${ansText}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap">
+            ${rec.firstTryCorrect
+              ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">⭐ 首試答對</span>'
+              : '<span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">🔄 重做後答對</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('reviewWorksheetBtn').addEventListener('click', function () {
+      document.getElementById('summaryView').classList.add('hidden');
+      document.getElementById('quizView').classList.remove('hidden');
+      renderQuestionGrid();
+      loadQuestion(currentQIndex);
+    });
+
+    async function handleResetUnitProgress() {
+      showConfirmModal(
+        '重新練習本單元',
+        '確定要清除你目前在「單元二：四邊形」的雲端作答進度，並從第 1 題重新開始嗎？',
+        async () => {
+          if (currentUser && currentUser.role === 'student' && !isTeacherPreview) {
+            showGlobalLoading('正在重設雲端練習進度...');
+            try {
+              await callApi({
+                action: 'resetProgress',
+                account: currentUser.account,
+                unitId: UNIT_ID
+              });
+              setCloudSyncStatus('ok', '雲端進度已重設');
+            } catch (e) {
+              setCloudSyncStatus('error', '重設進度時網絡異常');
+            } finally {
+              hideGlobalLoading();
+            }
+          }
+          initStudentFromCloudProgress(null);
+        }
+      );
+    }
+
+    document.getElementById('studentRestartBtn').addEventListener('click', handleResetUnitProgress);
+    document.getElementById('resetMyProgressBtn').addEventListener('click', handleResetUnitProgress);
+
+    // =========================================================================
+    // 9. 教師雲端監察後台邏輯
+    // =========================================================================
+    async function openTeacherDashboard() {
+      document.getElementById('quizView').classList.add('hidden');
+      document.getElementById('summaryView').classList.add('hidden');
+      document.getElementById('teacherView').classList.remove('hidden');
+
+      const loadingBanner = document.getElementById('teacherLoadingBanner');
+      loadingBanner.classList.remove('hidden');
+      setCloudSyncStatus('syncing', '正在讀取全級數據...');
+
+      try {
+        const res = await callApi({
+          action: 'getTeacherSummary',
+          unitId: UNIT_ID
+        });
+
+        if (res.status === 'success') {
+          teacherData.progressList = res.progressList || [];
+          teacherData.recordsList = res.recordsList || [];
+          updateTeacherKPIs();
+          renderTeacherTables();
+          setCloudSyncStatus('ok', '教師數據已同步');
+        }
+      } catch (err) {
+        setCloudSyncStatus('error', '無法讀取教師數據');
+      } finally {
+        loadingBanner.classList.add('hidden');
+      }
+    }
+
+    function updateTeacherKPIs() {
+      const pList = teacherData.progressList;
+      const inProgressCount = pList.filter((item) => !item.isCompleted).length;
+      const completedCount = pList.filter((item) => item.isCompleted).length;
+
+      document.getElementById('kpiInProgress').textContent = `${inProgressCount} 人`;
+      document.getElementById('kpiCompleted').textContent = `${completedCount} 人`;
+
+      let totalDoneQ = 0;
+      let totalFirstTry = 0;
+      const wrongFreqMap = {};
+
+      pList.forEach((item) => {
+        const doneQ = item.isCompleted ? QUESTIONS.length : Math.max(0, (Number(item.currentQ) || 1) - 1);
+        totalDoneQ += doneQ;
+        totalFirstTry += Number(item.firstTryCorrect) || 0;
+
+        const wrongNums = parseWrongListString(item.wrongList);
+        wrongNums.forEach((qNum) => {
+          wrongFreqMap[qNum] = (wrongFreqMap[qNum] || 0) + 1;
+        });
+      });
+
+      const avgAcc = totalDoneQ > 0 ? Math.round((totalFirstTry / totalDoneQ) * 100) + '%' : '--%';
+      document.getElementById('kpiAvgAccuracy').textContent = avgAcc;
+
+      const sortedWrong = Object.entries(wrongFreqMap)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([qNum, cnt]) => `第${qNum}題(${cnt}人)`);
+
+      document.getElementById('kpiTopWrongQ').textContent =
+        sortedWrong.length > 0 ? sortedWrong.join('、') : '暫無錯題紀錄';
+    }
+
+    function switchTeacherTab(tabName) {
+      const tabProgBtn = document.getElementById('tabProgressBtn');
+      const tabRecBtn = document.getElementById('tabRecordsBtn');
+      const progSec = document.getElementById('teacherProgressSection');
+      const recSec = document.getElementById('teacherRecordsSection');
+
+      if (tabName === 'progress') {
+        tabProgBtn.className = 'px-4 py-2 rounded-lg bg-white text-indigo-700 font-bold text-sm shadow-xs transition';
+        tabRecBtn.className = 'px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-sm transition';
+        progSec.classList.remove('hidden');
+        recSec.classList.add('hidden');
+      } else {
+        tabRecBtn.className = 'px-4 py-2 rounded-lg bg-white text-indigo-700 font-bold text-sm shadow-xs transition';
+        tabProgBtn.className = 'px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-sm transition';
+        recSec.classList.remove('hidden');
+        progSec.classList.add('hidden');
+      }
+    }
+
+    function renderTeacherTables() {
+      const classFilter = document.getElementById('teacherClassFilter').value;
+      const keyword = document.getElementById('teacherSearchInput').value.trim().toLowerCase();
+
+      const matchFilter = (item) => {
+        if (classFilter !== 'ALL' && item.className !== classFilter) return false;
+        if (keyword) {
+          const hay = `${item.className} ${item.classNum} ${item.name} ${item.account}`.toLowerCase();
+          if (!hay.includes(keyword)) return false;
+        }
+        return true;
+      };
+
+      const progTbody = document.getElementById('teacherProgressTbody');
+      progTbody.innerHTML = '';
+      const filteredProg = teacherData.progressList
+        .filter(matchFilter)
+        .sort((a, b) => `${a.className}${a.classNum}`.localeCompare(`${b.className}${b.classNum}`));
+
+      if (filteredProg.length === 0) {
+        progTbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-medium">暫無符合條件的學生作答紀錄</td></tr>`;
+      } else {
+        filteredProg.forEach((p) => {
+          const doneQ = p.isCompleted ? QUESTIONS.length : Math.max(0, (Number(p.currentQ) || 1) - 1);
+          const acc = doneQ > 0 ? Math.round(((Number(p.firstTryCorrect) || 0) / doneQ) * 100) + '%' : '--';
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50';
+          tr.innerHTML = `
+            <td class="py-3 px-3 font-bold text-slate-700">${p.className}</td>
+            <td class="py-3 px-3 font-mono text-slate-600">${p.classNum || '-'}</td>
+            <td class="py-3 px-3 font-bold text-slate-900">${p.name}</td>
+            <td class="py-3 px-3">
+              ${p.isCompleted
+                ? `<span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold">✅ 已完成 (${QUESTIONS.length}/${QUESTIONS.length})</span>`
+                : `<span class="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold">⏳ 第 ${p.currentQ} 題</span>`}
+            </td>
+            <td class="py-3 px-3 font-mono font-bold text-emerald-700">${p.firstTryCorrect} 題</td>
+            <td class="py-3 px-3 font-mono font-bold text-indigo-700">${acc}</td>
+            <td class="py-3 px-3 text-xs text-rose-600 font-medium">${p.wrongList || '—'}</td>
+            <td class="py-3 px-3 text-xs font-mono text-slate-500">${p.updatedAt || '—'}</td>
+          `;
+          progTbody.appendChild(tr);
+        });
+      }
+
+      const recTbody = document.getElementById('teacherRecordsTbody');
+      recTbody.innerHTML = '';
+      const filteredRec = teacherData.recordsList.filter(matchFilter);
+
+      if (filteredRec.length === 0) {
+        recTbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">暫無已完成的成績提交紀錄</td></tr>`;
+      } else {
+        filteredRec.forEach((r) => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50';
+          tr.innerHTML = `
+            <td class="py-3 px-3 text-xs font-mono text-slate-500">${r.timestamp}</td>
+            <td class="py-3 px-3 font-bold text-slate-700">${r.className}</td>
+            <td class="py-3 px-3 font-mono text-slate-600">${r.classNum || '-'}</td>
+            <td class="py-3 px-3 font-bold text-slate-900">${r.name}</td>
+            <td class="py-3 px-3 font-bold text-emerald-700">${r.score}</td>
+            <td class="py-3 px-3 text-xs text-slate-600">${r.wrongDetails}</td>
+          `;
+          recTbody.appendChild(tr);
+        });
+      }
+    }
+
+    document.getElementById('teacherRefreshBtn').addEventListener('click', openTeacherDashboard);
+
+    document.getElementById('teacherPreviewStudentBtn').addEventListener('click', function () {
+      isTeacherPreview = true;
+      document.getElementById('studentProgressBarWrapper').classList.remove('hidden');
+      initStudentFromCloudProgress(null);
+      document.getElementById('welcomeGreeting').textContent = '👩‍🏫 教師試做預覽模式（此模式不會寫入學生成績表）';
+    });
+
+    // =========================================================================
+    // 10. 互動幾何草稿畫板（空白畫紙／方格紙網格／釘板點陣 ＋ 黑／藍／紅三色筆）
+    // =========================================================================
+    const canvas = document.getElementById('scratchpadCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let penColor = '#1e293b';
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0) return;
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = penColor;
+    }
+
+    function toggleScratchpad(forceState) {
+      const sec = document.getElementById('scratchpadSection');
+      const label = document.getElementById('toggleScratchpadLabel');
+      const shouldShow = typeof forceState === 'boolean' ? forceState : sec.classList.contains('hidden');
+      if (shouldShow) {
+        sec.classList.remove('hidden');
+        label.textContent = '收起幾何草稿畫板';
+        resizeCanvas();
+      } else {
+        sec.classList.add('hidden');
+        label.textContent = '打開互動幾何草稿畫板';
+      }
+    }
+
+    document.getElementById('toggleScratchpadBtn').addEventListener('click', () => toggleScratchpad());
+
+    function setCanvasBgMode(mode) {
+      const blankBtn = document.getElementById('bgBlankBtn');
+      const gridBtn = document.getElementById('bgGridBtn');
+      const dotsBtn = document.getElementById('bgDotsBtn');
+
+      const inactiveClass = 'px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition';
+      const activeClass = 'px-2.5 py-1 rounded-lg bg-white text-indigo-700 shadow-xs transition';
+
+      blankBtn.className = inactiveClass;
+      gridBtn.className = inactiveClass;
+      dotsBtn.className = inactiveClass;
+
+      canvas.classList.remove('canvas-blank', 'canvas-grid', 'canvas-dots');
+
+      if (mode === 'blank') {
+        canvas.classList.add('canvas-blank');
+        blankBtn.className = activeClass;
+      } else if (mode === 'grid') {
+        canvas.classList.add('canvas-grid');
+        gridBtn.className = activeClass;
+      } else {
+        canvas.classList.add('canvas-dots');
+        dotsBtn.className = activeClass;
+      }
+    }
+
+    function setPenColor(color, btnEl) {
+      penColor = color;
+      ctx.strokeStyle = penColor;
+      document.querySelectorAll('.pen-color-btn').forEach((b) => {
+        b.classList.remove('ring-2', 'ring-offset-1', 'ring-indigo-500');
+      });
+      if (btnEl) btnEl.classList.add('ring-2', 'ring-offset-1', 'ring-indigo-500');
+    }
+
+    function clearScratchpad() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function getCanvasPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      const pos = getCanvasPos(e);
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    });
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing) return;
+      const pos = getCanvasPos(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    });
+    window.addEventListener('mouseup', () => { isDrawing = false; });
+
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      isDrawing = true;
+      const pos = getCanvasPos(e);
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (!isDrawing) return;
+      const pos = getCanvasPos(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }, { passive: false });
+    canvas.addEventListener('touchend', () => { isDrawing = false; });
+
+    window.addEventListener('resize', () => {
+      if (!document.getElementById('scratchpadSection').classList.contains('hidden')) {
+        resizeCanvas();
+      }
+    });
+
+    // =========================================================================
+    // 11. 全局載入遮罩與自訂確認對話框
+    // =========================================================================
+    function showGlobalLoading(text) {
+      document.getElementById('globalLoadingText').textContent = text || '處理中...';
+      document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+    }
+
+    function hideGlobalLoading() {
+      document.getElementById('globalLoadingOverlay').classList.add('hidden');
+    }
+
+    function showConfirmModal(title, body, onConfirm) {
+      const modal = document.getElementById('customModal');
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').textContent = body;
+      modal.classList.remove('hidden');
+
+      const cancelBtn = document.getElementById('modalCancelBtn');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+
+      const cleanup = () => modal.classList.add('hidden');
+      cancelBtn.onclick = cleanup;
+      confirmBtn.onclick = () => {
+        cleanup();
+        onConfirm();
+      };
+    }
+  </script>
+</body>
+</html>

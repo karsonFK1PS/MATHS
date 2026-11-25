@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小四數學自主練習平台 — 單元三：除法 (4A_U3)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f1f5f9;
+      user-select: none;
+    }
+    .option-card {
+      transition: all 0.18s ease;
+    }
+    .option-card:hover:not(.disabled-opt) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -4px rgba(30, 58, 138, 0.12);
+    }
+    .option-selected {
+      border-color: #4f46e5 !important;
+      background-color: #eef2ff !important;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    .option-correct {
+      border-color: #16a34a !important;
+      background-color: #dcfce7 !important;
+    }
+    .option-wrong {
+      border-color: #dc2626 !important;
+      background-color: #fee2e2 !important;
+      animation: shake 0.35s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    #scratchpad-canvas {
+      touch-action: none;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+  <!-- 頂部導覽列 -->
+  <header class="bg-gradient-to-r from-indigo-900 via-blue-900 to-indigo-800 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-sm font-bold transition">
+          <span>← 返回課題目錄</span>
+        </a>
+        <div>
+          <span class="text-xs uppercase tracking-wider text-indigo-200 block">4上A ‧ 學習單位 4N2</span>
+          <h1 class="text-lg sm:text-xl font-black tracking-wide">單元三：除法（除法一、二、乘除應用題及整除性）</h1>
+        </div>
+      </div>
+
+      <div id="user-badge-area" class="hidden flex items-center gap-3">
+        <div class="text-right">
+          <div id="user-display-name" class="text-sm font-bold">學生姓名</div>
+          <div id="user-display-meta" class="text-xs text-indigo-200">班別學號</div>
+        </div>
+        <button onclick="logoutUser()" class="px-3 py-1.5 rounded-lg bg-rose-500/80 hover:bg-rose-500 text-xs font-bold transition">
+          登出
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. 獨立登入畫面（若未從 index.html SSO 登入則顯示） -->
+  <main id="login-screen" class="flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-7">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-indigo-100 text-indigo-700 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl font-black">
+          ÷
+        </div>
+        <h2 class="text-2xl font-black text-slate-800">單元三：除法</h2>
+        <p class="text-sm text-slate-500 mt-1">請輸入校內帳號與密碼以同步雲端學習進度</p>
+      </div>
+
+      <form id="login-form" action="javascript:void(0);" onsubmit="handleManualLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">學生／教師帳號</label>
+          <input type="text" id="login-account" required placeholder="例如：B23001@fk1ps.hk"
+                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-base" />
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">密碼</label>
+          <input type="password" id="login-password" required placeholder="請輸入密碼"
+                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-base" />
+        </div>
+        <div id="login-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium"></div>
+        <button type="submit" id="login-submit-btn"
+                class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base shadow-md transition">
+          登入並開始練習
+        </button>
+      </form>
+      <div class="mt-4 text-center">
+        <a href="index.html" class="text-xs text-indigo-600 hover:underline font-medium">前往全學年統一登入主頁 (index.html)</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- 載入中提示 -->
+  <div id="loading-overlay" class="hidden flex-1 flex-col items-center justify-center p-8">
+    <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
+    <p id="loading-text" class="text-slate-600 font-bold">正在連接雲端資料庫同步進度...</p>
+  </div>
+
+  <!-- 2. 主練習介面 -->
+  <main id="quiz-screen" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-5 space-y-5">
+
+    <!-- 教師專屬快速選題工具列（僅當 role === 'teacher' 時顯示） -->
+    <div id="teacher-jump-bar" class="hidden p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-md bg-amber-600 text-white text-xs font-black">教師檢視模式</span>
+          <span class="text-sm font-bold text-amber-950">點擊下方題號可直接跳題檢查（不會寫入或覆寫學生紀錄）</span>
+        </div>
+        <span id="teacher-q-indicator" class="text-xs font-bold px-2.5 py-1 bg-amber-200/80 text-amber-950 rounded-lg">目前：第 1 / 30 題</span>
+      </div>
+      <div id="teacher-jump-buttons" class="flex flex-wrap gap-1.5"></div>
+    </div>
+
+    <!-- 頂部進度與統計欄 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3 flex-1 min-w-[240px]">
+        <span class="text-sm font-bold text-slate-600 whitespace-nowrap">
+          完成進度：<span id="progress-text" class="text-indigo-700 font-black text-base">1 / 30</span> 題
+        </span>
+        <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-300" style="width: 3.3%;"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 text-sm font-bold">
+        <div class="px-3 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200">
+          ★ 首試答對：<span id="stat-first-try">0</span>
+        </div>
+        <div class="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
+          ↻ 總嘗試次數：<span id="stat-attempts">0</span>
+        </div>
+        <button onclick="toggleScratchpad()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition flex items-center gap-1">
+          <span>✏️ 直式除法草稿紙</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 互動直式草稿畫板 -->
+    <div id="scratchpad-panel" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-sm text-slate-700">直式除法草稿畫板：</span>
+          <button type="button" onclick="setPadBg('blank')" id="bg-btn-blank" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white">空白畫紙</button>
+          <button type="button" onclick="setPadBg('grid')" id="bg-btn-grid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">對位方格紙</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="setPenColor('#1e293b')" class="w-6 h-6 rounded-full bg-slate-800 border-2 border-white shadow"></button>
+          <button type="button" onclick="setPenColor('#2563eb')" class="w-6 h-6 rounded-full bg-blue-600 border-2 border-white shadow"></button>
+          <button type="button" onclick="setPenColor('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 border-2 border-white shadow"></button>
+          <button type="button" onclick="clearScratchpad()" class="px-3 py-1 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 text-xs font-bold">清除畫板</button>
+        </div>
+      </div>
+      <div class="border border-slate-300 rounded-xl overflow-hidden bg-white flex justify-center">
+        <canvas id="scratchpad-canvas" width="760" height="250" class="w-full max-w-[760px] h-[250px]"></canvas>
+      </div>
+    </div>
+
+    <!-- 題目主卡片 -->
+    <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <span id="q-part-badge" class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-black border border-indigo-200">
+          第 6 課：除法(一)
+        </span>
+        <span id="q-number-badge" class="text-sm font-bold text-slate-400">第 1 題</span>
+      </div>
+
+      <h2 id="q-prompt" class="text-xl sm:text-2xl font-black text-slate-800 leading-snug mb-3">
+        題目載入中...
+      </h2>
+
+      <!-- 多選題特別提示徽章 -->
+      <div id="multi-select-banner" class="hidden mb-5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-sm font-bold">
+        <span>☑ 多選題：請選出所有符合條件的數字或選項，選好後按「提交答案」</span>
+      </div>
+
+      <!-- 題幹圖表／數卡／直式謎題區（若有） -->
+      <div id="q-main-figure" class="hidden mb-6 flex justify-center"></div>
+
+      <!-- 選項區（單選／多選卡片） -->
+      <div id="q-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 max-w-3xl"></div>
+
+      <!-- 單一填空題輸入區 -->
+      <div id="q-input-area" class="hidden mb-6 max-w-md">
+        <div class="flex items-center gap-3">
+          <input type="text" id="q-text-input" placeholder="請輸入答案"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();checkAnswer();}"
+                 class="flex-1 px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-indigo-500 outline-none text-xl font-bold text-center" />
+          <span id="q-input-unit" class="text-lg font-bold text-slate-600"></span>
+        </div>
+      </div>
+
+      <!-- 雙欄填空區（商與餘數） -->
+      <div id="q-qr-area" class="hidden mb-6 max-w-lg">
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex items-center gap-2">
+            <span id="q-q-label" class="text-base font-bold text-slate-700">商：</span>
+            <input type="text" id="q-quotient-input" placeholder="輸入數字"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('q-remainder-input').focus();}"
+                   class="w-28 px-3 py-2.5 rounded-xl border-2 border-slate-300 focus:border-indigo-500 outline-none text-xl font-bold text-center" />
+            <span id="q-q-unit" class="text-base font-bold text-slate-600"></span>
+          </div>
+          <span class="text-slate-400 font-black">……</span>
+          <div class="flex items-center gap-2">
+            <span id="q-r-label" class="text-base font-bold text-slate-700">餘數：</span>
+            <input type="text" id="q-remainder-input" placeholder="輸入數字"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();checkAnswer();}"
+                   class="w-28 px-3 py-2.5 rounded-xl border-2 border-slate-300 focus:border-indigo-500 outline-none text-xl font-bold text-center" />
+            <span id="q-r-unit" class="text-base font-bold text-slate-600"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 回饋與提示訊息區 -->
+      <div id="feedback-box" class="hidden mb-6 p-4 rounded-xl border text-base font-medium"></div>
+
+      <!-- 底部操作按鈕 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+        <div class="text-xs text-slate-400" id="sync-status-text">雲端同步就緒</div>
+        <div class="flex items-center gap-3">
+          <button id="submit-btn" onclick="checkAnswer()"
+                  class="px-7 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base shadow-md transition">
+            提交答案
+          </button>
+          <button id="next-btn" onclick="goNextQuestion()"
+                  class="hidden px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base shadow-md transition">
+            下一題 →
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 3. 完成證書畫面 -->
+  <main id="complete-screen" class="hidden flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 max-w-lg w-full p-8 text-center">
+      <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">
+        🏆
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">恭喜完成單元三：除法！</h2>
+      <p id="cert-student-info" class="text-slate-600 font-bold mb-6">4A (01) 學生姓名</p>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+          <div class="text-xs text-indigo-600 font-bold mb-1">首試答對題數</div>
+          <div id="cert-score" class="text-3xl font-black text-indigo-900">30 / 30</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+          <div class="text-xs text-emerald-600 font-bold mb-1">總嘗試次數</div>
+          <div id="cert-attempts" class="text-3xl font-black text-emerald-900">30 次</div>
+        </div>
+      </div>
+
+      <div id="cert-wrong-summary" class="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left text-sm text-slate-700"></div>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="index.html" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow transition">
+          ← 返回課題目錄
+        </a>
+        <button onclick="resetUnitPractice()" class="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+          ↻ 重新練習本單元
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
+    const UNIT_ID = "4A_U3";
+    const UNIT_NAME = "單元三：除法";
+
+    let currentUser = null;
+    let currentIndex = 0;
+    let firstTryCorrect = 0;
+    let totalAttempts = 0;
+    let wrongQuestionIds = new Set();
+    let currentQuestionHadWrong = false;
+    let isAnsweredCorrectly = false;
+    let selectedSingle = null;
+    let selectedMulti = new Set();
+
+    // =========================================================
+    // 輔助視覺元件（數卡、直式謎題、統計表、糖果圖）
+    // =========================================================
+    const VISUALS = {
+      cards: (nums) => `
+        <div class="flex items-center justify-center gap-4 my-1">
+          ${nums.map(n => `
+            <div class="w-16 h-20 rounded-2xl bg-gradient-to-b from-slate-100 to-slate-200 border-2 border-slate-400 shadow-sm flex items-center justify-center text-3xl font-black text-slate-800">
+              ${n}
+            </div>
+          `).join('')}
+        </div>
+      `,
+
+      // 直式謎題 1：2[A] ) 219 ，商 8 ，餘數 19 (219 - 19 = 200 -> 200 ÷ 8 = 25 -> A = 5)
+      puzzle1: () => `
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl px-8 py-5 font-mono text-2xl font-black text-slate-800 inline-block">
+          <div class="flex items-center justify-end pr-2 text-indigo-700">8</div>
+          <div class="flex items-center">
+            <span class="mr-1">2</span>
+            <span class="w-8 h-9 border-2 border-rose-500 bg-rose-50 text-rose-600 rounded flex items-center justify-center text-lg">?</span>
+            <span class="mx-1.5 text-3xl font-normal">)</span>
+            <span class="border-t-2 border-slate-800 px-2 tracking-widest">2 1 9</span>
+          </div>
+          <div class="flex items-center justify-end pr-2 mt-1 text-slate-500 text-xl tracking-widest">2 0 0</div>
+          <div class="flex items-center justify-end pr-2 border-t-2 border-slate-800 mt-1 pt-1 tracking-widest">1 9</div>
+        </div>
+      `,
+
+      // 直式謎題 2：[?] ) 474 -> 商 13，餘數 6 (474 - 6 = 468 -> 468 ÷ 13 = 36)
+      puzzle2: () => `
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl px-8 py-5 font-mono text-2xl font-black text-slate-800 inline-block">
+          <div class="flex items-center justify-end pr-2 text-indigo-700 tracking-widest">1 3</div>
+          <div class="flex items-center">
+            <span class="px-2 h-9 border-2 border-rose-500 bg-rose-50 text-rose-600 rounded flex items-center justify-center text-lg">除數 ?</span>
+            <span class="mx-1.5 text-3xl font-normal">)</span>
+            <span class="border-t-2 border-slate-800 px-2 tracking-widest">4 7 4</span>
+          </div>
+          <div class="flex items-center justify-end pr-2 border-t-2 border-slate-800 mt-3 pt-1 text-slate-600 text-xl">餘數 6</div>
+        </div>
+      `,
+
+      // 便利店果汁表格
+      juiceTable: () => `
+        <div class="overflow-hidden rounded-2xl border-2 border-slate-300 bg-white shadow-sm">
+          <table class="text-center border-collapse text-base">
+            <thead>
+              <tr class="bg-indigo-50 text-indigo-950 font-black border-b-2 border-slate-300">
+                <th class="px-5 py-2.5 border-r border-slate-300">果汁</th>
+                <th class="px-6 py-2.5 border-r border-slate-300">橙汁</th>
+                <th class="px-6 py-2.5 border-r border-slate-300">芒果汁</th>
+                <th class="px-6 py-2.5">草莓汁</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="font-bold text-slate-800">
+                <td class="px-5 py-2.5 bg-slate-50 border-r border-slate-300">數量（瓶）</td>
+                <td class="px-6 py-2.5 border-r border-slate-300">900</td>
+                <td class="px-6 py-2.5 border-r border-slate-300">840</td>
+                <td class="px-6 py-2.5 text-rose-700 font-black">795</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `,
+
+      // 糖果店三款糖果
+      candies: () => `
+        <div class="grid grid-cols-3 gap-4 max-w-md w-full">
+          <div class="p-3 rounded-2xl bg-amber-50 border-2 border-amber-200 text-center">
+            <div class="text-xs font-black text-amber-800 mb-1">款式 A</div>
+            <div class="text-2xl mb-1">📦</div>
+            <div class="text-base font-black text-slate-800">46 粒</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-emerald-50 border-2 border-emerald-200 text-center">
+            <div class="text-xs font-black text-emerald-800 mb-1">款式 B</div>
+            <div class="text-2xl mb-1">🫙</div>
+            <div class="text-base font-black text-slate-800">24 粒</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-rose-50 border-2 border-rose-200 text-center">
+            <div class="text-xs font-black text-rose-800 mb-1">款式 C</div>
+            <div class="text-2xl mb-1">🍬</div>
+            <div class="text-base font-black text-slate-800">13 粒</div>
+          </div>
+        </div>
+      `
+    };
+
+    // =========================================================
+    // 30 道四年級除法練習題（完整涵蓋 Ch 6-9 鞏固工作紙，提示絕不直接寫出答案）
+    // =========================================================
+    const QUESTIONS = [
+      // --- 第 6 課：除法(一) 兩位數除兩位數 ---
+      {
+        id: 1, part: '第 6 課：除法(一)', type: 'input',
+        prompt: '計算：90 ÷ 30 =',
+        answer: '3',
+        hint: '利用商不變性質，把被除數和除數同時去掉一個 0，想想 9 ÷ 3 等於多少。'
+      },
+      {
+        id: 2, part: '第 6 課：除法(一)', type: 'qr',
+        prompt: '計算：53 ÷ 40 = ？',
+        answerQ: '1', answerR: '13',
+        hint: '想一想 40 乘以幾最接近 53 但不超過 53，再用 53 減去該乘積便是餘數。'
+      },
+      {
+        id: 3, part: '第 6 課：除法(一)', type: 'single',
+        prompt: '以下哪一道算式的商最大？',
+        answer: 'A',
+        hint: '逐一估算各選項的商（整數部分），比較哪一個商的數值最大。',
+        options: [
+          { key: 'A', label: '50 ÷ 10' },
+          { key: 'B', label: '81 ÷ 30' },
+          { key: 'C', label: '87 ÷ 20' },
+          { key: 'D', label: '80 ÷ 20' }
+        ]
+      },
+      {
+        id: 4, part: '第 6 課：除法(一)', type: 'single',
+        prompt: '最大的兩位偶數除以 10，餘數是多少？',
+        answer: 'B',
+        hint: '先找出最大的兩位偶數（雙數），再除以 10，留意個位數字就是餘數。',
+        options: [
+          { key: 'A', label: '9' },
+          { key: 'B', label: '8' },
+          { key: 'C', label: '7' },
+          { key: 'D', label: '6' }
+        ]
+      },
+      {
+        id: 5, part: '第 6 課：除法(一)', type: 'qr',
+        prompt: '計算：79 ÷ 26 = ？',
+        answerQ: '3', answerR: '1',
+        hint: '把除數 26 估作 30 試商，用 26 分別乘以 2 或 3 看看哪個最接近 79。'
+      },
+      {
+        id: 6, part: '第 6 課：除法(一)', type: 'qr',
+        prompt: '計算：87 ÷ 14 = ？',
+        answerQ: '6', answerR: '3',
+        hint: '用 14 試乘 5、6 或 7，找出不超過 87 的最大乘積，再求餘數（餘數必須小於 14）。'
+      },
+
+      // --- 第 7 課：除法(二) 兩位數除三位數及連除 ---
+      {
+        id: 7, part: '第 7 課：除法(二)', type: 'input',
+        prompt: '計算：312 ÷ 52 =',
+        answer: '6',
+        hint: '把 52 估作 50，想想 50 乘以幾接近 300，再用 52 乘該數驗算。'
+      },
+      {
+        id: 8, part: '第 7 課：除法(二)', type: 'qr',
+        prompt: '計算：248 ÷ 42 = ？',
+        answerQ: '5', answerR: '38',
+        hint: '把 42 估作 40，40 × 6 = 240，但 42 × 6 會超過 248，試把商調小 1 再計算！'
+      },
+      {
+        id: 9, part: '第 7 課：除法(二)', type: 'input',
+        prompt: '先估算，再計算：802 ÷ 38 的結果大約是多少？（填整十數）',
+        answer: '20',
+        hint: '把 802 估作 800，把 38 估作 40，再計算 800 ÷ 40。'
+      },
+      {
+        id: 10, part: '第 7 課：除法(二)', type: 'single',
+        prompt: '觀察右面的直式謎題，方格內的數字（除數的個位）應該是多少？',
+        mainFigure: VISUALS.puzzle1(),
+        answer: 'C',
+        hint: '從直式可見 219 減去 200 餘 19，代表「除數 × 8 = 200」，用 200 ÷ 8 即可找出除數！',
+        options: [
+          { key: 'A', label: '3' },
+          { key: 'B', label: '4' },
+          { key: 'C', label: '5' },
+          { key: 'D', label: '6' }
+        ]
+      },
+      {
+        id: 11, part: '第 7 課：除法(二)', type: 'input',
+        prompt: '巧算連除：500 ÷ 25 ÷ 4 =',
+        answer: '5',
+        hint: '連續除以 25 和 4，等於除以「25 × 4」的積，先算括號內會非常快！'
+      },
+      {
+        id: 12, part: '第 7 課：除法(二)', type: 'input',
+        prompt: '巧算連除：448 ÷ 16 ÷ 4 =',
+        answer: '7',
+        hint: '可按次序先算 448 ÷ 16，再把所得的商除以 4（或先算 448 ÷ 4 再除以 16）。'
+      },
+      {
+        id: 13, part: '第 7 課：除法(二)', type: 'single',
+        prompt: '觀察下圖的除法算式：一個兩位數除 474，商是 13，餘數是 6。這個兩位數除數是多少？',
+        mainFigure: VISUALS.puzzle2(),
+        answer: 'B',
+        hint: '利用除法驗算公式：被除數 − 餘數 = 除數 × 商，先算 474 − 6，再除以商 13。',
+        options: [
+          { key: 'A', label: '34' },
+          { key: 'B', label: '36' },
+          { key: 'C', label: '38' },
+          { key: 'D', label: '42' }
+        ]
+      },
+
+      // --- 第 7–8 課：除法及乘除應用題 ---
+      {
+        id: 14, part: '第 7 課：除法應用題', type: 'input',
+        prompt: '學校舉辦秋季旅行，有 142 個四年級學生參加。每輛旅遊巴最多可載 55 個學生，要接載所有學生，最少需要旅遊巴多少輛？',
+        answer: '3', unit: '輛',
+        hint: '先算 142 ÷ 55 的商和餘數；剩下的學生也需要一輛車接載，所以商要加 1！'
+      },
+      {
+        id: 15, part: '第 7 課：除法應用題', type: 'input',
+        prompt: '爸爸有 95 元，每件西餅售 23 元，爸爸最多可買西餅多少件？',
+        answer: '4', unit: '件',
+        hint: '計算 95 ÷ 23，剩下的錢不夠再買一件西餅，因此只取整數商。'
+      },
+      {
+        id: 16, part: '第 7 課：除法應用題', type: 'input',
+        prompt: '一本小說有 285 頁，嘉欣每天看 15 頁，要把整本小說看完，她最少要多少星期？（1 星期有 7 天）',
+        answer: '3', unit: '星期',
+        hint: '分兩步計算：先用 285 ÷ 15 求出總天數，再把天數除以 7 換算成星期（不足一星期也要算一星期）。'
+      },
+      {
+        id: 17, part: '第 7 課：除法應用題', type: 'input',
+        prompt: '圖書館職員把 468 本圖書平均放在 14 層書架上，再把餘下的圖書全部放在其中一層書架上，這層書架共有圖書多少本？',
+        answer: '40', unit: '本',
+        hint: '先算 468 ÷ 14 得出每層原本放多少本及餘下多少本，再把「每層本數 + 餘數」相加。'
+      },
+      {
+        id: 18, part: '第 7 課：除法應用題', type: 'input',
+        prompt: '便利店職員把 795 瓶草莓汁每 36 瓶包裝成一箱，還欠多少瓶草莓汁才可多包裝成一箱？',
+        mainFigure: VISUALS.juiceTable(),
+        answer: '33', unit: '瓶',
+        hint: '先計算 795 ÷ 36 求出餘下多少瓶，再用每箱的 36 瓶減去餘數，便是還欠的瓶數。'
+      },
+      {
+        id: 19, part: '第 8 課：乘除應用題', type: 'input',
+        prompt: '果園裏有蘋果樹 99 棵。蘋果樹的數量是桃樹的 11 倍，果園裏有桃樹多少棵？',
+        answer: '9', unit: '棵',
+        hint: '看清楚誰是誰的 11 倍！蘋果樹（99 棵）較多，桃樹較少，求較小的數要用除法。'
+      },
+      {
+        id: 20, part: '第 8 課：乘除應用題', type: 'input',
+        prompt: '媽媽有 382 元，她把全部款項兌換成 50 元紙幣，最多可兌換多少張？',
+        answer: '7', unit: '張',
+        hint: '計算 382 ÷ 50，餘下的 32 元不足兌換一張 50 元紙幣，所以取整數商。'
+      },
+      {
+        id: 21, part: '第 8 課：乘除應用題', type: 'input',
+        prompt: '工廠生產了上衣 648 件和褲子 700 條，工作人員把全部上衣每 3 打放一箱，共可放多少箱？（1 打 = 12 件）',
+        answer: '18', unit: '箱',
+        hint: '先算每箱放多少件（3 × 12），再用上衣總數 648 除以每箱件數（褲子數量是干擾資料）。'
+      },
+
+      // --- 第 9 課：整除性（2、5、10 及 3 的整除性） ---
+      {
+        id: 22, part: '第 9 課：整除性 (2)', type: 'multi',
+        prompt: '以下哪些數可以被 2 整除？（可選多於一項）',
+        answer: ['A', 'C'],
+        hint: '能被 2 整除的數都是偶數，檢查每個數的個位數字是不是 0、2、4、6 或 8。',
+        options: [
+          { key: 'A', label: '80' },
+          { key: 'B', label: '125' },
+          { key: 'C', label: '246' },
+          { key: 'D', label: '379' }
+        ]
+      },
+      {
+        id: 23, part: '第 9 課：整除性 (2)', type: 'input',
+        prompt: '在 63 至 75 各數中（包括 63 和 75），共有多少個數可以被 2 整除？',
+        answer: '6', unit: '個',
+        hint: '依次數出 63 到 75 之間個位是 4、6、8、0、2、4 的偶數共有多少個。'
+      },
+      {
+        id: 24, part: '第 9 課：整除性 (2)', type: 'input',
+        prompt: '利用下面的三張數卡（4、0、7），組成可以被 2 整除的「最小三位數」是多少？',
+        mainFigure: VISUALS.cards(['4', '0', '7']),
+        answer: '470',
+        hint: '三位數的百位不能是 0，要最小應選 4 放百位；同時個位必須是偶數（0 或 4）才能被 2 整除。'
+      },
+      {
+        id: 25, part: '第 9 課：整除性 (5 和 10)', type: 'single',
+        prompt: '以下哪一個數「不可以」被 5 整除？',
+        answer: 'D',
+        hint: '能被 5 整除的數，個位數字一定是 0 或 5。找出個位不是 0 也不是 5 的數。',
+        options: [
+          { key: 'A', label: '85' },
+          { key: 'B', label: '120' },
+          { key: 'C', label: '135' },
+          { key: 'D', label: '266' }
+        ]
+      },
+      {
+        id: 26, part: '第 9 課：整除性 (5 和 10)', type: 'single',
+        prompt: '以下哪一個數可以「同時被 5 和 10 整除」？',
+        answer: 'C',
+        hint: '能同時被 5 和 10 整除的數，個位數字必須是 0。',
+        options: [
+          { key: 'A', label: '75' },
+          { key: 'B', label: '92' },
+          { key: 'C', label: '100' },
+          { key: 'D', label: '508' }
+        ]
+      },
+      {
+        id: 27, part: '第 9 課：整除性 (5 和 10)', type: 'input',
+        prompt: '利用右面的三張數卡（0、4、5），組成可以被 10 整除的「最大三位數」是多少？',
+        mainFigure: VISUALS.cards(['0', '4', '5']),
+        answer: '540',
+        hint: '能被 10 整除的數個位必須是 0，餘下兩張數卡把較大的放在百位即可。'
+      },
+      {
+        id: 28, part: '第 9 課：整除性 (3)', type: 'multi',
+        prompt: '以下哪些數可以被 3 整除？（可選多於一項）',
+        answer: ['B', 'C'],
+        hint: '把每個數的所有數字加起來，如果數字之和能被 3 整除，該數就能被 3 整除！',
+        options: [
+          { key: 'A', label: '58' },
+          { key: 'B', label: '84' },
+          { key: 'C', label: '156' },
+          { key: 'D', label: '224' }
+        ]
+      },
+      {
+        id: 29, part: '第 9 課：整除性 (3 和 5)', type: 'multi',
+        prompt: '以下哪些數可以「同時被 3 和 5 整除」？（可選多於一項）',
+        answer: ['A', 'D'],
+        hint: '先篩選出個位是 0 或 5（能被 5 整除）的數，再把各數位數字相加檢查是否能被 3 整除。',
+        options: [
+          { key: 'A', label: '75' },
+          { key: 'B', label: '96' },
+          { key: 'C', label: '193' },
+          { key: 'D', label: '210' }
+        ]
+      },
+      {
+        id: 30, part: '第 9 課：整除性綜合應用', type: 'single',
+        prompt: '林小姐買了以下其中一款糖果，她把所有糖果平均分給 3 個小朋友，剛好分盡。林小姐買的是哪一款糖果？',
+        mainFigure: VISUALS.candies(),
+        answer: 'B',
+        hint: '「平均分給 3 個小朋友剛好分盡」代表糖果粒數能被 3 整除，用各數位數字之和檢查 46、24 和 13 哪個可被 3 整除。',
+        options: [
+          { key: 'A', label: '款式 A（46 粒）' },
+          { key: 'B', label: '款式 B（24 粒）' },
+          { key: 'C', label: '款式 C（13 粒）' }
+        ]
+      }
+    ];
+
+    // =========================================================
+    // 頁面初始化與 SSO 單一登入檢查
+    // =========================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      initScratchpad();
+      const ssoRaw = sessionStorage.getItem('fk1ps_math_user');
+      if (ssoRaw) {
+        try {
+          const parsedUser = JSON.parse(ssoRaw);
+          if (parsedUser && parsedUser.account) {
+            currentUser = parsedUser;
+            applyUserHeader();
+            fetchUserProgressFromCloud();
+            return;
+          }
+        } catch (e) {}
+      }
+      document.getElementById('login-screen').classList.remove('hidden');
+    });
+
+    function applyUserHeader() {
+      document.getElementById('user-badge-area').classList.remove('hidden');
+      document.getElementById('user-display-name').textContent = currentUser.name;
+      const numStr = currentUser.classNum ? ` (${currentUser.classNum})` : '';
+      document.getElementById('user-display-meta').textContent = `${currentUser.className}${numStr}`;
+    }
+
+    function logoutUser() {
+      sessionStorage.removeItem('fk1ps_math_user');
+      window.location.href = 'index.html';
+    }
+
+    async function handleManualLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const acc = document.getElementById('login-account').value.trim();
+      const pwd = document.getElementById('login-password').value.trim();
+      const errBox = document.getElementById('login-error');
+      const btn = document.getElementById('login-submit-btn');
+
+      errBox.classList.add('hidden');
+      btn.disabled = true;
+      btn.textContent = '驗證中...';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'login',
+            mode: 'unit',
+            unitId: UNIT_ID,
+            account: acc,
+            password: pwd
+          })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          currentUser = data.user;
+          sessionStorage.setItem('fk1ps_math_user', JSON.stringify(currentUser));
+          applyUserHeader();
+          document.getElementById('login-screen').classList.add('hidden');
+          applyLoadedProgress(data.progress);
+        } else {
+          errBox.textContent = data.message || '登入失敗，請檢查帳號或密碼。';
+          errBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        errBox.textContent = '網絡連線異常，請稍後再試。';
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '登入並開始練習';
+      }
+    }
+
+    async function fetchUserProgressFromCloud() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('loading-overlay').classList.remove('hidden');
+
+      if (currentUser.role === 'teacher') {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        startQuizAt(0);
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'getStudentDashboard',
+            account: currentUser.account
+          })
+        });
+        const data = await res.json();
+        document.getElementById('loading-overlay').classList.add('hidden');
+        if (data.status === 'success' && data.progressMap && data.progressMap[UNIT_ID]) {
+          applyLoadedProgress(data.progressMap[UNIT_ID]);
+        } else {
+          startQuizAt(0);
+        }
+      } catch (err) {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        startQuizAt(0);
+      }
+    }
+
+    function applyLoadedProgress(prog) {
+      if (!prog || currentUser.role === 'teacher') {
+        startQuizAt(0);
+        return;
+      }
+      firstTryCorrect = Number(prog.firstTryCorrect) || 0;
+      totalAttempts = Number(prog.totalAttempts) || 0;
+      wrongQuestionIds.clear();
+
+      if (prog.wrongList) {
+        String(prog.wrongList).split(',').forEach(item => {
+          const num = parseInt(item.replace(/[^\d]/g, ''), 10);
+          if (!isNaN(num)) wrongQuestionIds.add(num);
+        });
+      }
+
+      const completedFlag = (prog.isCompleted === true || String(prog.isCompleted).toUpperCase() === 'TRUE');
+      const savedCurrentQ = Number(prog.currentQ) || 1;
+
+      if (completedFlag && (firstTryCorrect > 0 || totalAttempts > 0)) {
+        showCertificateScreen();
+      } else {
+        const qIdx = Math.max(0, Math.min(QUESTIONS.length - 1, savedCurrentQ - 1));
+        startQuizAt(qIdx);
+      }
+    }
+
+    // =========================================================
+    // 教師快速選題工具列
+    // =========================================================
+    function initTeacherJumpBar() {
+      const bar = document.getElementById('teacher-jump-bar');
+      const container = document.getElementById('teacher-jump-buttons');
+      const indicator = document.getElementById('teacher-q-indicator');
+      if (!bar || !container) return;
+
+      if (currentUser && currentUser.role === 'teacher') {
+        bar.classList.remove('hidden');
+        if (indicator) indicator.textContent = `目前：第 ${currentIndex + 1} / ${QUESTIONS.length} 題`;
+        container.innerHTML = '';
+        QUESTIONS.forEach((q, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = q.id;
+          const isCurrent = idx === currentIndex;
+          btn.className = 'w-9 h-9 rounded-xl text-sm font-black border transition cursor-pointer ' +
+            (isCurrent
+              ? 'bg-amber-600 text-white border-amber-700 shadow-sm scale-105'
+              : 'bg-white text-amber-900 border-amber-300 hover:bg-amber-100');
+          btn.onclick = () => {
+            currentIndex = idx;
+            renderQuestion();
+          };
+          container.appendChild(btn);
+        });
+      } else {
+        bar.classList.add('hidden');
+      }
+    }
+
+    // =========================================================
+    // 題目渲染與作答檢查邏輯
+    // =========================================================
+    function startQuizAt(idx) {
+      currentIndex = idx;
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      document.getElementById('complete-screen').classList.add('hidden');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[currentIndex];
+      currentQuestionHadWrong = false;
+      isAnsweredCorrectly = false;
+      selectedSingle = null;
+      selectedMulti.clear();
+
+      initTeacherJumpBar();
+
+      document.getElementById('progress-text').textContent = `${currentIndex + 1} / ${QUESTIONS.length}`;
+      const pct = Math.round(((currentIndex + 1) / QUESTIONS.length) * 100);
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+      document.getElementById('stat-first-try').textContent = firstTryCorrect;
+      document.getElementById('stat-attempts').textContent = totalAttempts;
+
+      document.getElementById('q-part-badge').textContent = q.part;
+      document.getElementById('q-number-badge').textContent = `第 ${q.id} 題 / 共 ${QUESTIONS.length} 題`;
+      document.getElementById('q-prompt').textContent = q.prompt;
+
+      const multiBanner = document.getElementById('multi-select-banner');
+      if (q.type === 'multi') {
+        multiBanner.classList.remove('hidden');
+      } else {
+        multiBanner.classList.add('hidden');
+      }
+
+      const mainFig = document.getElementById('q-main-figure');
+      if (q.mainFigure) {
+        mainFig.innerHTML = q.mainFigure;
+        mainFig.classList.remove('hidden');
+      } else {
+        mainFig.innerHTML = '';
+        mainFig.classList.add('hidden');
+      }
+
+      const fb = document.getElementById('feedback-box');
+      fb.classList.add('hidden');
+      document.getElementById('submit-btn').classList.remove('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+
+      const optGrid = document.getElementById('q-options-grid');
+      const inputArea = document.getElementById('q-input-area');
+      const qrArea = document.getElementById('q-qr-area');
+
+      optGrid.classList.add('hidden');
+      inputArea.classList.add('hidden');
+      qrArea.classList.add('hidden');
+
+      if (q.type === 'input') {
+        inputArea.classList.remove('hidden');
+        const inp = document.getElementById('q-text-input');
+        inp.value = '';
+        inp.disabled = false;
+        inp.focus();
+        document.getElementById('q-input-unit').textContent = q.unit || '';
+      } else if (q.type === 'qr') {
+        qrArea.classList.remove('hidden');
+        const qInp = document.getElementById('q-quotient-input');
+        const rInp = document.getElementById('q-remainder-input');
+        qInp.value = ''; rInp.value = '';
+        qInp.disabled = false; rInp.disabled = false;
+        document.getElementById('q-q-label').textContent = q.qLabel || '商：';
+        document.getElementById('q-r-label').textContent = q.rLabel || '餘數：';
+        document.getElementById('q-q-unit').textContent = q.qUnit || '';
+        document.getElementById('q-r-unit').textContent = q.rUnit || '';
+        qInp.focus();
+      } else {
+        optGrid.classList.remove('hidden');
+        optGrid.innerHTML = '';
+
+        q.options.forEach(opt => {
+          const card = document.createElement('div');
+          card.id = `opt-card-${opt.key}`;
+          card.className = 'option-card cursor-pointer rounded-2xl border-2 border-slate-200 bg-white p-4 flex items-center justify-between gap-3';
+          card.onclick = () => handleOptionClick(opt.key);
+
+          card.innerHTML = `
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">${opt.key}</span>
+              <span class="text-lg font-bold text-slate-800">${opt.label}</span>
+            </div>
+            ${q.type === 'multi' ? `<span id="chk-${opt.key}" class="w-6 h-6 rounded-md border-2 border-slate-300 flex items-center justify-center text-white text-xs font-black shrink-0"></span>` : ''}
+          `;
+          optGrid.appendChild(card);
+        });
+      }
+    }
+
+    function handleOptionClick(key) {
+      if (isAnsweredCorrectly) return;
+      const q = QUESTIONS[currentIndex];
+
+      if (q.type === 'single') {
+        selectedSingle = key;
+        q.options.forEach(o => {
+          const el = document.getElementById(`opt-card-${o.key}`);
+          el.classList.remove('option-selected', 'option-wrong');
+          if (o.key === key) el.classList.add('option-selected');
+        });
+      } else if (q.type === 'multi') {
+        const el = document.getElementById(`opt-card-${key}`);
+        const chk = document.getElementById(`chk-${key}`);
+        el.classList.remove('option-wrong');
+        if (selectedMulti.has(key)) {
+          selectedMulti.delete(key);
+          el.classList.remove('option-selected');
+          chk.classList.remove('bg-indigo-600', 'border-indigo-600');
+          chk.textContent = '';
+        } else {
+          selectedMulti.add(key);
+          el.classList.add('option-selected');
+          chk.classList.add('bg-indigo-600', 'border-indigo-600');
+          chk.textContent = '✓';
+        }
+      }
+    }
+
+    function checkAnswer() {
+      if (isAnsweredCorrectly) return;
+      const q = QUESTIONS[currentIndex];
+
+      if (q.type === 'single' && !selectedSingle) {
+        showFeedback('請先點選一個答案選項！', 'warn');
+        return;
+      }
+      if (q.type === 'multi' && selectedMulti.size === 0) {
+        showFeedback('請先點選至少一個選項！', 'warn');
+        return;
+      }
+      if (q.type === 'input' && !document.getElementById('q-text-input').value.trim()) {
+        showFeedback('請先輸入你的答案！', 'warn');
+        return;
+      }
+      if (q.type === 'qr') {
+        const qv = document.getElementById('q-quotient-input').value.trim();
+        const rv = document.getElementById('q-remainder-input').value.trim();
+        if (!qv || !rv) {
+          showFeedback('請同時輸入「商」和「餘數」（如無餘數請填 0）！', 'warn');
+          return;
+        }
+      }
+
+      totalAttempts++;
+      document.getElementById('stat-attempts').textContent = totalAttempts;
+
+      let isCorrect = false;
+      if (q.type === 'single') {
+        isCorrect = (selectedSingle === q.answer);
+      } else if (q.type === 'multi') {
+        const userArr = Array.from(selectedMulti).sort();
+        const ansArr = [...q.answer].sort();
+        isCorrect = (userArr.length === ansArr.length && userArr.every((v, i) => v === ansArr[i]));
+      } else if (q.type === 'input') {
+        const val = document.getElementById('q-text-input').value.trim().replace(/,/g, '');
+        isCorrect = (val === q.answer);
+      } else if (q.type === 'qr') {
+        const qv = document.getElementById('q-quotient-input').value.trim();
+        const rv = document.getElementById('q-remainder-input').value.trim();
+        isCorrect = (qv === q.answerQ && rv === q.answerR);
+      }
+
+      if (isCorrect) {
+        isAnsweredCorrectly = true;
+        if (!currentQuestionHadWrong) {
+          firstTryCorrect++;
+          document.getElementById('stat-first-try').textContent = firstTryCorrect;
+        }
+
+        if (q.type === 'single') {
+          document.getElementById(`opt-card-${selectedSingle}`).classList.add('option-correct');
+        } else if (q.type === 'multi') {
+          selectedMulti.forEach(k => document.getElementById(`opt-card-${k}`).classList.add('option-correct'));
+        } else if (q.type === 'input') {
+          document.getElementById('q-text-input').disabled = true;
+        } else if (q.type === 'qr') {
+          document.getElementById('q-quotient-input').disabled = true;
+          document.getElementById('q-remainder-input').disabled = true;
+        }
+
+        showFeedback(`🎉 答對了！${q.hint}`, 'success');
+        document.getElementById('submit-btn').classList.add('hidden');
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.textContent = (currentIndex === QUESTIONS.length - 1) ? '完成並查看成績 🏆' : '下一題 →';
+        nextBtn.classList.remove('hidden');
+
+        if (currentIndex < QUESTIONS.length - 1) {
+          saveProgressToCloud(currentIndex + 2, false);
+        }
+      } else {
+        currentQuestionHadWrong = true;
+        wrongQuestionIds.add(q.id);
+
+        if (q.type === 'single') {
+          document.getElementById(`opt-card-${selectedSingle}`).classList.add('option-wrong');
+        } else if (q.type === 'multi') {
+          selectedMulti.forEach(k => document.getElementById(`opt-card-${k}`).classList.add('option-wrong'));
+        }
+
+        showFeedback(`💡 再想一想！解題提示：${q.hint}`, 'error');
+      }
+    }
+
+    function showFeedback(msg, type) {
+      const fb = document.getElementById('feedback-box');
+      fb.classList.remove('hidden');
+      if (type === 'success') {
+        fb.className = 'mb-6 p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-base font-bold';
+      } else if (type === 'error') {
+        fb.className = 'mb-6 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 text-base font-bold';
+      } else {
+        fb.className = 'mb-6 p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-base font-bold';
+      }
+      fb.textContent = msg;
+    }
+
+    function goNextQuestion() {
+      if (currentIndex < QUESTIONS.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        submitFinalRecordToCloud();
+        showCertificateScreen();
+      }
+    }
+
+    function showCertificateScreen() {
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('complete-screen').classList.remove('hidden');
+
+      const numStr = currentUser.classNum ? ` (${currentUser.classNum})` : '';
+      document.getElementById('cert-student-info').textContent = `${currentUser.className}${numStr} ${currentUser.name}`;
+      document.getElementById('cert-score').textContent = `${firstTryCorrect} / ${QUESTIONS.length}`;
+      document.getElementById('cert-attempts').textContent = `${totalAttempts} 次`;
+
+      const wrongArr = Array.from(wrongQuestionIds).sort((a, b) => a - b);
+      const summaryEl = document.getElementById('cert-wrong-summary');
+      if (wrongArr.length === 0) {
+        summaryEl.innerHTML = '🌟 <strong>表現滿分！</strong>所有題目均一次答對，完全掌握兩位數除法、應用題及整除性！';
+      } else {
+        summaryEl.innerHTML = `📝 <strong>曾經答錯並已訂正的題號：</strong>第 ${wrongArr.join('、')} 題（建議重温相關概念）。`;
+      }
+    }
+
+    // =========================================================
+    // 雲端資料同步（自動過濾教師帳號，避免污染學生紀錄）
+    // =========================================================
+    async function saveProgressToCloud(nextQNum, isDone) {
+      if (!currentUser || currentUser.role === 'teacher') {
+        document.getElementById('sync-status-text').textContent = '教師檢視模式（不寫入雲端進度）';
+        return;
+      }
+      const syncEl = document.getElementById('sync-status-text');
+      syncEl.textContent = '正在同步進度...';
+      const wrongStr = Array.from(wrongQuestionIds).sort((a, b) => a - b).map(n => `第${n}題`).join(', ');
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'saveProgress',
+            account: currentUser.account,
+            name: currentUser.name,
+            className: currentUser.className,
+            classNum: currentUser.classNum,
+            unitId: UNIT_ID,
+            currentQ: nextQNum,
+            firstTryCorrect: firstTryCorrect,
+            totalAttempts: totalAttempts,
+            wrongList: wrongStr,
+            isCompleted: isDone
+          })
+        });
+        syncEl.textContent = '✓ 已即時同步至雲端';
+      } catch (e) {
+        syncEl.textContent = '⚠ 離線暫存中';
+      }
+    }
+
+    async function submitFinalRecordToCloud() {
+      if (!currentUser || currentUser.role === 'teacher') return;
+      const wrongArr = Array.from(wrongQuestionIds).sort((a, b) => a - b);
+      const wrongDetails = wrongArr.length === 0 ? '全對（無錯題）' : `曾錯題號：${wrongArr.map(n => '第' + n + '題').join('、')}`;
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'submitRecord',
+            account: currentUser.account,
+            name: currentUser.name,
+            className: currentUser.className,
+            classNum: currentUser.classNum,
+            unitId: UNIT_ID,
+            unitName: UNIT_NAME,
+            score: `${firstTryCorrect} / ${QUESTIONS.length}`,
+            wrongDetails: wrongDetails,
+            currentQ: QUESTIONS.length,
+            firstTryCorrect: firstTryCorrect,
+            totalAttempts: totalAttempts,
+            wrongList: wrongArr.map(n => `第${n}題`).join(', ')
+          })
+        });
+      } catch (e) {}
+    }
+
+    async function resetUnitPractice() {
+      firstTryCorrect = 0;
+      totalAttempts = 0;
+      wrongQuestionIds.clear();
+
+      if (currentUser && currentUser.role !== 'teacher') {
+        try {
+          await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'resetProgress',
+              account: currentUser.account,
+              unitId: UNIT_ID
+            })
+          });
+        } catch (e) {}
+      }
+      startQuizAt(0);
+    }
+
+    // =========================================================
+    // 互動直式草稿畫板
+    // =========================================================
+    let padCtx = null, isDrawing = false, penColor = '#1e293b', padBgMode = 'blank';
+    function initScratchpad() {
+      const canvas = document.getElementById('scratchpad-canvas');
+      if (!canvas) return;
+      padCtx = canvas.getContext('2d');
+      padCtx.lineWidth = 2.5; padCtx.lineCap = 'round'; padCtx.lineJoin = 'round';
+      const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.touches ? e.touches[0].clientX : e.clientX;
+        const cy = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
+      };
+      const start = (e) => { isDrawing = true; const p = getPos(e); padCtx.beginPath(); padCtx.moveTo(p.x, p.y); };
+      const move = (e) => { if (!isDrawing) return; e.preventDefault(); const p = getPos(e); padCtx.strokeStyle = penColor; padCtx.lineTo(p.x, p.y); padCtx.stroke(); };
+      const end = () => { isDrawing = false; };
+      canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+      canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); window.addEventListener('touchend', end);
+    }
+    function toggleScratchpad() {
+      const panel = document.getElementById('scratchpad-panel');
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) drawPadBackground();
+    }
+    function setPenColor(c) { penColor = c; }
+    function setPadBg(mode) {
+      padBgMode = mode;
+      ['blank', 'grid'].forEach(m => {
+        const btn = document.getElementById(`bg-btn-${m}`);
+        btn.className = (m === mode)
+          ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white'
+          : 'px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
+      });
+      clearScratchpad();
+    }
+    function drawPadBackground() {
+      const canvas = document.getElementById('scratchpad-canvas');
+      if (!canvas || !padCtx) return;
+      padCtx.clearRect(0, 0, canvas.width, canvas.height);
+      if (padBgMode === 'grid') {
+        padCtx.strokeStyle = '#e2e8f0'; padCtx.lineWidth = 1;
+        for (let x = 20; x < canvas.width; x += 24) { padCtx.beginPath(); padCtx.moveTo(x, 0); padCtx.lineTo(x, canvas.height); padCtx.stroke(); }
+        for (let y = 20; y < canvas.height; y += 24) { padCtx.beginPath(); padCtx.moveTo(0, y); padCtx.lineTo(canvas.width, y); padCtx.stroke(); }
+      }
+      padCtx.lineWidth = 2.5;
+    }
+    function clearScratchpad() { drawPadBackground(); }
+  </script>
+</body>
+</html>

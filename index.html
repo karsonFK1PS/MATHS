@@ -48,12 +48,12 @@
       </div>
 
       <div id="header-actions" class="hidden flex items-center gap-2.5">
-        <button id="refresh-btn" onclick="refreshPortalData(true)"
+        <button id="refresh-btn" type="button" onclick="refreshPortalData(true)"
                 class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-sm font-bold transition">
           <span id="refresh-icon">🔄</span>
           <span>刷新進度</span>
         </button>
-        <button onclick="handleLogout()"
+        <button type="button" onclick="handleLogout()"
                 class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-700 border border-slate-200 text-sm font-bold transition">
           登出
         </button>
@@ -72,7 +72,7 @@
         <p class="text-sm text-slate-500 mt-1">登入一次即可進入所有已開放單元並自動紀錄成績</p>
       </div>
 
-      <form onsubmit="handlePortalLogin(event)" class="space-y-4">
+      <form action="javascript:void(0);" onsubmit="handlePortalLogin(event)" class="space-y-4">
         <div>
           <label class="block text-sm font-bold text-slate-700 mb-1.5">校內帳號</label>
           <input type="text" id="account-input" required placeholder="例如：B23001@fk1ps.hk"
@@ -140,9 +140,7 @@
       </div>
     </section>
 
-    <!-- =========================================================
-         教師專屬數據中心：全級各單元學生結果分析面板（僅 teacher 顯示）
-         ========================================================= -->
+    <!-- 教師專屬數據中心：全級各單元學生結果分析面板（僅 teacher 顯示） -->
     <section id="teacher-analytics-section" class="hidden bg-white rounded-3xl shadow-md border-2 border-amber-300 overflow-hidden">
       <div class="bg-gradient-to-r from-amber-50 to-orange-50 px-6 py-4 border-b border-amber-200 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
@@ -150,10 +148,10 @@
           <h3 class="text-lg sm:text-xl font-black text-slate-900">全級各單元學生結果分析</h3>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="loadTeacherAnalytics(true)" class="px-3 py-1.5 rounded-xl bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition">
+          <button type="button" onclick="loadTeacherAnalytics(true)" class="px-3 py-1.5 rounded-xl bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition">
             🔄 重新載入分析數據
           </button>
-          <button onclick="exportAnalyticsCSV()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition">
+          <button type="button" onclick="exportAnalyticsCSV()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition">
             📥 匯出成績表 (CSV)
           </button>
         </div>
@@ -243,22 +241,22 @@
     <!-- 冊次篩選列與同步狀態提示 -->
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex flex-wrap items-center gap-2" id="filter-tabs">
-        <button onclick="setTermFilter('ALL')" data-filter="ALL" class="filter-btn tab-active px-4 py-2 rounded-full text-sm font-bold transition">
+        <button type="button" onclick="setTermFilter('ALL')" data-filter="ALL" class="filter-btn tab-active px-4 py-2 rounded-full text-sm font-bold transition">
           全部課題 (14)
         </button>
-        <button onclick="setTermFilter('OPEN')" data-filter="OPEN" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
+        <button type="button" onclick="setTermFilter('OPEN')" data-filter="OPEN" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
           🟢 只看已開放
         </button>
-        <button onclick="setTermFilter('4上A')" data-filter="4上A" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
+        <button type="button" onclick="setTermFilter('4上A')" data-filter="4上A" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
           4上A 冊
         </button>
-        <button onclick="setTermFilter('4上B')" data-filter="4上B" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
+        <button type="button" onclick="setTermFilter('4上B')" data-filter="4上B" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
           4上B 冊
         </button>
-        <button onclick="setTermFilter('4下A')" data-filter="4下A" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
+        <button type="button" onclick="setTermFilter('4下A')" data-filter="4下A" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
           4下A 冊
         </button>
-        <button onclick="setTermFilter('4下B')" data-filter="4下B" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
+        <button type="button" onclick="setTermFilter('4下B')" data-filter="4下B" class="filter-btn tab-inactive px-4 py-2 rounded-full text-sm font-bold border border-slate-200 transition">
           4下B 冊
         </button>
       </div>
@@ -273,9 +271,6 @@
   </main>
 
   <script>
-    // =========================================================
-    // 核心設定與全學年 14 單元基礎骨架（防斷線/防空白備援）
-    // =========================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
 
     const UNIT_FILE_MAP = {
@@ -318,9 +313,6 @@
     let currentFilter = "ALL";
     let teacherAnalyticsData = null;
 
-    // =========================================================
-    // 初始化與返回主目錄快取保護機制
-    // =========================================================
     window.addEventListener("DOMContentLoaded", () => {
       const savedUserRaw = sessionStorage.getItem("fk1ps_math_user");
       if (!savedUserRaw) {
@@ -339,7 +331,6 @@
         return;
       }
 
-      // 1. 先立即從 sessionStorage 讀取快取（確保返回主目錄時秒開 14 張卡片，絕不空白）
       const cachedUnits = sessionStorage.getItem("fk1ps_math_units");
       const cachedProg = sessionStorage.getItem("fk1ps_math_progress");
       const cachedAnalytics = sessionStorage.getItem("fk1ps_math_analytics");
@@ -365,8 +356,6 @@
 
       showPortalView();
       renderPortalAll();
-
-      // 2. 在背景向雲端請求最新資料並靜默更新
       refreshPortalData(false);
     });
 
@@ -406,11 +395,8 @@
       showLoginView();
     }
 
-    // =========================================================
-    // 登入與雲端數據同步（使用 text/plain 避免 CORS 預檢失敗）
-    // =========================================================
     async function handlePortalLogin(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       const acc = document.getElementById("account-input").value.trim();
       const pwd = document.getElementById("password-input").value.trim();
       const msgEl = document.getElementById("login-msg");
@@ -504,16 +490,12 @@
           await loadTeacherAnalytics(false);
         }
       } catch (err) {
-        // 保留畫面現有快取卡片不清空，僅顯示溫和提示
         indicator.innerHTML = `<span class="text-amber-600">⚠️ 雲端連線繁忙（已顯示最近快取進度）</span>`;
       } finally {
         if (refreshIcon) refreshIcon.classList.remove("animate-spin");
       }
     }
 
-    // =========================================================
-    // 渲染學生統計與 14 個單元卡片（支援已完成分數與再次開始練習）
-    // =========================================================
     function renderPortalAll() {
       updateTopSummaryStats();
       renderUnitCards();
@@ -586,7 +568,6 @@
         const isInProgress = !isCompleted && prog && (Number(prog.currentQ) > 1 || Number(prog.totalAttempts) > 0);
         const targetFile = UNIT_FILE_MAP[u.unitId] || `${u.unitId}.html`;
 
-        // 狀態徽章
         let statusBadgeHtml = "";
         if (isCompleted) {
           statusBadgeHtml = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black border border-emerald-200">✅ 已完成</span>`;
@@ -598,7 +579,6 @@
           statusBadgeHtml = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">🔒 籌備中</span>`;
         }
 
-        // 上次分數／進度詳情欄
         let scoreDetailHtml = "";
         if (isCompleted) {
           const scoreText = prog.score ? prog.score : `${prog.firstTryCorrect || u.totalQuestions} / ${u.totalQuestions}`;
@@ -617,39 +597,38 @@
           `;
         }
 
-        // 底部按鈕設計
         let actionBtnHtml = "";
         if (isTeacher) {
           actionBtnHtml = `
-            <button onclick="openUnitPage('${u.unitId}', '${targetFile}', false)"
+            <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', false)"
                     class="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-sm shadow transition">
               👨‍🏫 教師預覽與快速選題 →
             </button>
           `;
         } else if (isCompleted) {
           actionBtnHtml = `
-            <button onclick="openUnitPage('${u.unitId}', '${targetFile}', true)"
+            <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', true)"
                     class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow transition">
               ↻ 再次開始練習
             </button>
           `;
         } else if (isInProgress) {
           actionBtnHtml = `
-            <button onclick="openUnitPage('${u.unitId}', '${targetFile}', false)"
+            <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', false)"
                     class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-sm shadow transition">
               繼續練習（第 ${prog.currentQ} 題）→
             </button>
           `;
         } else if (u.status === "開放中") {
           actionBtnHtml = `
-            <button onclick="openUnitPage('${u.unitId}', '${targetFile}', false)"
+            <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', false)"
                     class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm shadow transition">
               開始練習 →
             </button>
           `;
         } else {
           actionBtnHtml = `
-            <button disabled
+            <button type="button" disabled
                     class="w-full py-3 rounded-xl bg-slate-100 text-slate-400 font-bold text-sm cursor-not-allowed">
               即將開放
             </button>
@@ -688,7 +667,6 @@
 
     async function openUnitPage(unitId, filename, isRestart) {
       if (isRestart && currentUser && currentUser.role !== "teacher") {
-        // 先重置雲端及本地該單元進度，讓學生從第 1 題重新作答（同時保留歷史 Records 成績）
         try {
           await fetch(API_URL, {
             method: "POST",
@@ -706,9 +684,6 @@
       window.location.href = filename;
     }
 
-    // =========================================================
-    // 教師數據中心：全級各單元學生結果分析邏輯
-    // =========================================================
     async function loadTeacherAnalytics(showSpinner) {
       if (!currentUser || currentUser.role !== "teacher") return;
       const tbody = document.getElementById("ta-student-tbody");
@@ -781,7 +756,6 @@
       const unitMeta = unitsData.find(u => u.unitId === unitId) || { totalQuestions: 20, unitName: unitId };
       const totalQ = Number(unitMeta.totalQuestions) || 20;
 
-      // 篩選學生並按班別、學號升冪排序
       let students = teacherAnalyticsData.students.filter(s => classFilter === "ALL" || s.className === classFilter);
       students.sort((a, b) => {
         if (a.className !== b.className) return a.className.localeCompare(b.className);
@@ -835,7 +809,6 @@
           sumFirstTry += firstTry;
         }
 
-        // 統計錯題題號
         if (wrongStr && wrongStr.indexOf("無錯題") === -1) {
           const matches = wrongStr.match(/第\s*\d+\s*題/g);
           if (matches) {
@@ -849,7 +822,6 @@
         return { stu, state, currentQ, firstTry, attempts, wrongStr, updatedAt };
       });
 
-      // 更新摘要卡片
       const totalStu = students.length;
       const compRate = totalStu > 0 ? Math.round((completedCnt / totalStu) * 100) : 0;
       document.getElementById("ta-total-students").textContent = `${totalStu} 人`;
@@ -859,7 +831,6 @@
         ? `${(sumFirstTry / activeStudentCnt).toFixed(1)} / ${totalQ}`
         : "暫無數據";
 
-      // 渲染高頻錯題標籤
       const topWrongsEl = document.getElementById("ta-top-wrongs");
       const sortedWrongs = Object.entries(wrongFreqMap).sort((a, b) => b[1] - a[1]);
       if (sortedWrongs.length === 0) {
@@ -875,7 +846,6 @@
         `).join("");
       }
 
-      // 渲染明細表格
       const tbody = document.getElementById("ta-student-tbody");
       const filteredRows = rowsData.filter(row => statusFilter === "ALL" || row.state === statusFilter);
 
@@ -938,8 +908,8 @@
         lines.push([stu.className, stu.classNum, stu.name, stu.account, unitId, statusTxt, firstTry, totalQ, attempts, wrongList, updatedAt].join(","));
       });
 
-      const blob = new Blob(["﻿" + lines.join("
-")], { type: "text/csv;charset=utf-8;" });
+      const csvText = lines.join("\n");
+      const blob = new Blob(["﻿" + csvText], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

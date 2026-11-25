@@ -470,7 +470,7 @@
         type: 'single',
         prompt: '觀察以下四個平面圖形，哪一個是「菱形」？',
         answer: 'C',
-        hint: '菱形必須是四邊形，而且「四條邊的長度都相等」。A 有八條邊，B 是長方形，D 是梯形。',
+        hint: '菱形必須是四邊形，而且「四條邊的長度都相等」。先排除不是四邊形的圖形，再比較四條邊是否等長。',
         options: [
           { key: 'A', label: 'A', svg: SVG_SHAPES.q1_a() },
           { key: 'B', label: 'B', svg: SVG_SHAPES.q1_b() },
@@ -832,17 +832,22 @@
       }
       firstTryCorrect = Number(prog.firstTryCorrect) || 0;
       totalAttempts = Number(prog.totalAttempts) || 0;
+      wrongQuestionIds.clear();
+
       if (prog.wrongList) {
-        prog.wrongList.split(',').forEach(item => {
+        String(prog.wrongList).split(',').forEach(item => {
           const num = parseInt(item.replace(/[^\d]/g, ''), 10);
           if (!isNaN(num)) wrongQuestionIds.add(num);
         });
       }
 
-      if (prog.isCompleted) {
+      const completedFlag = (prog.isCompleted === true || String(prog.isCompleted).toUpperCase() === 'TRUE');
+      const savedCurrentQ = Number(prog.currentQ) || 1;
+
+      if (completedFlag && (firstTryCorrect > 0 || totalAttempts > 0)) {
         showCertificateScreen();
       } else {
-        const qIdx = Math.max(0, Math.min(QUESTIONS.length - 1, (Number(prog.currentQ) || 1) - 1));
+        const qIdx = Math.max(0, Math.min(QUESTIONS.length - 1, savedCurrentQ - 1));
         startQuizAt(qIdx);
       }
     }
@@ -1203,10 +1208,15 @@
     }
 
     async function resetUnitPractice() {
+      firstTryCorrect = 0;
+      totalAttempts = 0;
+      wrongQuestionIds.clear();
+
       if (currentUser && currentUser.role !== 'teacher') {
         try {
           await fetch(API_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
               action: 'resetProgress',
               account: currentUser.account,
@@ -1215,9 +1225,6 @@
           });
         } catch (e) {}
       }
-      firstTryCorrect = 0;
-      totalAttempts = 0;
-      wrongQuestionIds.clear();
       startQuizAt(0);
     }
 

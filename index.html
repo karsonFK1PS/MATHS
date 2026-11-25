@@ -564,8 +564,8 @@
       filtered.forEach(u => {
         const isOpen = (u.status === "開放中") || isTeacher;
         const prog = progressMap[u.unitId];
-        const isCompleted = prog && prog.isCompleted === true;
-        const isInProgress = !isCompleted && prog && (Number(prog.currentQ) > 1 || Number(prog.totalAttempts) > 0);
+        const isCompleted = Boolean(prog && prog.isCompleted === true);
+        const isInProgress = !isCompleted && Boolean(prog && (Number(prog.currentQ) > 1 || Number(prog.totalAttempts) > 0));
         const targetFile = UNIT_FILE_MAP[u.unitId] || `${u.unitId}.html`;
 
         let statusBadgeHtml = "";
@@ -665,8 +665,18 @@
       });
     }
 
-    async function openUnitPage(unitId, filename, isRestart) {
+   async function openUnitPage(unitId, filename, isRestart) {
       if (isRestart && currentUser && currentUser.role !== "teacher") {
+        // 先寫入本地狀態為「進行中第 1 題」，避免返回時快取仍顯示已完成
+        progressMap[unitId] = {
+          currentQ: 1,
+          firstTryCorrect: 0,
+          totalAttempts: 0,
+          wrongList: "",
+          isCompleted: false
+        };
+        sessionStorage.setItem("fk1ps_math_progress", JSON.stringify(progressMap));
+
         try {
           await fetch(API_URL, {
             method: "POST",
@@ -678,8 +688,6 @@
             })
           });
         } catch (e) {}
-        delete progressMap[unitId];
-        sessionStorage.setItem("fk1ps_math_progress", JSON.stringify(progressMap));
       }
       window.location.href = filename;
     }
@@ -787,7 +795,7 @@
           wrongStr = p.wrongList || "";
           updatedAt = p.updatedAt || "—";
           currentQ = Number(p.currentQ) || 1;
-          if (p.isCompleted || r) {
+          if (p.isCompleted) {
             state = "COMPLETED";
           } else if (currentQ > 1 || attempts > 0) {
             state = "IN_PROGRESS";

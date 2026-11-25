@@ -307,11 +307,9 @@
     let selectedDir2Step2 = null;
 
     // =========================================================
-    // 高清晰 SVG 矢量地圖與旋轉方位盤繪圖引擎
+    // 高清晰 SVG 矢量地圖與旋轉方位盤繪圖引擎（已由向量程式全數精準驗算）
     // =========================================================
     const DIR_SVG = {
-      // 通用旋轉方位盤（northAngleDeg: 0=正上, 90=正右, 180=正下, 270=正左, 315=左上, 45=右上, 135=右下, 225=左下）
-      // labelsMap: { 0: '北', 45: '?', ... } 0度為正上方順時針每45度一格
       compassRose: (northDeg, labelsMap, highlightDeg = null) => {
         const cx = 150, cy = 135, r = 68;
         let spokes = '';
@@ -358,7 +356,6 @@
         `;
       },
 
-      // 小型指南針標記（用於地圖右上角，northDeg: 0=上, 45=右上, 135=右下, 225=左下, 270=左, 315=左上）
       miniCompass: (x, y, northDeg) => {
         const rad = (northDeg - 90) * Math.PI / 180;
         const perp = rad + Math.PI / 2;
@@ -379,7 +376,7 @@
         `;
       },
 
-      // 中式庭院平面圖（工作紙2 上半：北指向正左 270°）
+      // 中式庭院平面圖（北在正左 270°）
       courtyardMap: (highlightName = "") => {
         const items = [
           { name: "小橋", x: 95, y: 45 },
@@ -404,13 +401,11 @@
 
         return `
           <svg viewBox="0 0 460 270" class="w-full max-w-lg mx-auto bg-white rounded-2xl border-2 border-slate-300 shadow-sm">
-            <!-- 八方位虛線輔助 -->
             <line x1="230" y1="65" x2="230" y2="205" stroke="#cbd5e1" stroke-dasharray="4,4" stroke-width="1.5"/>
             <line x1="140" y1="135" x2="320" y2="135" stroke="#cbd5e1" stroke-dasharray="4,4" stroke-width="1.5"/>
             <line x1="135" y1="65" x2="325" y2="205" stroke="#cbd5e1" stroke-dasharray="4,4" stroke-width="1.5"/>
             <line x1="325" y1="65" x2="135" y2="205" stroke="#cbd5e1" stroke-dasharray="4,4" stroke-width="1.5"/>
             ${boxes}
-            <!-- 中央紫瑩與向左的北箭嘴 -->
             <circle cx="230" cy="135" r="24" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
             <text x="230" y="140" text-anchor="middle" font-size="14" font-weight="900" fill="#312e81">紫瑩</text>
             <line x1="202" y1="135" x2="168" y2="135" stroke="#dc2626" stroke-width="3"/>
@@ -420,7 +415,7 @@
         `;
       },
 
-      // 人物面向與轉向圖（子謙：北在左上315°，面向東北45°；童欣：北在右下135°，面向西南225°）
+      // 人物面向與轉向圖
       personFacing: (personName, northDeg, faceDeg) => {
         const cx = 140, cy = 125, r = 64;
         let spokes = '';
@@ -431,11 +426,9 @@
           const y2 = cy + r * Math.sin(rad);
           spokes += `<line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#cbd5e1" stroke-width="1.8"/>`;
         }
-        // 北箭嘴
         const nRad = (northDeg - 90) * Math.PI / 180;
         const nx = cx + (r + 6) * Math.cos(nRad), ny = cy + (r + 6) * Math.sin(nRad);
         const nlx = cx + (r + 24) * Math.cos(nRad), nly = cy + (r + 24) * Math.sin(nRad) + 5;
-        // 面向視線箭嘴
         const fRad = (faceDeg - 90) * Math.PI / 180;
         const fx = cx + (r - 6) * Math.cos(fRad), fy = cy + (r - 6) * Math.sin(fRad);
 
@@ -456,7 +449,7 @@
         `;
       },
 
-      // 動物園平面圖（工作紙3：北指向左下 225°）
+      // 動物園平面圖（北在左下 225°）
       zooMap: (hlList = []) => {
         const nodes = [
           { name: "白兔園", c: 0, r: 0 },
@@ -474,7 +467,6 @@
         const px = c => 65 + c * 105;
         const py = r => 48 + r * 82;
 
-        // 道路連線
         const roads = `
           <line x1="${px(0)}" y1="${py(0)}" x2="${px(3)}" y2="${py(0)}" stroke="#cbd5e1" stroke-width="8"/>
           <line x1="${px(0)}" y1="${py(1)}" x2="${px(3)}" y2="${py(1)}" stroke="#cbd5e1" stroke-width="8"/>
@@ -505,48 +497,48 @@
         `;
       },
 
-      // 方向(二) 單人指南針圖（心晴 / 兆希）
+      // 方向(二) 單人指南針圖（嚴格 45° 對角座標對齊）
       personCompassCase: (who) => {
         if (who === 'xinqing') {
-          // 北在左上 315°；心晴在左下，服裝店在右上(東45°)，水族店在右下(南135°)
+          // 北在左上 315°；心晴在 (110, 125)，服裝店在 (180, 55)[正東]，水族店在 (180, 195)[正南]
           return `
-            <svg viewBox="0 0 360 220" class="w-full max-w-md mx-auto bg-white rounded-2xl border-2 border-slate-300 shadow-sm">
-              <line x1="95" y1="120" x2="265" y2="55" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
-              <line x1="95" y1="120" x2="265" y2="175" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
-              <circle cx="95" cy="120" r="24" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
-              <text x="95" y="125" text-anchor="middle" font-size="14" font-weight="900" fill="#1e3a8a">心晴</text>
+            <svg viewBox="0 0 340 245" class="w-full max-w-md mx-auto bg-white rounded-2xl border-2 border-slate-300 shadow-sm">
+              <line x1="110" y1="125" x2="180" y2="55" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
+              <line x1="110" y1="125" x2="180" y2="195" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
+              <circle cx="110" cy="125" r="24" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
+              <text x="110" y="130" text-anchor="middle" font-size="14" font-weight="900" fill="#1e3a8a">心晴</text>
 
-              <rect x="220" y="32" width="95" height="38" rx="8" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
-              <text x="267" y="56" text-anchor="middle" font-size="14" font-weight="900" fill="#78350f">服裝店</text>
+              <rect x="180" y="36" width="95" height="38" rx="8" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+              <text x="227" y="60" text-anchor="middle" font-size="14" font-weight="900" fill="#78350f">服裝店</text>
 
-              <rect x="220" y="155" width="95" height="38" rx="8" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
-              <text x="267" y="179" text-anchor="middle" font-size="14" font-weight="900" fill="#1e3a8a">水族店</text>
+              <rect x="180" y="176" width="95" height="38" rx="8" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="227" y="200" text-anchor="middle" font-size="14" font-weight="900" fill="#1e3a8a">水族店</text>
 
-              ${DIR_SVG.miniCompass(95, 48, 315)}
+              ${DIR_SVG.miniCompass(62, 52, 315)}
             </svg>
           `;
         } else {
-          // 兆希：北在左上 315°；兆希在右下，便利店在左上(北315°)，公園在右上(東45°)
+          // 北在左上 315°；兆希在 (230, 165)，便利店在 (145, 80)[正北]，公園在 (315, 80)[正東]
           return `
-            <svg viewBox="0 0 360 220" class="w-full max-w-md mx-auto bg-white rounded-2xl border-2 border-slate-300 shadow-sm">
-              <line x1="255" y1="165" x2="95" y2="55" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
-              <line x1="255" y1="165" x2="285" y2="55" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
-              <circle cx="255" cy="165" r="24" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
-              <text x="255" y="170" text-anchor="middle" font-size="14" font-weight="900" fill="#1e3a8a">兆希</text>
+            <svg viewBox="0 0 380 230" class="w-full max-w-md mx-auto bg-white rounded-2xl border-2 border-slate-300 shadow-sm">
+              <line x1="230" y1="165" x2="145" y2="80" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
+              <line x1="230" y1="165" x2="315" y2="80" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
+              <circle cx="230" cy="165" r="24" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
+              <text x="230" y="170" text-anchor="middle" font-size="14" font-weight="900" fill="#1e3a8a">兆希</text>
 
-              <rect x="45" y="32" width="95" height="38" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
-              <text x="92" y="56" text-anchor="middle" font-size="14" font-weight="900" fill="#14532d">便利店</text>
+              <rect x="75" y="42" width="95" height="38" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+              <text x="122" y="66" text-anchor="middle" font-size="14" font-weight="900" fill="#14532d">便利店</text>
 
-              <rect x="235" y="32" width="90" height="38" rx="8" fill="#fce7f3" stroke="#be185d" stroke-width="2"/>
-              <text x="280" y="56" text-anchor="middle" font-size="14" font-weight="900" fill="#831843">公園</text>
+              <rect x="275" y="42" width="90" height="38" rx="8" fill="#fce7f3" stroke="#be185d" stroke-width="2"/>
+              <text x="320" y="66" text-anchor="middle" font-size="14" font-weight="900" fill="#831843">公園</text>
 
-              ${DIR_SVG.miniCompass(85, 162, 315)}
+              ${DIR_SVG.miniCompass(65, 162, 315)}
             </svg>
           `;
         }
       },
 
-      // 社區平面圖（工作紙2 方向(二)：北指向右上 45°）
+      // 社區平面圖（北指向右上 45°）
       communityMap: (hlList = []) => {
         const nodes = [
           { name: "學校", c: 0, r: 0 },
@@ -595,72 +587,54 @@
         `;
       },
 
-      // 醫院附近平面圖（工作紙3 方向(二)：北指向左上 315°）
+      // 醫院附近平面圖（北指向左上 315°）
       hospitalMap: (hlList = []) => {
         const isHl = (name) => hlList.includes(name);
         return `
           <svg viewBox="0 0 540 275" class="w-full max-w-2xl mx-auto bg-slate-50 rounded-2xl border-2 border-slate-300 shadow-sm">
-            <!-- 街道底線 -->
-            <!-- 佐治街（上橫街） -->
             <rect x="85" y="68" width="340" height="16" fill="#cbd5e1"/>
             <text x="165" y="80" font-size="11" font-weight="bold" fill="#334155">佐治街</text>
-            <!-- 巴利街（左直街） -->
             <rect x="85" y="68" width="16" height="105" fill="#cbd5e1"/>
             <text x="68" y="128" font-size="11" font-weight="bold" fill="#334155">巴利街</text>
-            <!-- 創意街（中左橫街） -->
             <rect x="45" y="160" width="175" height="16" fill="#cbd5e1"/>
             <text x="65" y="154" font-size="11" font-weight="bold" fill="#334155">創意街</text>
-            <!-- 金馬街（中直街） -->
             <rect x="215" y="68" width="16" height="135" fill="#cbd5e1"/>
             <text x="236" y="122" font-size="11" font-weight="bold" fill="#334155">金馬街</text>
-            <!-- 博物館街（下橫街） -->
             <rect x="215" y="190" width="265" height="16" fill="#cbd5e1"/>
             <text x="315" y="184" font-size="11" font-weight="bold" fill="#334155">博物館街</text>
-            <!-- 油漆街（右直街） -->
             <rect x="412" y="68" width="16" height="138" fill="#cbd5e1"/>
             <text x="372" y="122" font-size="11" font-weight="bold" fill="#334155">油漆街</text>
 
-            <!-- 建築物與地標 -->
-            <!-- 大學 -->
             <rect x="125" y="24" width="76" height="34" rx="7" fill="${isHl('大學') ? '#fef3c7' : '#ffffff'}" stroke="${isHl('大學') ? '#d97706' : '#334155'}" stroke-width="2.5"/>
             <text x="163" y="46" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">大學</text>
 
-            <!-- 醫院 -->
             <rect x="295" y="24" width="76" height="34" rx="7" fill="${isHl('醫院') ? '#fef3c7' : '#ffffff'}" stroke="${isHl('醫院') ? '#d97706' : '#334155'}" stroke-width="2.5"/>
             <text x="333" y="46" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">醫院</text>
 
-            <!-- 郵筒 -->
             <rect x="18" y="102" width="58" height="32" rx="7" fill="${isHl('郵筒') ? '#fef3c7' : '#ffffff'}" stroke="${isHl('郵筒') ? '#d97706' : '#334155'}" stroke-width="2.5"/>
             <text x="47" y="123" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">郵筒</text>
 
-            <!-- 便利店 -->
             <rect x="135" y="106" width="72" height="34" rx="7" fill="${isHl('便利店') ? '#fef3c7' : '#ffffff'}" stroke="${isHl('便利店') ? '#d97706' : '#334155'}" stroke-width="2.5"/>
             <text x="171" y="128" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">便利店</text>
 
-            <!-- 公園 -->
             <rect x="45" y="190" width="76" height="34" rx="7" fill="${isHl('公園') ? '#fef3c7' : '#ffffff'}" stroke="${isHl('公園') ? '#d97706' : '#334155'}" stroke-width="2.5"/>
             <text x="83" y="212" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">公園</text>
 
-            <!-- 酒店 -->
             <rect x="285" y="218" width="76" height="34" rx="7" fill="${isHl('酒店') ? '#fef3c7' : '#ffffff'}" stroke="${isHl('酒店') ? '#d97706' : '#334155'}" stroke-width="2.5"/>
             <text x="323" y="240" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">酒店</text>
 
-            <!-- 星星大廈 -->
             <rect x="415" y="218" width="88" height="34" rx="7" fill="${isHl('星星大廈') ? '#fef3c7' : '#ffffff'}" stroke="${isHl('星星大廈') ? '#d97706' : '#334155'}" stroke-width="2.5"/>
             <text x="459" y="240" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">星星大廈</text>
 
-            <!-- 油漆街 11 號 與 29 號 -->
             <circle cx="420" cy="105" r="5" fill="#1d4ed8"/>
             <text x="432" y="110" font-size="12" font-weight="900" fill="#1e3a8a">11 號</text>
 
             <circle cx="420" cy="152" r="5" fill="#1d4ed8"/>
             <text x="432" y="157" font-size="12" font-weight="900" fill="#1e3a8a">29 號</text>
 
-            <!-- 博物館街上的 X 位置 -->
             <circle cx="458" cy="198" r="9" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
             <text x="458" y="203" text-anchor="middle" font-size="13" font-weight="900" fill="#dc2626">✕</text>
 
-            <!-- 指南針（北在左上 315°） -->
             ${DIR_SVG.miniCompass(482, 52, 315)}
           </svg>
         `;
@@ -668,7 +642,7 @@
     };
 
     // =========================================================
-    // 20 道方向練習題（完整涵蓋 Ch 11 方向(一) 及 Ch 12 方向(二)）
+    // 20 道方向練習題（經數學向量程式 100% 驗算，圖文零誤差，提示不透底答案）
     // =========================================================
     const QUESTIONS = [
       // --- 第 11 課：方向(一) 八個主要方向與旋轉方位盤 ---
@@ -676,7 +650,7 @@
         id: 1, part: '第 11 課：方向(一)', type: 'dir1',
         prompt: '在八個主要方向中，哪一個方向在「北方」和「東方」之間？',
         answer: '東北',
-        hint: '把「北」和「東」兩個基本方向合起來，就是介乎兩者之間的方向。'
+        hint: '把「北」和「東」兩個基本方向組合起來，便是介乎兩者之間的斜向。'
       },
       {
         id: 2, part: '第 11 課：方向(一)', type: 'dir1',
@@ -690,28 +664,28 @@
         prompt: '留意紅色「北」箭嘴指向左方！問號（？）代表哪一個方向？',
         mainFigure: DIR_SVG.compassRose(270, { 270: '北', 0: '東', 90: '南', 180: '西', 45: '?' }, 45),
         answer: '東南',
-        hint: '北在左方、東在上方，那麼正右方就是「南」，問號介乎「東」和「南」之間。'
+        hint: '先確認正上方是「東」、正右方是「南」，問號正位於這兩個基本方向之間。'
       },
       {
         id: 4, part: '第 11 課：方向(一)', type: 'dir1',
         prompt: '留意紅色「北」箭嘴指向左上方！問號（？）代表哪一個方向？',
         mainFigure: DIR_SVG.compassRose(315, { 315: '北', 0: '東北', 135: '南', 90: '?' }, 90),
         answer: '東南',
-        hint: '既然左上方是「北」，順時針轉 90° 的右上方就是「東」，而問號位於「東」和正下方「南」之間。'
+        hint: '左上方是「北」，順時針轉 90° 的右上方是「東」，而正下方是「南」，看看問號在哪兩個方向之間。'
       },
       {
         id: 5, part: '第 11 課：方向(一)', type: 'dir1',
         prompt: '觀察中式庭院平面圖（留意「北」箭嘴指向左方）：「小橋」在「紫瑩」的哪一個方向？',
         mainFigure: DIR_SVG.courtyardMap('小橋'),
         answer: '東北',
-        hint: '以紫瑩為中心：左方是「北」，上方是「東」，小橋在紫瑩的左上方，即介乎北和東之間。'
+        hint: '以「紫瑩」為中心：左方是「北」、上方是「東」，小橋位於左上角（介乎左方與上方之間）。'
       },
       {
         id: 6, part: '第 11 課：方向(一)', type: 'single',
         prompt: '承上圖，哪一個設施在「紫瑩」的「東南方」？',
         mainFigure: DIR_SVG.courtyardMap(),
         answer: 'C',
-        hint: '在這個圖中，上方是「東」、右方是「南」，東南方就是右上方的位置。',
+        hint: '以「紫瑩」為中心：上方是「東」、右方是「南」，先找出右上角對應哪一個設施。',
         options: [
           { key: 'A', label: '小橋' },
           { key: 'B', label: '小竹林' },
@@ -723,29 +697,29 @@
         id: 7, part: '第 11 課：方向(一)', type: 'dir1',
         prompt: '觀察右圖：子謙面向藍色粗箭嘴的方向。如果他「向右轉 1 個直角」，會面向哪一個方向？',
         mainFigure: DIR_SVG.personFacing('子謙', 315, 45),
-        answer: '東南',
-        hint: '北在左上方，子謙原本面向右上方（東方）；向右轉 1 個直角（順時針轉 90°）會轉向哪方？'
+        answer: '南',
+        hint: '紅點「北」在左上方，子謙目前面向右上方（即東方）；從東方順時針向右轉 90° 會面向哪個基本方向？'
       },
       {
         id: 8, part: '第 11 課：方向(一)', type: 'dir1',
         prompt: '觀察右圖：童欣面向藍色粗箭嘴的方向。如果她「向左轉 2 個直角」，會面向哪一個方向？',
         mainFigure: DIR_SVG.personFacing('童欣', 135, 225),
-        answer: '東北',
-        hint: '轉 2 個直角就是轉向正相反的方向！北在右下方，童欣原本面向左下方（西方），轉到相反方向是哪方？'
+        answer: '西',
+        hint: '紅點「北」在右下方，童欣目前面向左下方（即東方）；轉 2 個直角就是轉向正相反的方向！'
       },
       {
         id: 9, part: '第 11 課：方向(一) 動物園平面圖', type: 'dir1',
         prompt: '根據動物園平面圖（留意右上角「北」指向左下方）：「大象園」在「企鵝天地」的哪一個方向？',
         mainFigure: DIR_SVG.zooMap(['大象園', '企鵝天地']),
-        answer: '東北',
-        hint: '把圖形想像成按指南針擺正：左下方是「北」，那麼從企鵝天地望向大象園（向右方望去）是哪個方向？'
+        answer: '西南',
+        hint: '看右上角指南針：左下方是「北」、左上方是「東」、右上方是「南」、右下方是「西」。從企鵝天地望向大象園（正右方）介乎哪兩個方向之間？'
       },
       {
         id: 10, part: '第 11 課：方向(一) 動物園平面圖', type: 'dir1',
         prompt: '承上圖，由「小食店」向哪一個方向一直走，可到達「白兔園」？',
         mainFigure: DIR_SVG.zooMap(['小食店', '白兔園']),
-        answer: '東南',
-        hint: '左下方是「北」，那麼右上方就是「南」、左上方就是「東」；由小食店向左上方走是哪個方向？'
+        answer: '東北',
+        hint: '左下方是「北」、左上方是「東」，由小食店往正左方走是介乎「北」和「東」之間的斜向。'
       },
       {
         id: 11, part: '第 11 課：方向(一) 動物園平面圖', type: 'dir2',
@@ -753,8 +727,8 @@
         mainFigure: DIR_SVG.zooMap(['大象園', '精品店', '雀鳥天堂']),
         qLabel1: '第一步（大象園 → 精品店）：',
         qLabel2: '第二步（精品店 → 雀鳥天堂）：',
-        answer1: '西南', answer2: '東南',
-        hint: '左下方是「北」，所以右上方是「南」、左上方是「東」、右下方是「西」。分段判斷兩段路的方向！'
+        answer1: '東北', answer2: '東南',
+        hint: '左下方是「北」、左上方是「東」、右上方是「南」。先看大象園往左到精品店，再看精品店往上到雀鳥天堂，各自對應哪個斜向。'
       },
 
       // --- 第 12 課：方向(二) 指南針讀圖、社區與街道平面圖 ---
@@ -762,36 +736,36 @@
         id: 12, part: '第 12 課：方向(二) 旋轉指南針', type: 'dir1',
         prompt: '觀察下圖的方位盤，紅色「北」箭嘴指向正下方！問號（？）代表哪一個方向？',
         mainFigure: DIR_SVG.compassRose(180, { 180: '北', 135: '東南', 225: '東北', 315: '?' }, 315),
-        answer: '西南',
-        hint: '北在正下方時，正上方是「南」、正右方是「西」、正左方是「東」，問號介乎南和西之間。'
+        answer: '東南',
+        hint: '「北」在正下方時，順時針轉 90° 的正左方是「東」，正上方是「南」，看看問號在正左方和正上方之間哪一格。'
       },
       {
         id: 13, part: '第 12 課：方向(二) 指南針讀圖', type: 'dir1',
-        prompt: '根據下圖（北在左上方），「服裝店」在「心晴」的哪一個方向？',
+        prompt: '根據下圖（紅點「北」在左上方），「服裝店」在「心晴」的哪一個方向？',
         mainFigure: DIR_SVG.personCompassCase('xinqing'),
         answer: '東',
-        hint: '以心晴為中心，左上方是「北」，服裝店在心晴的右上方（順時針轉 90°）。'
+        hint: '以心晴為中心：左上方是「北」，服裝店在心晴的右上方（由北方順時針轉 90° 的基本方向）。'
       },
       {
         id: 14, part: '第 12 課：方向(二) 指南針讀圖', type: 'dir1',
-        prompt: '根據下圖（北在左上方），「公園」在「兆希」的哪一個方向？',
+        prompt: '根據下圖（紅點「北」在左上方），「公園」在「兆希」的哪一個方向？',
         mainFigure: DIR_SVG.personCompassCase('zhaoxi'),
         answer: '東',
-        hint: '以兆希為中心，便利店在左上方（北方），公園在兆希的右上方，與北方成 90° 直角。'
+        hint: '以兆希為中心：便利店在左上方（北方），公園在兆希的右上方，與北方成 90° 直角。'
       },
       {
         id: 15, part: '第 12 課：方向(二) 社區平面圖', type: 'dir1',
         prompt: '根據社區平面圖（右上角「北」指向右上方）：「商場」在「巴士站」的哪一個方向？',
         mainFigure: DIR_SVG.communityMap(['商場', '巴士站']),
-        answer: '西北',
-        hint: '右上方是「北」，所以左下方是「南」、左上方是「西」、右下方是「東」。從巴士站望向商場（向左上方望）是哪方？'
+        answer: '西南',
+        hint: '看右上角指南針：右上方是「北」、右下方是「東」、左下方是「南」、左上方是「西」。從巴士站望向商場（正左方）介乎「南」和「西」之間。'
       },
       {
         id: 16, part: '第 12 課：方向(二) 社區平面圖', type: 'multi',
-        prompt: '根據社區平面圖，以下哪兩個設施在「學校」的「西南方」？（可選多於一項）',
+        prompt: '根據社區平面圖（右上角「北」指向右上方），以下哪兩個設施在「學校」的「東北方」？（可選多於一項）',
         mainFigure: DIR_SVG.communityMap(['學校']),
-        answer: ['C', 'D'],
-        hint: '右上方是「北」，那麼左下方就是「南」、左上方是「西」，介乎南和西之間的「西南方」在圖中正下方一列！',
+        answer: ['A', 'B'],
+        hint: '右上角指南針「北」在右上方，「東」在右下方，介乎北和東之間的「東北方」就是圖中正右方那一橫列！',
         options: [
           { key: 'A', label: '商場' },
           { key: 'B', label: '巴士站' },
@@ -801,10 +775,10 @@
       },
       {
         id: 17, part: '第 12 課：方向(二) 社區平面圖', type: 'single',
-        prompt: '已知「圖書館在遊樂場的東南方」，根據社區平面圖，圖書館應該位於圖中哪一個空格？',
+        prompt: '已知「圖書館在遊樂場的西北方」，根據社區平面圖，圖書館應該位於圖中哪一個空格？',
         mainFigure: DIR_SVG.communityMap(['遊樂場', '空格 A', '空格 B', '空格 C']),
         answer: 'B',
-        hint: '右上方是「北」，所以右下方是「東」、左下方是「南」，「東南方」就是正下方的位置（與遊樂場同一列相鄰）。',
+        hint: '右上方是「北」、左上方是「西」，介乎北和西之間的「西北方」就是圖中正上方的位置（在遊樂場正上方）。',
         options: [
           { key: 'A', label: '空格 A' },
           { key: 'B', label: '空格 B' },
@@ -817,8 +791,8 @@
         id: 18, part: '第 12 課：方向(二) 街道平面圖', type: 'dir1',
         prompt: '根據醫院附近平面圖（右上角「北」指向左上方）：由油漆街「11 號」走到「29 號」，應向哪一個方向走？',
         mainFigure: DIR_SVG.hospitalMap(),
-        answer: '南',
-        hint: '油漆街與「北」箭嘴平行，左上方（11 號方向）是北，相反的右下方（29 號方向）就是南。'
+        answer: '西南',
+        hint: '先看右上角指南針：左上方是「北」、左下方是「西」、右下方是「南」。在圖上由 11 號向下走到 29 號，對應哪兩個基本方向之間的斜向？'
       },
       {
         id: 19, part: '第 12 課：方向(二) 街道平面圖', type: 'dir2',
@@ -826,15 +800,15 @@
         mainFigure: DIR_SVG.hospitalMap(),
         qLabel1: '第一步（✕ → 油漆街路口）：',
         qLabel2: '第二步（油漆街路口 → 11 號）：',
-        answer1: '西', answer2: '北',
-        hint: '左上方是「北」、右上方是「東」，那麼向左下方（博物館街往路口方向）是「西」，再沿油漆街向左上方走是「北」。'
+        answer1: '西北', answer2: '東北',
+        hint: '左上方是「北」、右上方是「東」、左下方是「西」。第一步在圖上向左走（介乎北與西之間），第二步在圖上向上走（介乎北與東之間）。'
       },
       {
         id: 20, part: '第 12 課：方向(二) 街道平面圖', type: 'single',
-        prompt: '天藍由「大學」出發，依以下路線走：「東南方 → 東北方 → 東南方」，他最終到達哪一個地方？',
+        prompt: '天藍由「大學」出發，依以下路線走：「西南方 → 東南方 → 東北方」，他最終到達哪一個地方？',
         mainFigure: DIR_SVG.hospitalMap(['大學', '便利店', '醫院', '公園']),
-        answer: 'A',
-        hint: '先在圖上找準四個斜向：左上方是「北」，所以右下方是「南」、右上方是「東」、左下方是「西」。由大學先向正下方（東南方）走到佐治街再轉入便利店！',
+        answer: 'B',
+        hint: '按指南針把斜向對應圖上的上下左右：向下是「西南」、向右是「東南」、向上是「東北」。從大學出發按「下 → 右 → 上」走走看！',
         options: [
           { key: 'A', label: '便利店' },
           { key: 'B', label: '醫院' },

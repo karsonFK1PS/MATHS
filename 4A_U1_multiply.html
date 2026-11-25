@@ -265,43 +265,43 @@
 
     // 20 道四年級乘法練習題（涵蓋兩位數×整十／兩位數、三位數×整十／兩位數、乘法交換與結合性質巧算、應用題）
     const QUESTIONS = [
-      { id: 1, part: '第 1 課：乘法(一)', type: 'input', prompt: '計算：24 × 30 =', answer: '720', hint: '先算 24 × 3 = 72，再在末尾加一個 0，即 720。' },
-      { id: 2, part: '第 1 課：乘法(一)', type: 'single', prompt: '估算 48 × 29 的積最接近下列哪一個數？', answer: 'C', hint: '把 48 估作 50，29 估作 30，50 × 30 = 1500。', options: [
+      { id: 1, part: '第 1 課：乘法(一)', type: 'input', prompt: '計算：24 × 30 =', answer: '720', hint: '先算 24 乘以一位數 3，再考慮乘數「30」末尾的 0 對積的影響。' },
+      { id: 2, part: '第 1 課：乘法(一)', type: 'single', prompt: '估算 48 × 29 的積最接近下列哪一個數？', answer: 'C', hint: '先把 48 和 29 分別估作最接近的整十數，再把兩個估算值相乘。', options: [
         { key: 'A', label: '800' }, { key: 'B', label: '1000' }, { key: 'C', label: '1500' }, { key: 'D', label: '2000' }
       ]},
-      { id: 3, part: '第 1 課：乘法(一)', type: 'input', prompt: '計算：36 × 15 =', answer: '540', hint: '36 × 10 = 360，36 × 5 = 180，360 + 180 = 540。' },
-      { id: 4, part: '第 1 課：乘法(一)', type: 'input', prompt: '學校訂購午餐，每份餐盒售 28 元，訂購 25 份共需多少元？', answer: '700', unit: '元', hint: '28 × 25：可把 25 拆成 100 ÷ 4，28 ÷ 4 × 100 = 700 元。' },
-      { id: 5, part: '第 1 課：乘法(一)', type: 'single', prompt: '計算 64 × 12 的直式時，十位數字「1」乘以 64 代表多少？', answer: 'B', hint: '乘數「12」十位的「1」代表 10，10 × 64 = 640。', options: [
+      { id: 3, part: '第 1 課：乘法(一)', type: 'input', prompt: '計算：36 × 15 =', answer: '540', hint: '可把 15 拆成「10 + 5」，分別算出 36 × 10 與 36 × 5 再相加。' },
+      { id: 4, part: '第 1 課：乘法(一)', type: 'input', prompt: '學校訂購午餐，每份餐盒售 28 元，訂購 25 份共需多少元？', answer: '700', unit: '元', hint: '求總金額用乘法：單價 × 份數（28 × 25），留意 25 與 4 相乘的凑整技巧。' },
+      { id: 5, part: '第 1 課：乘法(一)', type: 'single', prompt: '計算 64 × 12 的直式時，十位數字「1」乘以 64 代表多少？', answer: 'B', hint: '留意「1」在乘數 12 的哪一個數位，它代表的實際數值是多少？', options: [
         { key: 'A', label: '64' }, { key: 'B', label: '640' }, { key: 'C', label: '128' }, { key: 'D', label: '6400' }
       ]},
-      { id: 6, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：125 × 40 =', answer: '5000', hint: '先算 125 × 4 = 500，再乘以 10 得 5000。' },
-      { id: 7, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：214 × 23 =', answer: '4922', hint: '214 × 3 = 642，214 × 20 = 4280，642 + 4280 = 4922。' },
-      { id: 8, part: '第 2 課：乘法(二)', type: 'single', prompt: '水果店每箱蘋果重 18 kg，運來 105 箱，共有蘋果多少 kg？', answer: 'A', hint: '18 × 105 = 18 × 100 + 18 × 5 = 1800 + 90 = 1890 kg。', options: [
+      { id: 6, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：125 × 40 =', answer: '5000', hint: '先留意 125 × 4 的特殊乘積，再處理乘數「40」末尾的 0。' },
+      { id: 7, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：214 × 23 =', answer: '4922', hint: '直式計算時，先用個位「3」乘 214，再用十位「20」乘 214（注意對位），最後把兩行積相加。' },
+      { id: 8, part: '第 2 課：乘法(二)', type: 'single', prompt: '水果店每箱蘋果重 18 kg，運來 105 箱，共有蘋果多少 kg？', answer: 'A', hint: '計算 18 × 105，可拆成 18 × 100 與 18 × 5 兩部分相加，小心中間的 0 不會影響數位對齊。', options: [
         { key: 'A', label: '1890 kg' }, { key: 'B', label: '1809 kg' }, { key: 'C', label: '2890 kg' }, { key: 'D', label: '1090 kg' }
       ]},
-      { id: 9, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：308 × 16 =', answer: '4928', hint: '注意被乘數十位是 0：308 × 6 = 1848，308 × 10 = 3080，相加得 4928。' },
-      { id: 10, part: '第 2 課：乘法(二)', type: 'single', prompt: '估算 396 × 21 的積大約是多少？', answer: 'C', hint: '396 ≈ 400，21 ≈ 20，400 × 20 = 8000。', options: [
+      { id: 9, part: '第 2 課：乘法(二)', type: 'input', prompt: '計算：308 × 16 =', answer: '4928', hint: '被乘數 308 的十位是 0，用 6 和 10 分別去乘時，記得把進位加上去。' },
+      { id: 10, part: '第 2 課：乘法(二)', type: 'single', prompt: '估算 396 × 21 的積大約是多少？', answer: 'C', hint: '將 396 估作整百數、21 估作整十數，再進行估算乘法。', options: [
         { key: 'A', label: '6000' }, { key: 'B', label: '7000' }, { key: 'C', label: '8000' }, { key: 'D', label: '10000' }
       ]},
-      { id: 11, part: '第 3 課：乘法(三)', type: 'single', prompt: '計算 25 × 37 × 4 時，用哪種方法巧算最快？', answer: 'B', hint: '運用乘法交換性質和結合性質，先算 25 × 4 = 100，再算 100 × 37 = 3700。', options: [
+      { id: 11, part: '第 3 課：乘法(三)', type: 'single', prompt: '計算 25 × 37 × 4 時，用哪種方法巧算最快？', answer: 'B', hint: '觀察哪兩個數相乘可以直接湊成整百數（100），再乘餘下的數。', options: [
         { key: 'A', label: '先算 37 × 4' }, { key: 'B', label: '先算 25 × 4 = 100' }, { key: 'C', label: '先算 25 + 37' }, { key: 'D', label: '逐一由左直式硬算' }
       ]},
-      { id: 12, part: '第 3 課：乘法(三)', type: 'input', prompt: '巧算：25 × 19 × 4 =', answer: '1900', hint: '25 × 4 = 100，100 × 19 = 1900。' },
-      { id: 13, part: '第 3 課：乘法(三)', type: 'input', prompt: '巧算：125 × 17 × 8 =', answer: '17000', hint: '125 × 8 = 1000，1000 × 17 = 17000。' },
-      { id: 14, part: '第 3 課：乘法(三)', type: 'single', prompt: '下列哪一組算式的結果「不相等」？', answer: 'D', hint: 'A、B、C 都符合乘法交換／結合性質；D 中 50 × 24 = 1200，50 × 20 + 4 = 1004。', options: [
+      { id: 12, part: '第 3 課：乘法(三)', type: 'input', prompt: '巧算：25 × 19 × 4 =', answer: '1900', hint: '利用乘法交換性質調動次序，先算 25 × 4 湊整百，再乘 19。' },
+      { id: 13, part: '第 3 課：乘法(三)', type: 'input', prompt: '巧算：125 × 17 × 8 =', answer: '17000', hint: '先找出哪兩個數相乘會得到 1000，再與 17 相乘。' },
+      { id: 14, part: '第 3 課：乘法(三)', type: 'single', prompt: '下列哪一組算式的結果「不相等」？', answer: 'D', hint: '檢查每一組是否符合乘法交換性質或結合性質；留意「全乘」與「先乘再加」的分別。', options: [
         { key: 'A', label: '16 × 25 與 25 × 16' },
         { key: 'B', label: '(12 × 5) × 6 與 12 × (5 × 6)' },
         { key: 'C', label: '50 × 24 與 50 × 20 × 1.2' },
         { key: 'D', label: '50 × 24 與 50 × 20 + 4' }
       ]},
-      { id: 15, part: '第 3 課：乘法(三)', type: 'input', prompt: '電器店有 15 箱風扇，每箱有 8 部，每部售價 240 元。全部售出共得多少元？', answer: '28800', unit: '元', hint: '先算總部數 15 × 8 = 120 部，再算 240 × 120 = 28800 元。' },
-      { id: 16, part: '第 1–3 課綜合', type: 'input', prompt: '計算：45 × 20 =', answer: '900', hint: '45 × 2 = 90，再在後面添一個 0 得 900。' },
-      { id: 17, part: '第 1–3 課綜合', type: 'input', prompt: '計算：152 × 14 =', answer: '2128', hint: '152 × 4 = 608，152 × 10 = 1520，608 + 1520 = 2128。' },
-      { id: 18, part: '第 1–3 課綜合', type: 'single', prompt: '若 □ × 20 = 1600，那麼 □ 代表哪一個數？', answer: 'C', hint: '1600 ÷ 20 = 160 ÷ 2 = 80。', options: [
+      { id: 15, part: '第 3 課：乘法(三)', type: 'input', prompt: '電器店有 15 箱風扇，每箱有 8 部，每部售價 240 元。全部售出共得多少元？', answer: '28800', unit: '元', hint: '先求出風扇總部數（箱數 × 每箱部數），再乘以每部售價。' },
+      { id: 16, part: '第 1–3 課綜合', type: 'input', prompt: '計算：45 × 20 =', answer: '900', hint: '先算 45 × 2，再根據乘數「20」補回一個 0。' },
+      { id: 17, part: '第 1–3 課綜合', type: 'input', prompt: '計算：152 × 14 =', answer: '2128', hint: '分兩步計算：152 × 4 的積加上 152 × 10 的積。' },
+      { id: 18, part: '第 1–3 課綜合', type: 'single', prompt: '若 □ × 20 = 1600，那麼 □ 代表哪一個數？', answer: 'C', hint: '已知乘積是 1600，其中一個乘數是 20，用除法逆算：1600 ÷ 20。', options: [
         { key: 'A', label: '8' }, { key: 'B', label: '18' }, { key: 'C', label: '80' }, { key: 'D', label: '800' }
       ]},
-      { id: 19, part: '第 1–3 課綜合', type: 'input', prompt: '文具店購入 24 盒顏色筆，每盒 12 枝，共有顏色筆多少枝？', answer: '288', unit: '枝', hint: '24 × 12 = 24 × 10 + 24 × 2 = 240 + 48 = 288 枝。' },
-      { id: 20, part: '第 1–3 課綜合', type: 'input', prompt: '巧算：50 × 43 × 2 =', answer: '4300', hint: '50 × 2 = 100，100 × 43 = 4300。' }
+      { id: 19, part: '第 1–3 課綜合', type: 'input', prompt: '文具店購入 24 盒顏色筆，每盒 12 枝，共有顏色筆多少枝？', answer: '288', unit: '枝', hint: '用乘法計算總枝數：24 × 12，可拆成 24 × 10 + 24 × 2 計算。' },
+      { id: 20, part: '第 1–3 課綜合', type: 'input', prompt: '巧算：50 × 43 × 2 =', answer: '4300', hint: '先算哪兩個數相乘可以得到 100，再乘以 43？' }
     ];
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -577,7 +577,7 @@
         if (q.type === 'single') {
           document.getElementById(`opt-card-${selectedSingle}`).classList.add('option-wrong');
         }
-        showFeedback(`💡 再想一想！提示：${q.hint}`, 'error');
+        showFeedback(`💡 再想一想！解題提示：${q.hint}`, 'error');
       }
     }
 

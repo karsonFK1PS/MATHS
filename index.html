@@ -935,8 +935,7 @@
         lines.push([stu.className, stu.classNum, stu.name, stu.account, unitId, statusTxt, firstTry, totalQ, attempts, wrongList, updatedAt].join(","));
       });
 
-      const csvText = lines.join("
-");
+      const csvText = lines.join("\n");
       const blob = new Blob(["﻿" + csvText], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

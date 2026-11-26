@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>鳳溪第一小學 小四數學科 — 60秒三級進階挑戰賽與排行榜</title>
+  <title>鳳溪第一小學 小四數學科 — 30秒無限續命挑戰賽與排行榜</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
@@ -56,7 +56,7 @@
         </a>
         <div>
           <span class="text-xs uppercase tracking-wider text-amber-300 font-black block">FK1PS MATH ARENA ‧ 三級進階題庫（淺 → 中 → 深）</span>
-          <h1 class="text-lg sm:text-xl font-black tracking-wide">🏆 60秒無限挑戰賽與榮譽排行榜</h1>
+          <h1 class="text-lg sm:text-xl font-black tracking-wide">🏆 30秒無限續命挑戰賽與榮譽排行榜</h1>
         </div>
       </div>
 
@@ -80,7 +80,7 @@
           🏆
         </div>
         <h2 class="text-2xl font-black text-slate-900">登入進入無限挑戰賽</h2>
-        <p class="text-sm text-slate-500 mt-1">完成基礎任務即可解鎖對應單元的 60 秒競速挑戰！</p>
+        <p class="text-sm text-slate-500 mt-1">完成基礎任務即可解鎖對應單元的 30 秒無限續命挑戰！</p>
       </div>
       <form action="javascript:void(0);" onsubmit="handleDirectLogin(event)" class="space-y-4">
         <div>
@@ -126,7 +126,7 @@
             </select>
           </div>
           <p class="text-xs sm:text-sm text-slate-600 font-medium">
-            限時 <strong class="text-indigo-700">60 秒</strong>：初階 <strong class="text-emerald-700">+80 分</strong>、中階 <strong class="text-amber-700">+120 分</strong>、高階 <strong class="text-rose-700">+180 分</strong>（連擊 3 題起額外 <strong class="text-amber-600">+20 分</strong>），答錯扣 <strong class="text-rose-600">50 分</strong>並冷卻 2.5 秒；<strong class="text-indigo-700">準確率達 60% 或以上</strong>方可上榜。
+            初始 <strong class="text-indigo-700">30 秒</strong>，<strong class="text-emerald-700">每答對 1 題延長 +3 秒</strong>！初階 <strong class="text-emerald-700">+80 分</strong>、中階 <strong class="text-amber-700">+120 分</strong>、高階 <strong class="text-rose-700">+180 分</strong>（連擊 3 題起額外 <strong class="text-amber-600">+20 分</strong>），答錯扣 <strong class="text-rose-600">50 分</strong>並冷卻 2.5 秒；排行榜保留個人最高分紀錄。
           </p>
         </div>
 
@@ -137,7 +137,7 @@
           </div>
           <button id="start-challenge-btn" onclick="startChallenge()"
                   class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-base shadow-lg shadow-orange-500/30 transition">
-            🚀 立即開始 60 秒挑戰
+            🚀 立即開始 30 秒無限挑戰
           </button>
         </div>
       </div>
@@ -190,13 +190,13 @@
           </div>
         </div>
 
-        <!-- 狀態 B：60 秒競速作答中 -->
+        <!-- 狀態 B：30 秒無限續命作答中 -->
         <div id="stage-playing" class="hidden space-y-5">
           <!-- 頂部即時儀表 -->
           <div class="grid grid-cols-4 gap-2.5 bg-slate-900 text-white p-3.5 rounded-2xl">
             <div class="text-center">
               <div class="text-[11px] text-slate-400 font-bold">剩餘時間</div>
-              <div id="hud-timer" class="text-2xl font-black text-amber-400 font-mono">60s</div>
+              <div id="hud-timer" class="text-2xl font-black text-amber-400 font-mono">30s</div>
             </div>
             <div class="text-center border-l border-white/10">
               <div class="text-[11px] text-slate-400 font-bold">目前得分</div>
@@ -223,7 +223,7 @@
             <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
               <div class="flex items-center gap-2">
                 <span id="play-q-tag" class="px-2.5 py-0.5 rounded-md bg-indigo-600 text-white text-xs font-black">第 1 題</span>
-                <span id="play-tier-badge" class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-black">🌱 淺程度</span>
+                <span id="play-tier-badge" class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-black">🌱 初階（第 1–6 題 ‧ +80分）</span>
               </div>
               <span class="text-xs font-bold text-slate-400">點選正確答案（或按鍵盤 1–4）</span>
             </div>
@@ -266,8 +266,8 @@
               <div id="res-correct" class="text-3xl font-black text-emerald-950 mt-1">0 題</div>
             </div>
             <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
-              <div class="text-xs font-bold text-amber-700">挑戰用時</div>
-              <div id="res-time" class="text-3xl font-black text-amber-950 mt-1">60 秒</div>
+              <div class="text-xs font-bold text-amber-700">存活總用時</div>
+              <div id="res-time" class="text-3xl font-black text-amber-950 mt-1">30 秒</div>
             </div>
           </div>
 
@@ -322,7 +322,7 @@
                 <th class="py-2.5 px-3 w-14 text-center">名次</th>
                 <th class="py-2.5 px-3">班別 / 姓名</th>
                 <th class="py-2.5 px-3 text-right">最高分</th>
-                <th class="py-2.5 px-3 text-right">用時</th>
+                <th class="py-2.5 px-3 text-right">存活用時</th>
               </tr>
             </thead>
             <tbody id="lb-tbody" class="divide-y divide-slate-100 text-sm">
@@ -337,7 +337,7 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
-    const CHALLENGE_DURATION = 60;
+    const CHALLENGE_DURATION = 30;
 
     const UNIT_META = {
       "4A_U1": { name: "單元一：乘法", file: "4A_U1_multiply.html" },
@@ -362,13 +362,11 @@
     let combo = 0;
     let wrongStreak = 0;
     let timeLeft = CHALLENGE_DURATION;
+    let elapsedSec = 0;
     let timerHandle = null;
     let isPlaying = false;
     let isTransitioning = false;
 
-    // =========================================================
-    // 基礎工具：洗牌、數學函式、唯一選項建立與即時驗算斷言
-    // =========================================================
     function shuffleArray(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -393,7 +391,6 @@
       return c;
     }
 
-    // 建立 4 個不重複選項並驗證正解一定在內
     function buildVerifiedOptions(correctStr, distractorList) {
       const cText = String(correctStr);
       const set = new Set([cText]);
@@ -404,7 +401,6 @@
           if (dText && dText !== cText) set.add(dText);
         }
       }
-      // 若不足 4 個（例如純數字題），安全補齊不重複數值
       const numMatch = cText.match(/^(\d+)(.*)$/);
       let step = 1;
       while (set.size < 4) {
@@ -425,16 +421,11 @@
       return { options: shuffled, correctIndex };
     }
 
-    // =========================================================
-    // 三級進階題庫產生器（緊扣工作紙重點、無灌水編號、全自動驗算）
-    // tier: 'easy' (第1-6題), 'medium' (第7-12題), 'hard' (第13題+)
-    // =========================================================
     function buildTieredQuestionQueue(unitId) {
       const easyPool = generateTierPool(unitId, "easy", 60);
       const mediumPool = generateTierPool(unitId, "medium", 60);
       const hardPool = generateTierPool(unitId, "hard", 80);
 
-      // 第 1-6 題必為初階、第 7-12 題必為中階、第 13 題起必為高階
       return [
         ...easyPool.slice(0, 6),
         ...mediumPool.slice(0, 6),
@@ -907,9 +898,6 @@
       return `<svg viewBox="0 0 260 230" class="w-56 h-48 bg-white rounded-2xl border border-slate-200 shadow-sm"><circle cx="${cx}" cy="${cy}" r="38" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>${spokes}<circle cx="${cx}" cy="${cy}" r="4" fill="#0f172a"/></svg>`;
     }
 
-    // =========================================================
-    // 初始化與登入驗證
-    // =========================================================
     window.addEventListener("DOMContentLoaded", async () => {
       const params = new URLSearchParams(window.location.search);
       const uParam = params.get("unit");
@@ -1090,6 +1078,7 @@
       combo = 0;
       wrongStreak = 0;
       timeLeft = CHALLENGE_DURATION;
+      elapsedSec = 0;
       isPlaying = true;
       isTransitioning = false;
 
@@ -1099,6 +1088,7 @@
 
       timerHandle = setInterval(() => {
         timeLeft--;
+        elapsedSec++;
         updateHud();
         if (timeLeft <= 0) {
           timeLeft = 0;
@@ -1111,7 +1101,7 @@
     function updateHud() {
       const tEl = document.getElementById("hud-timer");
       tEl.textContent = `${timeLeft}s`;
-      if (timeLeft <= 10) tEl.classList.add("timer-urgent");
+      if (timeLeft <= 8) tEl.classList.add("timer-urgent");
       else tEl.classList.remove("timer-urgent");
 
       document.getElementById("hud-score").textContent = score;
@@ -1195,12 +1185,13 @@
         const bonus = combo >= 3 ? 20 : 0;
         const gained = basePts + bonus;
         score += gained;
+        timeLeft += 3;
 
         document.getElementById(`c-opt-${chosenIdx}`).classList.add("opt-correct");
         fb.className = "h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-emerald-100 text-emerald-900";
         fb.textContent = bonus > 0
-          ? `🎉 答對！+${gained} 分（基礎 ${basePts} 分 + 連擊 +20 分）`
-          : `✅ 答對！+${basePts} 分`;
+          ? `🎉 答對！+${gained} 分 ‧ ⏱ +3秒（基礎 ${basePts} + 連擊 +20）`
+          : `✅ 答對！+${basePts} 分 ‧ ⏱ 延長 +3 秒！`;
       } else {
         combo = 0;
         wrongStreak++;
@@ -1243,11 +1234,12 @@
     async function finishChallenge(isEarlyQuit) {
       clearInterval(timerHandle);
       isPlaying = false;
-      const timeUsedSec = Math.max(1, CHALLENGE_DURATION - timeLeft);
+      const timeUsedSec = Math.max(1, elapsedSec);
 
       showStage("result");
       document.getElementById("res-score").textContent = `${score} 分`;
-      document.getElementById("res-correct").textContent = `${correctCount} 題`;
+      const finalAcc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById("res-correct").textContent = `${correctCount}/${answeredCount} (${finalAcc}%)`;
       document.getElementById("res-time").textContent = `${timeUsedSec} 秒`;
 
       const statusEl = document.getElementById("res-upload-status");
@@ -1256,17 +1248,8 @@
         return;
       }
 
-      const finalAcc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
-      document.getElementById("res-correct").textContent = `${correctCount}/${answeredCount} (${finalAcc}%)`;
-
-      if (answeredCount === 0 || finalAcc < 60) {
-        statusEl.className = "text-sm font-black text-rose-600";
-        statusEl.textContent = `⚠️ 本局準確率為 ${finalAcc}%（未達 60% 上榜門檻），成績不列入排行榜，請看清題目再挑戰！`;
-        return;
-      }
-
       statusEl.className = "text-xs font-bold text-indigo-600";
-      statusEl.textContent = "☁️ 準確率達標（" + finalAcc + "%）！正在上傳成績至雲端排行榜...";
+      statusEl.textContent = "☁️ 正在上傳成績至雲端排行榜（僅保留最高分紀錄）...";
       try {
         const res = await fetch(API_URL, {
           method: "POST",
@@ -1418,3 +1401,11 @@
   </script>
 </body>
 </html>
+```[cite: 28, 29, 30]
+
+<ElicitationsGroup message="貼上並測試後若遇到任何狀況，可點選以下項目：">
+  <Elicitation label="貼上後畫面未更新" query="我已貼上最新程式碼並儲存，但網頁畫面仍未更新，該如何處理？"/>
+  <Elicitation label="發現特定題目有誤" query="我在測試 30 秒挑戰時發現某道題目的答案或選項有誤，想修正。"/>
+</ElicitationsGroup>
+
+<FollowUp label="測試完成後，需要我幫你整理恢復開放挑戰模式的步驟嗎？" query="請幫我整理測試完成後，在 index.html 恢復開放 30 秒挑戰模式的步驟。"/>

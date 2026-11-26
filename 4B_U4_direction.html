@@ -142,7 +142,7 @@
           <span class="px-2.5 py-0.5 rounded-md bg-amber-600 text-white text-xs font-black">教師檢視模式</span>
           <span class="text-sm font-bold text-amber-950">點擊下方題號可直接跳題檢查（不會寫入或覆寫學生紀錄）</span>
         </div>
-        <span id="teacher-q-indicator" class="text-xs font-bold px-2.5 py-1 bg-amber-200/80 text-amber-950 rounded-lg">目前：第 1 / 20 題</span>
+        <span id="teacher-q-indicator" class="text-xs font-bold px-2.5 py-1 bg-amber-200/80 text-amber-950 rounded-lg">目前：第 1 / 19 題</span>
       </div>
       <div id="teacher-jump-buttons" class="flex flex-wrap gap-1.5"></div>
     </div>
@@ -151,10 +151,10 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3 flex-1 min-w-[240px]">
         <span class="text-sm font-bold text-slate-600 whitespace-nowrap">
-          完成進度：<span id="progress-text" class="text-indigo-700 font-black text-base">1 / 20</span> 題
+          完成進度：<span id="progress-text" class="text-indigo-700 font-black text-base">1 / 19</span> 題
         </span>
         <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-          <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-300" style="width: 5%;"></div>
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-300" style="width: 5.2%;"></div>
         </div>
       </div>
 
@@ -265,11 +265,11 @@
       <div class="grid grid-cols-2 gap-4 mb-6">
         <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
           <div class="text-xs text-indigo-600 font-bold mb-1">首試答對題數</div>
-          <div id="cert-score" class="text-3xl font-black text-indigo-900">20 / 20</div>
+          <div id="cert-score" class="text-3xl font-black text-indigo-900">19 / 19</div>
         </div>
         <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
           <div class="text-xs text-emerald-600 font-bold mb-1">總嘗試次數</div>
-          <div id="cert-attempts" class="text-3xl font-black text-emerald-900">20 次</div>
+          <div id="cert-attempts" class="text-3xl font-black text-emerald-900">19 次</div>
         </div>
       </div>
 
@@ -307,9 +307,10 @@
     let selectedDir2Step2 = null;
 
     // =========================================================
-    // 高清晰 SVG 矢量地圖與旋轉方位盤繪圖引擎（已由向量程式全數精準驗算）
+    // 高清晰 SVG 矢量地圖與旋轉方位盤繪圖引擎（全數使用標準紅色箭頭標示北方）
     // =========================================================
     const DIR_SVG = {
+      // 通用旋轉方位盤（northDeg: 0=正上, 90=正右, 180=正下, 270=正左, 315=左上, 45=右上, 135=右下, 225=左下）
       compassRose: (northDeg, labelsMap, highlightDeg = null) => {
         const cx = 150, cy = 135, r = 68;
         let spokes = '';
@@ -325,10 +326,10 @@
           spokes += `<line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${stroke}" stroke-width="${width}"/>`;
 
           if (isNorth) {
-            const ax1 = cx + (r - 12) * Math.cos(rad - 0.16);
-            const ay1 = cy + (r - 12) * Math.sin(rad - 0.16);
-            const ax2 = cx + (r - 12) * Math.cos(rad + 0.16);
-            const ay2 = cy + (r - 12) * Math.sin(rad + 0.16);
+            const ax1 = cx + (r - 13) * Math.cos(rad - 0.18);
+            const ay1 = cy + (r - 13) * Math.sin(rad - 0.18);
+            const ax2 = cx + (r - 13) * Math.cos(rad + 0.18);
+            const ay2 = cy + (r - 13) * Math.sin(rad + 0.18);
             spokes += `<polygon points="${x2.toFixed(1)},${y2.toFixed(1)} ${ax1.toFixed(1)},${ay1.toFixed(1)} ${ax2.toFixed(1)},${ay2.toFixed(1)}" fill="#dc2626"/>`;
           }
 
@@ -356,6 +357,7 @@
         `;
       },
 
+      // 小型指南針標記（全部使用清晰紅色三角箭頭標示北方）
       miniCompass: (x, y, northDeg) => {
         const rad = (northDeg - 90) * Math.PI / 180;
         const perp = rad + Math.PI / 2;
@@ -364,13 +366,17 @@
         const sx = x - r * Math.cos(rad), sy = y - r * Math.sin(rad);
         const ex = x + r * Math.cos(perp), ey = y + r * Math.sin(perp);
         const wx = x - r * Math.cos(perp), wy = y - r * Math.sin(perp);
+        const ax1 = x + (r - 9) * Math.cos(rad - 0.25);
+        const ay1 = y + (r - 9) * Math.sin(rad - 0.25);
+        const ax2 = x + (r - 9) * Math.cos(rad + 0.25);
+        const ay2 = y + (r - 9) * Math.sin(rad + 0.25);
         const lx = x + (r + 14) * Math.cos(rad), ly = y + (r + 14) * Math.sin(rad) + 4;
         return `
           <g>
             <circle cx="${x}" cy="${y}" r="30" fill="#ffffff" stroke="#334155" stroke-width="2"/>
             <line x1="${wx.toFixed(1)}" y1="${wy.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="#94a3b8" stroke-width="1.5"/>
-            <line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#dc2626" stroke-width="3"/>
-            <circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="3.5" fill="#dc2626"/>
+            <line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${(nx - 4 * Math.cos(rad)).toFixed(1)}" y2="${(ny - 4 * Math.sin(rad)).toFixed(1)}" stroke="#dc2626" stroke-width="3"/>
+            <polygon points="${nx.toFixed(1)},${ny.toFixed(1)} ${ax1.toFixed(1)},${ay1.toFixed(1)} ${ax2.toFixed(1)},${ay2.toFixed(1)}" fill="#dc2626"/>
             <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" font-size="13" font-weight="900" fill="#dc2626">北</text>
           </g>
         `;
@@ -409,13 +415,13 @@
             <circle cx="230" cy="135" r="24" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
             <text x="230" y="140" text-anchor="middle" font-size="14" font-weight="900" fill="#312e81">紫瑩</text>
             <line x1="202" y1="135" x2="168" y2="135" stroke="#dc2626" stroke-width="3"/>
-            <polygon points="162,135 172,129 172,141" fill="#dc2626"/>
-            <text x="150" y="140" text-anchor="middle" font-size="14" font-weight="900" fill="#dc2626">北</text>
+            <polygon points="160,135 172,129 172,141" fill="#dc2626"/>
+            <text x="148" y="140" text-anchor="middle" font-size="14" font-weight="900" fill="#dc2626">北</text>
           </svg>
         `;
       },
 
-      // 人物面向與轉向圖
+      // 人物面向與轉向圖（紅色北方與藍色面向均為清晰箭頭）
       personFacing: (personName, northDeg, faceDeg) => {
         const cx = 140, cy = 125, r = 64;
         let spokes = '';
@@ -426,25 +432,32 @@
           const y2 = cy + r * Math.sin(rad);
           spokes += `<line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#cbd5e1" stroke-width="1.8"/>`;
         }
+        // 紅色北箭頭
         const nRad = (northDeg - 90) * Math.PI / 180;
-        const nx = cx + (r + 6) * Math.cos(nRad), ny = cy + (r + 6) * Math.sin(nRad);
-        const nlx = cx + (r + 24) * Math.cos(nRad), nly = cy + (r + 24) * Math.sin(nRad) + 5;
+        const nx = cx + (r + 8) * Math.cos(nRad), ny = cy + (r + 8) * Math.sin(nRad);
+        const nax1 = cx + (r - 5) * Math.cos(nRad - 0.18), nay1 = cy + (r - 5) * Math.sin(nRad - 0.18);
+        const nax2 = cx + (r - 5) * Math.cos(nRad + 0.18), nay2 = cy + (r - 5) * Math.sin(nRad + 0.18);
+        const nlx = cx + (r + 25) * Math.cos(nRad), nly = cy + (r + 25) * Math.sin(nRad) + 5;
+
+        // 藍色面向箭頭
         const fRad = (faceDeg - 90) * Math.PI / 180;
-        const fx = cx + (r - 6) * Math.cos(fRad), fy = cy + (r - 6) * Math.sin(fRad);
+        const fx = cx + (r - 2) * Math.cos(fRad), fy = cy + (r - 2) * Math.sin(fRad);
+        const fax1 = cx + (r - 15) * Math.cos(fRad - 0.2), fay1 = cy + (r - 15) * Math.sin(fRad - 0.2);
+        const fax2 = cx + (r - 15) * Math.cos(fRad + 0.2), fay2 = cy + (r - 15) * Math.sin(fRad + 0.2);
 
         return `
           <svg viewBox="0 0 280 250" class="w-64 h-56 mx-auto bg-white rounded-2xl border-2 border-slate-200 shadow-sm">
             ${spokes}
-            <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#dc2626" stroke-width="3"/>
-            <circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="4" fill="#dc2626"/>
+            <line x1="${cx}" y1="${cy}" x2="${(nx - 6 * Math.cos(nRad)).toFixed(1)}" y2="${(ny - 6 * Math.sin(nRad)).toFixed(1)}" stroke="#dc2626" stroke-width="3.5"/>
+            <polygon points="${nx.toFixed(1)},${ny.toFixed(1)} ${nax1.toFixed(1)},${nay1.toFixed(1)} ${nax2.toFixed(1)},${nay2.toFixed(1)}" fill="#dc2626"/>
             <text x="${nlx.toFixed(1)}" y="${nly.toFixed(1)}" text-anchor="middle" font-size="15" font-weight="900" fill="#dc2626">北</text>
 
-            <line x1="${cx}" y1="${cy}" x2="${fx.toFixed(1)}" y2="${fy.toFixed(1)}" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
-            <circle cx="${fx.toFixed(1)}" cy="${fy.toFixed(1)}" r="5.5" fill="#2563eb"/>
+            <line x1="${cx}" y1="${cy}" x2="${(fx - 7 * Math.cos(fRad)).toFixed(1)}" y2="${(fy - 7 * Math.sin(fRad)).toFixed(1)}" stroke="#2563eb" stroke-width="4.5" stroke-linecap="round"/>
+            <polygon points="${fx.toFixed(1)},${fy.toFixed(1)} ${fax1.toFixed(1)},${fay1.toFixed(1)} ${fax2.toFixed(1)},${fay2.toFixed(1)}" fill="#2563eb"/>
 
             <circle cx="${cx}" cy="${cy}" r="22" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2.5"/>
             <text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="13" font-weight="900" fill="#1e3a8a">${personName}</text>
-            <text x="140" y="238" text-anchor="middle" font-size="12" font-weight="bold" fill="#2563eb">藍色粗箭嘴 = ${personName}目前面向的方向</text>
+            <text x="140" y="238" text-anchor="middle" font-size="12" font-weight="bold" fill="#2563eb">藍色粗箭頭 = ${personName}目前面向的方向</text>
           </svg>
         `;
       },
@@ -497,7 +510,7 @@
         `;
       },
 
-      // 方向(二) 單人指南針圖（嚴格 45° 對角座標對齊）
+      // 方向(二) 單人指南針圖（嚴格 45° 對角座標對齊，紅色北方為箭頭）
       personCompassCase: (who) => {
         if (who === 'xinqing') {
           // 北在左上 315°；心晴在 (110, 125)，服裝店在 (180, 55)[正東]，水族店在 (180, 195)[正南]
@@ -519,10 +532,12 @@
           `;
         } else {
           // 北在左上 315°；兆希在 (230, 165)，便利店在 (145, 80)[正北]，公園在 (315, 80)[正東]
+          // 從公園(315, 80)望向便利店(145, 80)為正左方(270°)，相對於北(315°)為 (270 - 315 + 360) = 315° = 西北方
           return `
             <svg viewBox="0 0 380 230" class="w-full max-w-md mx-auto bg-white rounded-2xl border-2 border-slate-300 shadow-sm">
               <line x1="230" y1="165" x2="145" y2="80" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
               <line x1="230" y1="165" x2="315" y2="80" stroke="#94a3b8" stroke-dasharray="4,4" stroke-width="2"/>
+              <line x1="145" y1="61" x2="275" y2="61" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1.5"/>
               <circle cx="230" cy="165" r="24" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2.5"/>
               <text x="230" y="170" text-anchor="middle" font-size="14" font-weight="900" fill="#1e3a8a">兆希</text>
 
@@ -642,7 +657,7 @@
     };
 
     // =========================================================
-    // 20 道方向練習題（經數學向量程式 100% 驗算，圖文零誤差，提示不透底答案）
+    // 19 道方向練習題（依最新修訂要求更新，全數經程式驗算零誤差）
     // =========================================================
     const QUESTIONS = [
       // --- 第 11 課：方向(一) 八個主要方向與旋轉方位盤 ---
@@ -654,28 +669,28 @@
       },
       {
         id: 2, part: '第 11 課：方向(一)', type: 'dir1',
-        prompt: '觀察下圖的方位盤，紅色箭嘴指着「北」方，問號（？）代表哪一個方向？',
-        mainFigure: DIR_SVG.compassRose(0, { 0: '北', 45: '?', 90: '東', 135: '東南', 180: '南', 270: '西', 315: '西北' }, 45),
+        prompt: '觀察下圖的方位盤，紅色箭頭指着「北」方，問號（？）代表哪一個方向？',
+        mainFigure: DIR_SVG.compassRose(0, { 0: '北', 45: '?' }, 45),
         answer: '東北',
-        hint: '問號位於正上方「北」和正右方「東」之間。'
+        hint: '先根據正上方的「北」順時針找出正右方的「東」，問號正位於這兩個基本方向之間。'
       },
       {
         id: 3, part: '第 11 課：方向(一)', type: 'dir1',
-        prompt: '留意紅色「北」箭嘴指向左方！問號（？）代表哪一個方向？',
-        mainFigure: DIR_SVG.compassRose(270, { 270: '北', 0: '東', 90: '南', 180: '西', 45: '?' }, 45),
+        prompt: '留意紅色「北」箭頭指向左方！問號（？）代表哪一個方向？',
+        mainFigure: DIR_SVG.compassRose(270, { 270: '北', 45: '?' }, 45),
         answer: '東南',
-        hint: '先確認正上方是「東」、正右方是「南」，問號正位於這兩個基本方向之間。'
+        hint: '從左方的「北」順時針轉 90° 是正上方的「東」，再轉 90° 是正右方的「南」，問號介乎這兩個基本方向之間。'
       },
       {
         id: 4, part: '第 11 課：方向(一)', type: 'dir1',
-        prompt: '留意紅色「北」箭嘴指向左上方！問號（？）代表哪一個方向？',
-        mainFigure: DIR_SVG.compassRose(315, { 315: '北', 0: '東北', 135: '南', 90: '?' }, 90),
+        prompt: '留意紅色「北」箭頭指向左上方！問號（？）代表哪一個方向？',
+        mainFigure: DIR_SVG.compassRose(315, { 315: '北', 90: '?' }, 90),
         answer: '東南',
-        hint: '左上方是「北」，順時針轉 90° 的右上方是「東」，而正下方是「南」，看看問號在哪兩個方向之間。'
+        hint: '左上方是「北」，順時針轉 90° 的右上方是「東」，再轉 90° 的右下方是「南」，看看問號在哪兩個基本方向之間。'
       },
       {
         id: 5, part: '第 11 課：方向(一)', type: 'dir1',
-        prompt: '觀察中式庭院平面圖（留意「北」箭嘴指向左方）：「小橋」在「紫瑩」的哪一個方向？',
+        prompt: '觀察中式庭院平面圖（留意「北」箭頭指向左方）：「小橋」在「紫瑩」的哪一個方向？',
         mainFigure: DIR_SVG.courtyardMap('小橋'),
         answer: '東北',
         hint: '以「紫瑩」為中心：左方是「北」、上方是「東」，小橋位於左上角（介乎左方與上方之間）。'
@@ -695,21 +710,21 @@
       },
       {
         id: 7, part: '第 11 課：方向(一)', type: 'dir1',
-        prompt: '觀察右圖：子謙面向藍色粗箭嘴的方向。如果他「向右轉 1 個直角」，會面向哪一個方向？',
+        prompt: '觀察右圖：子謙面向藍色粗箭頭的方向。如果他「向右轉 1 個直角」，會面向哪一個方向？',
         mainFigure: DIR_SVG.personFacing('子謙', 315, 45),
         answer: '南',
-        hint: '紅點「北」在左上方，子謙目前面向右上方（即東方）；從東方順時針向右轉 90° 會面向哪個基本方向？'
+        hint: '紅色「北」箭頭在左上方，子謙目前面向右上方（即東方）；從東方順時針向右轉 90° 會面向哪個基本方向？'
       },
       {
         id: 8, part: '第 11 課：方向(一)', type: 'dir1',
-        prompt: '觀察右圖：童欣面向藍色粗箭嘴的方向。如果她「向左轉 2 個直角」，會面向哪一個方向？',
+        prompt: '觀察右圖：童欣面向藍色粗箭頭的方向。如果她「向左轉 2 個直角」，會面向哪一個方向？',
         mainFigure: DIR_SVG.personFacing('童欣', 135, 225),
         answer: '西',
-        hint: '紅點「北」在右下方，童欣目前面向左下方（即東方）；轉 2 個直角就是轉向正相反的方向！'
+        hint: '紅色「北」箭頭在右下方，童欣目前面向左下方（即東方）；轉 2 個直角就是轉向正相反的方向！'
       },
       {
         id: 9, part: '第 11 課：方向(一) 動物園平面圖', type: 'dir1',
-        prompt: '根據動物園平面圖（留意右上角「北」指向左下方）：「大象園」在「企鵝天地」的哪一個方向？',
+        prompt: '根據動物園平面圖（留意右上角「北」箭頭指向左下方）：「大象園」在「企鵝天地」的哪一個方向？',
         mainFigure: DIR_SVG.zooMap(['大象園', '企鵝天地']),
         answer: '西南',
         hint: '看右上角指南針：左下方是「北」、左上方是「東」、右上方是「南」、右下方是「西」。從企鵝天地望向大象園（正右方）介乎哪兩個方向之間？'
@@ -734,35 +749,35 @@
       // --- 第 12 課：方向(二) 指南針讀圖、社區與街道平面圖 ---
       {
         id: 12, part: '第 12 課：方向(二) 旋轉指南針', type: 'dir1',
-        prompt: '觀察下圖的方位盤，紅色「北」箭嘴指向正下方！問號（？）代表哪一個方向？',
-        mainFigure: DIR_SVG.compassRose(180, { 180: '北', 135: '東南', 225: '東北', 315: '?' }, 315),
+        prompt: '觀察下圖的方位盤，紅色「北」箭頭指向正下方！問號（？）代表哪一個方向？',
+        mainFigure: DIR_SVG.compassRose(180, { 180: '北', 315: '?' }, 315),
         answer: '東南',
-        hint: '「北」在正下方時，順時針轉 90° 的正左方是「東」，正上方是「南」，看看問號在正左方和正上方之間哪一格。'
+        hint: '「北」在正下方時，順時針轉 90° 的正左方是「東」，再轉 90° 的正上方是「南」，看看問號在正左方和正上方之間哪一格。'
       },
       {
         id: 13, part: '第 12 課：方向(二) 指南針讀圖', type: 'dir1',
-        prompt: '根據下圖（紅點「北」在左上方），「服裝店」在「心晴」的哪一個方向？',
+        prompt: '根據下圖（紅色「北」箭頭在左上方），「水族店」在「心晴」的哪一個方向？',
         mainFigure: DIR_SVG.personCompassCase('xinqing'),
-        answer: '東',
-        hint: '以心晴為中心：左上方是「北」，服裝店在心晴的右上方（由北方順時針轉 90° 的基本方向）。'
+        answer: '南',
+        hint: '以心晴為中心：左上方是「北」，水族店在心晴的右下方，與北方成正相反的方向！'
       },
       {
         id: 14, part: '第 12 課：方向(二) 指南針讀圖', type: 'dir1',
-        prompt: '根據下圖（紅點「北」在左上方），「公園」在「兆希」的哪一個方向？',
+        prompt: '根據下圖（紅色「北」箭頭在左上方），「便利店」在「公園」的哪一個方向？',
         mainFigure: DIR_SVG.personCompassCase('zhaoxi'),
-        answer: '東',
-        hint: '以兆希為中心：便利店在左上方（北方），公園在兆希的右上方，與北方成 90° 直角。'
+        answer: '西北',
+        hint: '看左下角指南針：左上方是「北」，順時針轉 90° 的右上方是「東」，逆時針轉 90° 的左下方是「西」。從公園往正左方望向便利店，介乎哪兩個基本方向之間？'
       },
       {
         id: 15, part: '第 12 課：方向(二) 社區平面圖', type: 'dir1',
-        prompt: '根據社區平面圖（右上角「北」指向右上方）：「商場」在「巴士站」的哪一個方向？',
+        prompt: '根據社區平面圖（右上角「北」箭頭指向右上方）：「商場」在「巴士站」的哪一個方向？',
         mainFigure: DIR_SVG.communityMap(['商場', '巴士站']),
         answer: '西南',
         hint: '看右上角指南針：右上方是「北」、右下方是「東」、左下方是「南」、左上方是「西」。從巴士站望向商場（正左方）介乎「南」和「西」之間。'
       },
       {
         id: 16, part: '第 12 課：方向(二) 社區平面圖', type: 'multi',
-        prompt: '根據社區平面圖（右上角「北」指向右上方），以下哪兩個設施在「學校」的「東北方」？（可選多於一項）',
+        prompt: '根據社區平面圖（右上角「北」箭頭指向右上方），以下哪兩個設施在「學校」的「東北方」？（可選多於一項）',
         mainFigure: DIR_SVG.communityMap(['學校']),
         answer: ['A', 'B'],
         hint: '右上角指南針「北」在右上方，「東」在右下方，介乎北和東之間的「東北方」就是圖中正右方那一橫列！',
@@ -789,7 +804,7 @@
       // --- 第 12 課：方向(二) 醫院附近街道平面圖 ---
       {
         id: 18, part: '第 12 課：方向(二) 街道平面圖', type: 'dir1',
-        prompt: '根據醫院附近平面圖（右上角「北」指向左上方）：由油漆街「11 號」走到「29 號」，應向哪一個方向走？',
+        prompt: '根據醫院附近平面圖（右上角「北」箭頭指向左上方）：由油漆街「11 號」走到「29 號」，應向哪一個方向走？',
         mainFigure: DIR_SVG.hospitalMap(),
         answer: '西南',
         hint: '先看右上角指南針：左上方是「北」、左下方是「西」、右下方是「南」。在圖上由 11 號向下走到 29 號，對應哪兩個基本方向之間的斜向？'
@@ -802,18 +817,6 @@
         qLabel2: '第二步（油漆街路口 → 11 號）：',
         answer1: '西北', answer2: '東北',
         hint: '左上方是「北」、右上方是「東」、左下方是「西」。第一步在圖上向左走（介乎北與西之間），第二步在圖上向上走（介乎北與東之間）。'
-      },
-      {
-        id: 20, part: '第 12 課：方向(二) 街道平面圖', type: 'single',
-        prompt: '天藍由「大學」出發，依以下路線走：「西南方 → 東南方 → 東北方」，他最終到達哪一個地方？',
-        mainFigure: DIR_SVG.hospitalMap(['大學', '便利店', '醫院', '公園']),
-        answer: 'B',
-        hint: '按指南針把斜向對應圖上的上下左右：向下是「西南」、向右是「東南」、向上是「東北」。從大學出發按「下 → 右 → 上」走走看！',
-        options: [
-          { key: 'A', label: '便利店' },
-          { key: 'B', label: '醫院' },
-          { key: 'C', label: '公園' }
-        ]
       }
     ];
 

@@ -30,6 +30,13 @@
     .tab-inactive:hover {
       background-color: #e2e8f0;
     }
+    @keyframes modalPop {
+      0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-anim {
+      animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
   </style>
 </head>
 <body class="min-h-screen text-slate-800 flex flex-col">
@@ -48,6 +55,11 @@
       </div>
 
       <div id="header-actions" class="hidden flex items-center gap-2.5">
+        <button type="button" onclick="openChallengeAnnounceModal()"
+                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-sm font-bold transition">
+          <span>📢</span>
+          <span>挑戰預告</span>
+        </button>
         <button id="refresh-btn" type="button" onclick="refreshPortalData(true)"
                 class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-sm font-bold transition">
           <span id="refresh-icon">🔄</span>
@@ -270,6 +282,69 @@
     <section id="units-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-10"></section>
   </main>
 
+  <!-- 無限挑戰模式開放預告 POPUP -->
+  <div id="challenge-announce-modal"
+       class="hidden fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-sm flex items-center justify-center p-4"
+       onclick="if (event.target === this) closeChallengeAnnounceModal()">
+    <div class="modal-anim bg-white rounded-3xl shadow-2xl border-2 border-amber-200 max-w-xl w-full overflow-hidden">
+      <!-- 彈窗頂部 -->
+      <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 px-6 py-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🏆</span>
+          <div>
+            <span class="text-[11px] font-black uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">新模式預告</span>
+            <h3 class="text-lg sm:text-xl font-black mt-0.5">30秒無限續命挑戰模式即將開放！</h3>
+          </div>
+        </div>
+        <button type="button" onclick="closeChallengeAnnounceModal()"
+                class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center transition">
+          ✕
+        </button>
+      </div>
+
+      <!-- 彈窗內容 -->
+      <div class="p-6 space-y-4 text-sm text-slate-700 max-h-[75vh] overflow-y-auto">
+        <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 font-black">
+          🕒 正式開放時間：<span class="underline decoration-amber-500 decoration-2">明天（2026年11月27日 星期五）16:00</span> 準時開放！<br/>
+          <span class="text-xs font-bold text-amber-800 mt-1 block">（目前為預告階段，先完成基礎練習做好準備，明天 16:00 即可挑戰排行榜！）</span>
+        </div>
+
+        <div class="space-y-1.5">
+          <h4 class="font-black text-slate-900 flex items-center gap-1.5">
+            <span>✅ 參與要求</span>
+          </h4>
+          <ul class="list-disc pl-5 space-y-1 text-xs sm:text-sm font-medium text-slate-600">
+            <li>必須先完成對應單元的<strong>「基礎練習任務」</strong>（卡片顯示「✅ 已完成」），才可解鎖該單元的無限挑戰模式。</li>
+            <li>榮譽排行榜只保留每位學生在該單元的<strong>個人最高分</strong>紀錄（同分則存活用時較短者優先）。</li>
+          </ul>
+        </div>
+
+        <div class="space-y-1.5">
+          <h4 class="font-black text-slate-900 flex items-center gap-1.5">
+            <span>⚡ 遊戲玩法與計分</span>
+          </h4>
+          <ul class="list-disc pl-5 space-y-1 text-xs sm:text-sm font-medium text-slate-600">
+            <li><strong>30 秒起跳＋答對續命</strong>：初始時間為 <strong>30 秒</strong>，<strong>每答對 1 題即時延長 +3 秒</strong>，只要答對就能一直挑戰下去！</li>
+            <li><strong>三級難度遞進</strong>：<strong>第 1–6 題初階（+80 分）</strong>、<strong>第 7–12 題中階（+120 分）</strong>、<strong>第 13 題起高階（+180 分）</strong>，連續答對 3 題起每題額外 <strong>+20 分</strong>。</li>
+            <li><strong>防亂按規則</strong>：答錯扣 <strong>50 分</strong>（最低 0 分）並冷卻 <strong>2.5 秒</strong>（連續答錯 3 題冷卻 <strong>4 秒</strong>），請先計算再作答。</li>
+          </ul>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700">
+          ⚠️ 題目由 AI 系統自動生成；如遇到答案出錯，請先截圖保存，再通知老師修正。
+        </div>
+      </div>
+
+      <!-- 彈窗底部按鈕 -->
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+        <button type="button" onclick="closeChallengeAnnounceModal()"
+                class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm shadow transition">
+          我知道了，返回練習 →
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
 
@@ -307,6 +382,7 @@
       { unitId: "4BB_U6", term: "4下B", unitName: "單元六：棒形圖", topicCode: "4D1 棒形圖(二)", lessons: "第22-23課", totalQuestions: 20, status: "籌備中" }
     ];
 
+    // 暫時暫停開放挑戰模式按鈕（2026-11-27 16:00 開放時改回 ["4A_U1", "4A_U2", "4A_U3", "4B_U4", "4B_U5"]）
     const CHALLENGE_UNITS = [];
 
     let currentUser = null;
@@ -314,6 +390,17 @@
     let progressMap = {};
     let currentFilter = "ALL";
     let teacherAnalyticsData = null;
+
+    function openChallengeAnnounceModal() {
+      const modal = document.getElementById("challenge-announce-modal");
+      if (modal) modal.classList.remove("hidden");
+    }
+
+    function closeChallengeAnnounceModal() {
+      const modal = document.getElementById("challenge-announce-modal");
+      if (modal) modal.classList.add("hidden");
+      sessionStorage.setItem("fk1ps_challenge_notice_seen", "1");
+    }
 
     window.addEventListener("DOMContentLoaded", () => {
       const savedUserRaw = sessionStorage.getItem("fk1ps_math_user");
@@ -378,13 +465,17 @@
 
       if (isTeacher) {
         document.getElementById("user-welcome-title").textContent = `${currentUser.name}（教師帳號）`;
-        document.getElementById("user-welcome-sub").textContent = "您可直接檢視全級各單元的學生完成率、平均分與錯題分析，亦可點選任何單元預覽題目或試玩挑戰賽。";
+        document.getElementById("user-welcome-sub").textContent = "您可直接檢視全級各單元的學生完成率、平均分與錯題分析，亦可點選任何單元預覽題目。";
         document.getElementById("teacher-analytics-section").classList.remove("hidden");
       } else {
         const numStr = currentUser.classNum ? ` (${currentUser.classNum}號)` : "";
         document.getElementById("user-welcome-title").textContent = `${currentUser.className} 班${numStr} ${currentUser.name}`;
-        document.getElementById("user-welcome-sub").textContent = "點擊下方「開放中」的課題卡片即可直接開始、繼續或再次練習，完成基礎任務後更可解鎖 180 秒限時挑戰榜！";
+        document.getElementById("user-welcome-sub").textContent = "點擊下方「開放中」的課題卡片即可直接開始、繼續或再次練習，無需重複輸入密碼！";
         document.getElementById("teacher-analytics-section").classList.add("hidden");
+      }
+
+      if (!sessionStorage.getItem("fk1ps_challenge_notice_seen")) {
+        openChallengeAnnounceModal();
       }
     }
 
@@ -611,7 +702,7 @@
               ${hasChallenge ? `
                 <a href="challenge.html?unit=${u.unitId}"
                    class="block text-center w-full py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-black text-xs transition">
-                  🏆 180秒無限挑戰與排行榜（教師試玩）
+                  🏆 30秒無限續命挑戰與排行榜（教師試玩）
                 </a>
               ` : ""}
             </div>
@@ -622,7 +713,7 @@
               ${hasChallenge ? `
                 <a href="challenge.html?unit=${u.unitId}"
                    class="block text-center w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-sm shadow transition">
-                  🏆 限時挑戰榜（180秒競速）→
+                  🏆 無限挑戰榜（30秒續命）→
                 </a>
               ` : ""}
               <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', true)"
@@ -686,7 +777,6 @@
 
     async function openUnitPage(unitId, filename, isRestart) {
       if (isRestart && currentUser && currentUser.role !== "teacher") {
-        // 先寫入本地狀態為「進行中第 1 題」，避免返回時快取仍顯示已完成
         progressMap[unitId] = {
           currentQ: 1,
           firstTryCorrect: 0,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>鳳溪第一小學 小四數學科 — 180秒三級進階挑戰賽與排行榜</title>
+  <title>鳳溪第一小學 小四數學科 — 60秒三級進階挑戰賽與排行榜</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
@@ -56,7 +56,7 @@
         </a>
         <div>
           <span class="text-xs uppercase tracking-wider text-amber-300 font-black block">FK1PS MATH ARENA ‧ 三級進階題庫（淺 → 中 → 深）</span>
-          <h1 class="text-lg sm:text-xl font-black tracking-wide">🏆 180秒無限挑戰賽與榮譽排行榜</h1>
+          <h1 class="text-lg sm:text-xl font-black tracking-wide">🏆 60秒無限挑戰賽與榮譽排行榜</h1>
         </div>
       </div>
 
@@ -80,7 +80,7 @@
           🏆
         </div>
         <h2 class="text-2xl font-black text-slate-900">登入進入無限挑戰賽</h2>
-        <p class="text-sm text-slate-500 mt-1">完成基礎任務即可解鎖對應單元的 180 秒競速挑戰！</p>
+        <p class="text-sm text-slate-500 mt-1">完成基礎任務即可解鎖對應單元的 60 秒競速挑戰！</p>
       </div>
       <form action="javascript:void(0);" onsubmit="handleDirectLogin(event)" class="space-y-4">
         <div>
@@ -126,7 +126,7 @@
             </select>
           </div>
           <p class="text-xs sm:text-sm text-slate-600 font-medium">
-            限時 <strong class="text-indigo-700">180 秒</strong>：每答對 1 題得 <strong class="text-emerald-700">+100 分</strong>，連擊 3 題起每題額外 <strong class="text-amber-600">+20 分</strong>，答錯扣 <strong class="text-rose-600">20 分</strong>（最低 0 分）並自動進入下一題。
+            限時 <strong class="text-indigo-700">60 秒</strong>：答對 <strong class="text-emerald-700">+100 分</strong>（連擊 3 題起額外 <strong class="text-amber-600">+20 分</strong>），答錯扣 <strong class="text-rose-600">50 分</strong>並鎖定冷卻 2.5 秒；<strong class="text-indigo-700">準確率達 60% 或以上</strong>方可登上榮譽榜。
           </p>
         </div>
 
@@ -137,7 +137,7 @@
           </div>
           <button id="start-challenge-btn" onclick="startChallenge()"
                   class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-base shadow-lg shadow-orange-500/30 transition">
-            🚀 立即開始 180 秒挑戰
+            🚀 立即開始 60 秒挑戰
           </button>
         </div>
       </div>
@@ -153,6 +153,13 @@
         </a>
       </div>
     </section>
+
+
+    <!-- 題庫生成與糾錯提示 -->
+    <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-sm font-black shadow-md flex items-center gap-2.5">
+      <span class="text-lg shrink-0">⚠️</span>
+      <span>提示：題目由AI系統自動生成。若遇到答案出錯，請先截圖保存，再通知老師修正。</span>
+    </div>
 
     <!-- 遊戲主舞台 ＋ 右側即時排行榜 -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -190,13 +197,13 @@
           </div>
         </div>
 
-        <!-- 狀態 B：180 秒競速作答中 -->
+        <!-- 狀態 B：60 秒競速作答中 -->
         <div id="stage-playing" class="hidden space-y-5">
           <!-- 頂部即時儀表 -->
           <div class="grid grid-cols-4 gap-2.5 bg-slate-900 text-white p-3.5 rounded-2xl">
             <div class="text-center">
               <div class="text-[11px] text-slate-400 font-bold">剩餘時間</div>
-              <div id="hud-timer" class="text-2xl font-black text-amber-400 font-mono">180s</div>
+              <div id="hud-timer" class="text-2xl font-black text-amber-400 font-mono">60s</div>
             </div>
             <div class="text-center border-l border-white/10">
               <div class="text-[11px] text-slate-400 font-bold">目前得分</div>
@@ -261,7 +268,7 @@
             </div>
             <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
               <div class="text-xs font-bold text-amber-700">挑戰用時</div>
-              <div id="res-time" class="text-3xl font-black text-amber-950 mt-1">180 秒</div>
+              <div id="res-time" class="text-3xl font-black text-amber-950 mt-1">60 秒</div>
             </div>
           </div>
 
@@ -331,7 +338,7 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
-    const CHALLENGE_DURATION = 120;
+    const CHALLENGE_DURATION = 60;
 
     const UNIT_META = {
       "4A_U1": { name: "單元一：乘法", file: "4A_U1_multiply.html" },
@@ -352,7 +359,9 @@
     let qCursor = 0;
     let score = 0;
     let correctCount = 0;
+    let answeredCount = 0;
     let combo = 0;
+    let wrongStreak = 0;
     let timeLeft = CHALLENGE_DURATION;
     let timerHandle = null;
     let isPlaying = false;
@@ -504,67 +513,191 @@
           }
         }
       } else if (unitId === "4A_U2") {
-        // --- 單元二：四邊形（緊扣工作紙幾何概念、周界、包含關係與幾何條） ---
+        // --- 單元二：四邊形（參考 4上A 第4課《菱形》及第5課《四邊形之間的關係》工作紙，不含周界，多設 SVG 圖形題） ---
+        const buildRhombusSideSVG = (sideVal, highlightEdge) => {
+          // 菱形頂點 A(120,28) 上, B(55,88) 左, C(120,148) 下, D(185,88) 右
+          const isAB = highlightEdge === "AB";
+          const isBC = highlightEdge === "BC";
+          const isCD = highlightEdge === "CD";
+          const isDA = highlightEdge === "DA";
+          return `
+            <svg viewBox="0 0 240 175" class="w-56 h-40 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <polygon points="120,28 185,88 120,148 55,88" fill="#eef2ff" stroke="#334155" stroke-width="2.5"/>
+              <line x1="120" y1="28" x2="185" y2="88" stroke="${isDA ? '#dc2626' : '#334155'}" stroke-width="${isDA ? '4.5' : '2.5'}"/>
+              <line x1="185" y1="88" x2="120" y2="148" stroke="${isCD ? '#dc2626' : '#334155'}" stroke-width="${isCD ? '4.5' : '2.5'}"/>
+              <line x1="120" y1="148" x2="55" y2="88" stroke="${isBC ? '#dc2626' : '#334155'}" stroke-width="${isBC ? '4.5' : '2.5'}"/>
+              <line x1="55" y1="88" x2="120" y2="28" stroke="${isAB ? '#dc2626' : '#334155'}" stroke-width="${isAB ? '4.5' : '2.5'}"/>
+              <text x="120" y="20" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">A</text>
+              <text x="42" y="92" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">B</text>
+              <text x="120" y="165" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">C</text>
+              <text x="198" y="92" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">D</text>
+              <text x="80" y="54" text-anchor="middle" font-size="12" font-weight="900" fill="#1d4ed8">${sideVal} cm</text>
+              <text x="160" y="54" text-anchor="middle" font-size="12" font-weight="900" fill="#1d4ed8">${sideVal} cm</text>
+              ${highlightEdge ? `<text x="120" y="93" text-anchor="middle" font-size="12" font-weight="900" fill="#dc2626">求 ${highlightEdge} 長度</text>` : ''}
+            </svg>
+          `;
+        };
+
+        const buildParallelEdgesSVG = (askSide) => {
+          // 四邊形 PQRS：P(70,35), S(185,35), R(160,135), Q(45,135) -> PS 平行 QR，PQ 平行 SR
+          const hlPS = askSide === "PS";
+          const hlPQ = askSide === "PQ";
+          return `
+            <svg viewBox="0 0 240 170" class="w-56 h-40 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <polygon points="70,35 185,35 160,135 45,135" fill="#f0fdf4" stroke="#334155" stroke-width="2.5"/>
+              <line x1="70" y1="35" x2="185" y2="35" stroke="${hlPS ? '#dc2626' : '#15803d'}" stroke-width="${hlPS ? '4.5' : '3'}"/>
+              <line x1="70" y1="35" x2="45" y2="135" stroke="${hlPQ ? '#dc2626' : '#334155'}" stroke-width="${hlPQ ? '4.5' : '2.5'}"/>
+              <text x="64" y="27" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">P</text>
+              <text x="192" y="27" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">S</text>
+              <text x="168" y="152" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">R</text>
+              <text x="38" y="152" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">Q</text>
+            </svg>
+          `;
+        };
+
+        const buildGeoboardRhombusSVG = (variantIdx) => {
+          // 5x5 釘板網格：x = 45 + c*35 (c=0..4), y = 25 + r*32 (r=0..4)
+          // variant 0: 菱形 P(c=2,r=0), S(c=4,r=2), T(c=2,r=4), R(c=0,r=2) -> 2x2 斜菱形，四邊相等
+          // variant 1: 菱形 A(c=2,r=0), B(c=3,r=2), C(c=1,r=1), D(c=0,r=3) -> 參考工作紙釘板菱形
+          const gx = c => 45 + c * 35;
+          const gy = r => 25 + r * 32;
+          let dots = '';
+          for (let r = 0; r < 5; r++) {
+            for (let c = 0; c < 5; c++) {
+              dots += `<circle cx="${gx(c)}" cy="${gy(r)}" r="2.5" fill="#94a3b8"/>`;
+            }
+          }
+          if (variantIdx === 0) {
+            const pts = `${gx(2)},${gy(0)} ${gx(4)},${gy(2)} ${gx(2)},${gy(4)} ${gx(0)},${gy(2)}`;
+            return `
+              <svg viewBox="0 0 230 175" class="w-56 h-40 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                ${dots}
+                <polygon points="${pts}" fill="#fef3c7" fill-opacity="0.75" stroke="#d97706" stroke-width="2.5"/>
+                <circle cx="${gx(2)}" cy="${gy(0)}" r="4" fill="#dc2626"/><text x="${gx(2)}" y="${gy(0)-7}" text-anchor="middle" font-size="12" font-weight="900">P</text>
+                <circle cx="${gx(0)}" cy="${gy(2)}" r="4" fill="#1d4ed8"/><text x="${gx(0)-10}" y="${gy(2)+4}" text-anchor="middle" font-size="12" font-weight="900">R</text>
+                <circle cx="${gx(4)}" cy="${gy(2)}" r="4" fill="#1d4ed8"/><text x="${gx(4)+10}" y="${gy(2)+4}" text-anchor="middle" font-size="12" font-weight="900">S</text>
+                <circle cx="${gx(2)}" cy="${gy(4)}" r="4" fill="#1d4ed8"/><text x="${gx(2)}" y="${gy(4)+14}" text-anchor="middle" font-size="12" font-weight="900">T</text>
+              </svg>
+            `;
+          } else {
+            // A(3,0), B(1,1), C(1,3), D(3,2) -> dx=-2, dy=+1 (length sqrt(5)), dx=0, dy=+2 (length 2) -> let's use exact rhombus A(2,0), B(4,1), C(2,2), D(0,1)
+            const pts = `${gx(2)},${gy(0)} ${gx(4)},${gy(1)} ${gx(2)},${gy(2)} ${gx(0)},${gy(1)}`;
+            return `
+              <svg viewBox="0 0 230 175" class="w-56 h-40 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                ${dots}
+                <polygon points="${pts}" fill="#e0e7ff" fill-opacity="0.75" stroke="#4f46e5" stroke-width="2.5"/>
+                <text x="${gx(2)}" y="${gy(0)-6}" text-anchor="middle" font-size="12" font-weight="900">A</text>
+                <text x="${gx(4)+10}" y="${gy(1)+4}" text-anchor="middle" font-size="12" font-weight="900">B</text>
+                <text x="${gx(2)}" y="${gy(2)+13}" text-anchor="middle" font-size="12" font-weight="900">C</text>
+                <text x="${gx(0)-10}" y="${gy(1)+4}" text-anchor="middle" font-size="12" font-weight="900">D</text>
+              </svg>
+            `;
+          }
+        };
+
+        const buildShapeCardSVG = (kind) => {
+          // kind: 'rhombus' | 'rect' | 'square' | 'parallelogram' | 'trapezoid'
+          if (kind === "rhombus") {
+            return `<svg viewBox="0 0 220 140" class="w-52 h-32 bg-white rounded-2xl border border-slate-200 shadow-sm"><polygon points="110,18 182,70 110,122 38,70" fill="#dbeafe" stroke="#1e40af" stroke-width="2.5"/></svg>`;
+          }
+          if (kind === "square") {
+            return `<svg viewBox="0 0 220 140" class="w-52 h-32 bg-white rounded-2xl border border-slate-200 shadow-sm"><rect x="65" y="25" width="90" height="90" fill="#e0e7ff" stroke="#3730a3" stroke-width="2.5"/><rect x="65" y="25" width="10" height="10" fill="none" stroke="#3730a3" stroke-width="1.5"/></svg>`;
+          }
+          if (kind === "rect") {
+            return `<svg viewBox="0 0 220 140" class="w-52 h-32 bg-white rounded-2xl border border-slate-200 shadow-sm"><rect x="42" y="32" width="136" height="76" fill="#fef3c7" stroke="#b45309" stroke-width="2.5"/><rect x="42" y="32" width="10" height="10" fill="none" stroke="#b45309" stroke-width="1.5"/></svg>`;
+          }
+          if (kind === "parallelogram") {
+            return `<svg viewBox="0 0 220 140" class="w-52 h-32 bg-white rounded-2xl border border-slate-200 shadow-sm"><polygon points="62,32 178,32 158,108 42,108" fill="#dcfce7" stroke="#15803d" stroke-width="2.5"/></svg>`;
+          }
+          return `<svg viewBox="0 0 220 140" class="w-52 h-32 bg-white rounded-2xl border border-slate-200 shadow-sm"><polygon points="75,32 145,32 182,108 38,108" fill="#fce7f3" stroke="#be185d" stroke-width="2.5"/></svg>`;
+        };
+
         if (tier === "easy") {
-          for (let s = 3; s <= 25; s++) {
-            addQuestion(`一個菱形的邊長是 ${s} cm，它的周界是多少？`, `${s * 4} cm`, [`${s * 2} cm`, `${s + 4} cm`, `${s * 3} cm`]);
-          }
-          const basicShapes = [
-            { q: "哪一種四邊形有「四條邊長度相等」且「四個角都是直角」？", a: "正方形", d: ["一般菱形", "平行四邊形", "梯形"] },
-            { q: "哪一種四邊形「只有一組對邊平行」？", a: "梯形", d: ["平行四邊形", "菱形", "長方形"] },
-            { q: "哪一種四邊形「兩組對邊分別平行」，但四個角不一定是直角？", a: "平行四邊形", d: ["梯形", "五邊形", "三角形"] },
-            { q: "菱形有多少條長度相等的邊？", a: "4 條", d: ["2 條", "3 條", "0 條"] },
-            { q: "長方形有多少個直角？", a: "4 個", d: ["2 個", "1 個", "0 個"] },
-            { q: "平行四邊形有多少組對邊平行？", a: "2 組", d: ["1 組", "3 組", "4 組"] }
-          ];
-          basicShapes.forEach(it => addQuestion(it.q, it.a, it.d));
-        } else if (tier === "medium") {
-          for (let s = 4; s <= 28; s++) {
-            const p = s * 4;
-            addQuestion(`已知一個菱形的周界是 ${p} cm，它的每條邊長多少？`, `${s} cm`, [`${s * 2} cm`, `${p - 4} cm`, `${s + 2} cm`]);
-          }
-          const inclusionQs = [
-            { q: "「所有正方形都是菱形」這句話是否正確？", a: "✓ 正確（正方形四邊相等）", d: ["✗ 不正確", "只有斜放時才是", "無法判斷"] },
-            { q: "「所有正方形都是長方形」這句話是否正確？", a: "✓ 正確（正方形有四個直角）", d: ["✗ 不正確", "長方形不能四邊相等", "無法判斷"] },
-            { q: "「所有菱形都是正方形」這句話是否正確？", a: "✗ 不正確（菱形未必有直角）", d: ["✓ 正確", "所有菱形都有四個直角", "無法判斷"] },
-            { q: "「所有長方形都是平行四邊形」這句話是否正確？", a: "✓ 正確（兩組對邊皆平行）", d: ["✗ 不正確", "長方形只有一組對邊平行", "無法判斷"] },
-            { q: "「所有平行四邊形都是長方形」這句話是否正確？", a: "✗ 不正確（角未必是直角）", d: ["✓ 正確", "平行四邊形必有四個直角", "無法判斷"] },
-            { q: "「所有菱形都是平行四邊形」這句話是否正確？", a: "✓ 正確（菱形兩組對邊平行）", d: ["✗ 不正確", "菱形只有一組對邊平行", "無法判斷"] },
-            { q: "把一個菱形的四個角拉成直角後，它會變成哪一種四邊形？", a: "正方形", d: ["梯形", "一般長方形（鄰邊不等）", "三角形"] },
-            { q: "把一個平行四邊形的四個角變成直角（鄰邊長度不同），它會變成哪一種圖形？", a: "長方形", d: ["正方形", "菱形", "梯形"] }
-          ];
-          inclusionQs.forEach(it => addQuestion(it.q, it.a, it.d));
-        } else {
-          // 深程度：幾何條拼砌（無編號後綴，靠不同組合呈現）+ 綜合周界與特性推理
-          const stripSets = [
-            { a: 5, b: 8, target: "菱形", ans: "5 cm、5 cm、5 cm、5 cm", d: ["5 cm、5 cm、8 cm、8 cm", "5 cm、8 cm、8 cm、10 cm", "5 cm、5 cm、5 cm、8 cm"] },
-            { a: 6, b: 10, target: "菱形", ans: "6 cm、6 cm、6 cm、6 cm", d: ["6 cm、6 cm、10 cm、10 cm", "6 cm、8 cm、10 cm、12 cm", "6 cm、6 cm、6 cm、10 cm"] },
-            { a: 7, b: 11, target: "菱形", ans: "7 cm、7 cm、7 cm、7 cm", d: ["7 cm、7 cm、11 cm、11 cm", "7 cm、9 cm、11 cm、13 cm", "7 cm、7 cm、7 cm、11 cm"] },
-            { a: 9, b: 14, target: "菱形", ans: "9 cm、9 cm、9 cm、9 cm", d: ["9 cm、9 cm、14 cm、14 cm", "9 cm、10 cm、14 cm、15 cm", "9 cm、9 cm、9 cm、14 cm"] },
-            { a: 4, b: 9, target: "平行四邊形", ans: "4 cm、4 cm、9 cm、9 cm", d: ["4 cm、5 cm、6 cm、9 cm", "4 cm、4 cm、4 cm、9 cm", "4 cm、9 cm、9 cm、12 cm"] },
-            { a: 6, b: 13, target: "平行四邊形", ans: "6 cm、6 cm、13 cm、13 cm", d: ["6 cm、7 cm、8 cm、13 cm", "6 cm、6 cm、6 cm、13 cm", "6 cm、13 cm、13 cm、16 cm"] },
-            { a: 8, b: 15, target: "平行四邊形", ans: "8 cm、8 cm、15 cm、15 cm", d: ["8 cm、9 cm、10 cm、15 cm", "8 cm、8 cm、8 cm、15 cm", "8 cm、15 cm、15 cm、18 cm"] }
-          ];
-          stripSets.forEach(st => {
-            addQuestion(`以下哪一組四枝幾何條可以拼砌出一個${st.target}？`, st.ans, st.d);
-          });
-          for (let s = 6; s <= 24; s += 2) {
-            const p = s * 4;
-            const rectW = s + 3;
-            const rectH = s - 3;
+          // 淺程度：不用直尺度量看圖寫邊長、辨認菱形與四邊形基本特徵
+          for (let s = 2; s <= 15; s++) {
+            const edge = ["BC", "CD", "DA", "AB"][s % 4];
             addQuestion(
-              `一條鐵線剛好可以圍成一個邊長 ${s} cm 的菱形；如果改用同一條鐵線圍成長 ${rectW} cm 的長方形，闊是多少？`,
-              `${rectH} cm`,
-              [`${s} cm`, `${rectW} cm`, `${p - rectW} cm`]
+              `觀察下圖菱形 ABCD（不用直尺度量），${edge} 的長度是多少？`,
+              `${s} cm`,
+              [`${s * 2} cm`, `${s + 2} cm`, `${Math.max(1, s - 1)} cm`],
+              buildRhombusSideSVG(s, edge)
             );
           }
-          const deepLogic = [
-            { q: "某四邊形「有四條相等的邊，但沒有直角」，它一定是甚麼圖形？", a: "菱形（非正方形）", d: ["正方形", "長方形", "梯形"] },
-            { q: "某四邊形「兩組對邊平行且相等，鄰邊不相等，且沒有直角」，它一定是甚麼圖形？", a: "平行四邊形", d: ["菱形", "長方形", "正方形"] },
-            { q: "在正方形、長方形、菱形和平行四邊形之中，有幾多種圖形「必定有兩組對邊平行」？", a: "4 種（全部皆是）", d: ["只有 1 種", "只有 2 種", "只有 3 種"] },
-            { q: "在正方形、長方形、菱形和梯形之中，有幾多種圖形「必定四條邊相等」？", a: "2 種（正方形、菱形）", d: ["1 種", "3 種", "4 種"] }
+          addQuestion("觀察下圖，這是一個甚麼平面圖形？", "菱形", ["長方形", "梯形", "五邊形"], buildShapeCardSVG("rhombus"));
+          addQuestion("觀察下圖，這是一個甚麼平面圖形？", "正方形", ["梯形", "菱形", "三角形"], buildShapeCardSVG("square"));
+          addQuestion("觀察下圖，這是一個甚麼平面圖形？", "長方形", ["菱形", "梯形", "六邊形"], buildShapeCardSVG("rect"));
+          addQuestion("觀察下圖，這是一個甚麼平面圖形？", "平行四邊形", ["梯形", "正方形", "三角形"], buildShapeCardSVG("parallelogram"));
+          addQuestion("觀察下圖，這是一個甚麼平面圖形？", "梯形", ["正方形", "長方形", "菱形"], buildShapeCardSVG("trapezoid"));
+          addQuestion("菱形的四條邊長度有甚麼關係？", "四條邊長度相等", ["只有兩條邊相等", "四條邊都不相等", "只有上下邊相等"]);
+        } else if (tier === "medium") {
+          // 中程度：看圖找互相平行的邊、工作紙四邊形之間的關係（正方形／長方形／菱形／平行四邊形）
+          addQuestion(
+            "觀察下圖四邊形 PQRS，哪一條邊與 PS 互相平行？",
+            "QR",
+            ["PQ", "SR", "PR"],
+            buildParallelEdgesSVG("PS")
+          );
+          addQuestion(
+            "觀察下圖四邊形 PQRS，哪一條邊與 PQ 互相平行？",
+            "SR",
+            ["PS", "QR", "QS"],
+            buildParallelEdgesSVG("PQ")
+          );
+          addQuestion(
+            "觀察下圖釘板上的菱形 ABCD，它的四條邊長度相等嗎？",
+            "相等（菱形的四條邊皆相等）",
+            ["不相等", "只有左右兩邊相等", "只有上下兩邊相等"],
+            buildGeoboardRhombusSVG(1)
+          );
+          const relQs = [
+            { q: "根據菱形和正方形的性質，以下哪句描述正確？", a: "所有正方形皆是菱形", d: ["所有菱形皆是正方形", "正方形沒有四條相等的邊", "菱形必定有四個直角"] },
+            { q: "根據正方形和長方形的性質，以下哪句描述正確？", a: "所有正方形皆是長方形", d: ["所有長方形皆是正方形", "長方形沒有四個直角", "正方形只有一組對邊平行"] },
+            { q: "以下哪兩種四邊形都具備「四條邊長度相等」這項性質？", a: "菱形和正方形", d: ["長方形和平行四邊形", "正方形和長方形", "菱形和梯形"] },
+            { q: "以下哪一種四邊形具備「對邊平行」且「四個角都是直角」？", a: "正方形和長方形", d: ["只有菱形", "只有梯形", "菱形和平行四邊形"] },
+            { q: "以下哪一種四邊形不具備「對邊長度相等」這項性質？", a: "一般梯形", d: ["正方形", "長方形", "平行四邊形"] },
+            { q: "以下哪項有關菱形的描述是「錯誤」的？", a: "它只有一對對邊平行", d: ["它的四條邊長度相等", "它有兩對對邊平行", "它的對邊長度相等"] },
+            { q: "哪一種四邊形「只有一組對邊平行」？", a: "梯形", d: ["平行四邊形", "菱形", "長方形"] },
+            { q: "把一個菱形的四個角變成直角後，它會成為哪一種圖形？", a: "正方形", d: ["梯形", "一般長方形", "三角形"] },
+            { q: "把一個平行四邊形的四個角變成直角（長與闊不同），它會成為哪一種圖形？", a: "長方形", d: ["正方形", "菱形", "梯形"] }
           ];
-          deepLogic.forEach(it => addQuestion(it.q, it.a, it.d));
+          relQs.forEach(it => addQuestion(it.q, it.a, it.d));
+          for (let s = 3; s <= 12; s++) {
+            addQuestion(
+              `下圖菱形 ABCD 中，已知 AB = ${s} cm，CD 的長度是多少？`,
+              `${s} cm`,
+              [`${s * 2} cm`, `${s + 3} cm`, `${Math.max(1, s - 2)} cm`],
+              buildRhombusSideSVG(s, "CD")
+            );
+          }
+        } else {
+          // 深程度：釘板圖形辨認、幾何條組配與四邊形包含關係深度辨析
+          addQuestion(
+            "觀察下圖釘板上的四邊形 PRST，它屬於哪一種平面圖形？",
+            "菱形",
+            ["梯形", "長方形（非正方形）", "三角形"],
+            buildGeoboardRhombusSVG(0)
+          );
+          const stripGroups = [
+            { q: "以下哪一組四枝幾何條可以拼砌出一個「菱形」？", a: "6 cm、6 cm、6 cm、6 cm", d: ["6 cm、6 cm、9 cm、9 cm", "6 cm、7 cm、8 cm、9 cm", "6 cm、6 cm、6 cm、9 cm"] },
+            { q: "以下哪一組四枝幾何條可以拼砌出一個「菱形」？", a: "8 cm、8 cm、8 cm、8 cm", d: ["8 cm、8 cm、10 cm、10 cm", "8 cm、8 cm、8 cm、10 cm", "5 cm、8 cm、8 cm、10 cm"] },
+            { q: "以下哪一組四枝幾何條可以拼砌出一個「菱形」？", a: "9 cm、9 cm、9 cm、9 cm", d: ["9 cm、9 cm、12 cm、12 cm", "9 cm、9 cm、9 cm、12 cm", "7 cm、9 cm、11 cm、13 cm"] },
+            { q: "以下哪一組四枝幾何條可以拼砌出一個「平行四邊形」？", a: "5 cm、5 cm、10 cm、10 cm", d: ["5 cm、6 cm、7 cm、10 cm", "5 cm、5 cm、5 cm、10 cm", "5 cm、10 cm、10 cm、12 cm"] },
+            { q: "以下哪一組四枝幾何條可以拼砌出一個「平行四邊形」？", a: "7 cm、7 cm、12 cm、12 cm", d: ["7 cm、8 cm、9 cm、12 cm", "7 cm、7 cm、7 cm、12 cm", "7 cm、12 cm、12 cm、15 cm"] },
+            { q: "以下哪一組四枝幾何條可以拼砌出一個「平行四邊形」？", a: "6 cm、6 cm、11 cm、11 cm", d: ["6 cm、7 cm、8 cm、11 cm", "6 cm、6 cm、6 cm、11 cm", "6 cm、11 cm、11 cm、14 cm"] }
+          ];
+          stripGroups.forEach(it => addQuestion(it.q, it.a, it.d));
+
+          const deepQuadQs = [
+            { q: "「所有菱形皆是平行四邊形，但不是所有平行四邊形皆是菱形。」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "兩者完全相同", "無法判斷"] },
+            { q: "「所有長方形皆是平行四邊形，但不是所有平行四邊形皆是長方形。」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "兩者完全相同", "無法判斷"] },
+            { q: "「所有正方形皆是長方形，也是菱形。」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "正方形不是長方形", "正方形不是菱形"] },
+            { q: "一個平面圖形如果「只有一組對邊平行」，它一定不是哪一種圖形？", a: "平行四邊形", d: ["梯形", "只有一組對邊平行的四邊形", "非菱形四邊形"] },
+            { q: "在「正方形、長方形、菱形、平行四邊形」中，哪一種圖形同時具備「四條邊相等」與「四個直角」？", a: "正方形", d: ["菱形", "長方形", "平行四邊形"] },
+            { q: "一個四邊形有「兩組對邊平行」，但「四個角都不是直角」，它可能是哪一種圖形？", a: "菱形或一般平行四邊形", d: ["只能是正方形", "只能是長方形", "一定是梯形"] },
+            { q: "小明說：「因為菱形四條邊都相等，所以所有菱形都有四個直角。」他的說法對嗎？", a: "不對，菱形未必有四個直角", d: ["對，四條邊相等必有直角", "對，所有菱形都是正方形", "不對，菱形四條邊不相等"] },
+            { q: "小華說：「所有長方形都有對邊平行的性質。」她的說法對嗎？", a: "對，長方形兩組對邊互相平行", d: ["不對，長方形沒有平行邊", "不對，只有正方形才有平行邊", "不對，長方形只有一組對邊平行"] }
+          ];
+          deepQuadQs.forEach(it => addQuestion(it.q, it.a, it.d));
         }
       } else if (unitId === "4A_U3") {
         // --- 單元三：除法 ---
@@ -968,7 +1101,7 @@
     }
 
     // =========================================================
-    // 180 秒三級進階競速流程（第1-15題淺、第16-30題中、第31題+深）
+    // 60 秒三級進階競速流程（第1-15題淺、第16-30題中、第31題+深）
     // =========================================================
     function startChallenge() {
       if (!isUnitUnlocked) return;
@@ -978,7 +1111,9 @@
       qCursor = 0;
       score = 0;
       correctCount = 0;
+      answeredCount = 0;
       combo = 0;
+      wrongStreak = 0;
       timeLeft = CHALLENGE_DURATION;
       isPlaying = true;
       isTransitioning = false;
@@ -1001,11 +1136,12 @@
     function updateHud() {
       const tEl = document.getElementById("hud-timer");
       tEl.textContent = `${timeLeft}s`;
-      if (timeLeft <= 20) tEl.classList.add("timer-urgent");
+      if (timeLeft <= 10) tEl.classList.add("timer-urgent");
       else tEl.classList.remove("timer-urgent");
 
       document.getElementById("hud-score").textContent = score;
-      document.getElementById("hud-qcount").textContent = `第${qCursor + 1}題 (${correctCount}對)`;
+      const accPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 100;
+      document.getElementById("hud-qcount").textContent = `${correctCount}/${answeredCount}題 (${accPct}%)`;
       document.getElementById("hud-combo").textContent = combo >= 3 ? `${combo} 🔥 (+20)` : `${combo}`;
     }
 
@@ -1072,8 +1208,12 @@
 
       document.querySelectorAll("#play-options-grid button").forEach(b => b.disabled = true);
 
+      answeredCount++;
+      let delayMs = 400;
+
       if (isRight) {
         combo++;
+        wrongStreak = 0;
         correctCount++;
         const bonus = combo >= 3 ? 20 : 0;
         const gained = 100 + bonus;
@@ -1086,14 +1226,22 @@
           : `✅ 答對！+100 分`;
       } else {
         combo = 0;
-        score = Math.max(0, score - 20);
+        wrongStreak++;
+        score = Math.max(0, score - 50);
 
         document.getElementById(`c-opt-${chosenIdx}`).classList.add("opt-wrong");
         const rightBtn = document.getElementById(`c-opt-${q.correctIndex}`);
         if (rightBtn) rightBtn.classList.add("opt-correct");
 
-        fb.className = "h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-rose-100 text-rose-900";
-        fb.textContent = `❌ 答錯（-20 分），正確答案是：${q.options[q.correctIndex]}`;
+        if (wrongStreak >= 3) {
+          delayMs = 4000;
+          fb.className = "h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-rose-600 text-white";
+          fb.textContent = `⚠️ 連續答錯 ${wrongStreak} 題！請先計算再作答（暫停 4 秒，正解：${q.options[q.correctIndex]}）`;
+        } else {
+          delayMs = 2500;
+          fb.className = "h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-rose-100 text-rose-900";
+          fb.textContent = `❌ 答錯（-50 分，冷靜思考 2.5 秒），正確答案是：${q.options[q.correctIndex]}`;
+        }
       }
 
       updateHud();
@@ -1103,7 +1251,7 @@
         qCursor++;
         updateHud();
         renderChallengeQuestion();
-      }, isRight ? 420 : 950);
+      }, delayMs);
     }
 
     window.addEventListener("keydown", (e) => {
@@ -1131,7 +1279,17 @@
         return;
       }
 
-      statusEl.textContent = "☁️ 正在上傳成績至雲端排行榜...";
+      const finalAcc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      document.getElementById("res-correct").textContent = `${correctCount}/${answeredCount} (${finalAcc}%)`;
+
+      if (answeredCount === 0 || finalAcc < 60) {
+        statusEl.className = "text-sm font-black text-rose-600";
+        statusEl.textContent = `⚠️ 本局準確率為 ${finalAcc}%（未達 60% 上榜門檻），成績不列入排行榜，請看清題目再挑戰！`;
+        return;
+      }
+
+      statusEl.className = "text-xs font-bold text-indigo-600";
+      statusEl.textContent = "☁️ 準確率達標（" + finalAcc + "%）！正在上傳成績至雲端排行榜...";
       try {
         const res = await fetch(API_URL, {
           method: "POST",

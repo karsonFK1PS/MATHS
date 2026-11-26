@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小四數學自主練習平台 — 單元五：倍數和因數 (4B_U5)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f1f5f9;
+      user-select: none;
+    }
+    .option-card {
+      transition: all 0.18s ease;
+    }
+    .option-card:hover:not(.disabled-opt) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -4px rgba(30, 58, 138, 0.12);
+    }
+    .option-selected {
+      border-color: #4f46e5 !important;
+      background-color: #eef2ff !important;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    .option-correct {
+      border-color: #16a34a !important;
+      background-color: #dcfce7 !important;
+    }
+    .option-wrong {
+      border-color: #dc2626 !important;
+      background-color: #fee2e2 !important;
+      animation: shake 0.35s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    #scratchpad-canvas {
+      touch-action: none;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+  <!-- 頂部導覽列 -->
+  <header class="bg-gradient-to-r from-indigo-900 via-blue-900 to-indigo-800 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-sm font-bold transition">
+          <span>← 返回課題目錄</span>
+        </a>
+        <div>
+          <span class="text-xs uppercase tracking-wider text-indigo-200 block">4上B ‧ 學習單位 4N3, 4N4</span>
+          <h1 class="text-lg sm:text-xl font-black tracking-wide">單元五：倍數和因數（因數、質數與合成數、H.C.F. 及 L.C.M.）</h1>
+        </div>
+      </div>
+
+      <div id="user-badge-area" class="hidden flex items-center gap-3">
+        <div class="text-right">
+          <div id="user-display-name" class="text-sm font-bold">學生姓名</div>
+          <div id="user-display-meta" class="text-xs text-indigo-200">班別學號</div>
+        </div>
+        <button onclick="logoutUser()" class="px-3 py-1.5 rounded-lg bg-rose-500/80 hover:bg-rose-500 text-xs font-bold transition">
+          登出
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. 獨立登入畫面（若未從 index.html SSO 登入則顯示） -->
+  <main id="login-screen" class="flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-7">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-indigo-100 text-indigo-700 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl font-black">
+          🔢
+        </div>
+        <h2 class="text-2xl font-black text-slate-800">單元五：倍數和因數</h2>
+        <p class="text-sm text-slate-500 mt-1">請輸入校內帳號與密碼以同步雲端學習進度</p>
+      </div>
+
+      <form id="login-form" action="javascript:void(0);" onsubmit="handleManualLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">學生／教師帳號</label>
+          <input type="text" id="login-account" required placeholder="例如：B23001@fk1ps.hk"
+                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-base" />
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">密碼</label>
+          <input type="password" id="login-password" required placeholder="請輸入密碼"
+                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-base" />
+        </div>
+        <div id="login-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium"></div>
+        <button type="submit" id="login-submit-btn"
+                class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base shadow-md transition">
+          登入並開始練習
+        </button>
+      </form>
+      <div class="mt-4 text-center">
+        <a href="index.html" class="text-xs text-indigo-600 hover:underline font-medium">前往全學年統一登入主頁 (index.html)</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- 載入中提示 -->
+  <div id="loading-overlay" class="hidden flex-1 flex-col items-center justify-center p-8">
+    <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
+    <p id="loading-text" class="text-slate-600 font-bold">正在連接雲端資料庫同步進度...</p>
+  </div>
+
+  <!-- 2. 主練習介面 -->
+  <main id="quiz-screen" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-5 space-y-5">
+
+    <!-- 教師專屬快速選題工具列（僅當 role === 'teacher' 時顯示） -->
+    <div id="teacher-jump-bar" class="hidden p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-md bg-amber-600 text-white text-xs font-black">教師檢視模式</span>
+          <span class="text-sm font-bold text-amber-950">點擊下方題號可直接跳題檢查（不會寫入或覆寫學生紀錄）</span>
+        </div>
+        <span id="teacher-q-indicator" class="text-xs font-bold px-2.5 py-1 bg-amber-200/80 text-amber-950 rounded-lg">目前：第 1 / 24 題</span>
+      </div>
+      <div id="teacher-jump-buttons" class="flex flex-wrap gap-1.5"></div>
+    </div>
+
+    <!-- 頂部進度與統計欄 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3 flex-1 min-w-[240px]">
+        <span class="text-sm font-bold text-slate-600 whitespace-nowrap">
+          完成進度：<span id="progress-text" class="text-indigo-700 font-black text-base">1 / 24</span> 題
+        </span>
+        <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-300" style="width: 4.1%;"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 text-sm font-bold">
+        <div class="px-3 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200">
+          ★ 首試答對：<span id="stat-first-try">0</span>
+        </div>
+        <div class="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
+          ↻ 總嘗試次數：<span id="stat-attempts">0</span>
+        </div>
+        <button onclick="toggleScratchpad()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition flex items-center gap-1">
+          <span>✏️ 短除法草稿紙</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 互動短除法草稿畫板 -->
+    <div id="scratchpad-panel" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-sm text-slate-700">短除法／列舉草稿畫板：</span>
+          <button type="button" onclick="setPadBg('blank')" id="bg-btn-blank" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white">空白畫紙</button>
+          <button type="button" onclick="setPadBg('grid')" id="bg-btn-grid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">方格紙</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="setPenColor('#1e293b')" class="w-6 h-6 rounded-full bg-slate-800 border-2 border-white shadow"></button>
+          <button type="button" onclick="setPenColor('#2563eb')" class="w-6 h-6 rounded-full bg-blue-600 border-2 border-white shadow"></button>
+          <button type="button" onclick="setPenColor('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 border-2 border-white shadow"></button>
+          <button type="button" onclick="clearScratchpad()" class="px-3 py-1 rounded-lg bg-rose-100 text-rose-700 hover:bg-rose-200 text-xs font-bold">清除畫板</button>
+        </div>
+      </div>
+      <div class="border border-slate-300 rounded-xl overflow-hidden bg-white flex justify-center">
+        <canvas id="scratchpad-canvas" width="760" height="240" class="w-full max-w-[760px] h-[240px]"></canvas>
+      </div>
+    </div>
+
+    <!-- 題目主卡片 -->
+    <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-8">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <span id="q-part-badge" class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-black border border-indigo-200">
+          第 14 課：因數
+        </span>
+        <span id="q-number-badge" class="text-sm font-bold text-slate-400">第 1 題</span>
+      </div>
+
+      <h2 id="q-prompt" class="text-xl sm:text-2xl font-black text-slate-800 leading-snug mb-3">
+        題目載入中...
+      </h2>
+
+      <!-- 多選題特別提示徽章 -->
+      <div id="multi-select-banner" class="hidden mb-5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-sm font-bold">
+        <span>☑ 多選題：請選出所有正確答案（可選多於一項），選好後按「提交答案」</span>
+      </div>
+
+      <!-- 題幹短除式謎題／數卡／百格表區（若有） -->
+      <div id="q-main-figure" class="hidden mb-6 flex justify-center"></div>
+
+      <!-- 1. 單選／多選卡片區 -->
+      <div id="q-options-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 max-w-3xl"></div>
+
+      <!-- 2. 單一填空題輸入區 -->
+      <div id="q-input-area" class="hidden mb-6 max-w-md">
+        <div class="flex items-center gap-3">
+          <input type="text" id="q-text-input" placeholder="請輸入數字答案"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();checkAnswer();}"
+                 class="flex-1 px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-indigo-500 outline-none text-xl font-bold text-center" />
+          <span id="q-input-unit" class="text-lg font-bold text-slate-600"></span>
+        </div>
+      </div>
+
+      <!-- 3. 雙欄填空區（如 H.C.F. 與 L.C.M. / 最小因數與最大因數） -->
+      <div id="q-dual-area" class="hidden mb-6 max-w-xl">
+        <div class="flex flex-wrap items-center gap-4">
+          <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200">
+            <span id="q-dual-label1" class="text-sm font-black text-slate-700">第一項：</span>
+            <input type="text" id="q-dual-input1" placeholder="輸入數字"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('q-dual-input2').focus();}"
+                   class="w-24 px-2.5 py-1.5 rounded-lg border-2 border-slate-300 focus:border-indigo-500 outline-none text-lg font-bold text-center bg-white" />
+          </div>
+          <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2.5 rounded-xl border border-slate-200">
+            <span id="q-dual-label2" class="text-sm font-black text-slate-700">第二項：</span>
+            <input type="text" id="q-dual-input2" placeholder="輸入數字"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();checkAnswer();}"
+                   class="w-24 px-2.5 py-1.5 rounded-lg border-2 border-slate-300 focus:border-indigo-500 outline-none text-lg font-bold text-center bg-white" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 回饋與提示訊息區 -->
+      <div id="feedback-box" class="hidden mb-6 p-4 rounded-xl border text-base font-medium"></div>
+
+      <!-- 底部操作按鈕 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+        <div class="text-xs text-slate-400" id="sync-status-text">雲端同步就緒</div>
+        <div class="flex items-center gap-3">
+          <button id="submit-btn" onclick="checkAnswer()"
+                  class="px-7 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base shadow-md transition">
+            提交答案
+          </button>
+          <button id="next-btn" onclick="goNextQuestion()"
+                  class="hidden px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base shadow-md transition">
+            下一題 →
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 3. 完成證書畫面 -->
+  <main id="complete-screen" class="hidden flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 max-w-lg w-full p-8 text-center">
+      <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">
+        🏆
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">恭喜完成單元五：倍數和因數！</h2>
+      <p id="cert-student-info" class="text-slate-600 font-bold mb-6">4A (01) 學生姓名</p>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+          <div class="text-xs text-indigo-600 font-bold mb-1">首試答對題數</div>
+          <div id="cert-score" class="text-3xl font-black text-indigo-900">24 / 24</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+          <div class="text-xs text-emerald-600 font-bold mb-1">總嘗試次數</div>
+          <div id="cert-attempts" class="text-3xl font-black text-emerald-900">24 次</div>
+        </div>
+      </div>
+
+      <div id="cert-wrong-summary" class="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left text-sm text-slate-700"></div>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="index.html" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow transition">
+          ← 返回課題目錄
+        </a>
+        <button onclick="resetUnitPractice()" class="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+          ↻ 重新練習本單元
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
+    const UNIT_ID = "4B_U5";
+    const UNIT_NAME = "單元五：倍數和因數";
+
+    let currentUser = null;
+    let currentIndex = 0;
+    let firstTryCorrect = 0;
+    let totalAttempts = 0;
+    let wrongQuestionIds = new Set();
+    let currentQuestionHadWrong = false;
+    let isAnsweredCorrectly = false;
+    let selectedSingle = null;
+    let selectedMulti = new Set();
+
+    // =========================================================
+    // 視覺元件（符號短除法謎題、數卡、數表）
+    // =========================================================
+    const FM_VISUALS = {
+      cards: (nums) => `
+        <div class="flex flex-wrap items-center justify-center gap-3 my-1">
+          ${nums.map(n => `
+            <div class="w-14 h-16 rounded-2xl bg-gradient-to-b from-slate-50 to-slate-200 border-2 border-slate-400 shadow-sm flex items-center justify-center text-2xl font-black text-slate-800">
+              ${n}
+            </div>
+          `).join('')}
+        </div>
+      `,
+
+      // 短除法符號謎題（求 H.C.F.：5 | ★  ● -> 7 | 14  35 -> 2  5）
+      shortDivHCF: () => `
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl px-8 py-5 font-mono text-2xl font-black text-slate-800 inline-block shadow-sm">
+          <div class="flex items-center">
+            <span class="w-8 text-right pr-2 text-indigo-700">5</span>
+            <div class="border-l-2 border-b-2 border-slate-800 px-4 py-1 flex gap-6">
+              <span class="text-rose-600">★</span>
+              <span class="text-emerald-700">●</span>
+            </div>
+          </div>
+          <div class="flex items-center mt-1">
+            <span class="w-8 text-right pr-2 text-indigo-700">7</span>
+            <div class="border-l-2 border-b-2 border-slate-800 px-4 py-1 flex gap-5">
+              <span>14</span>
+              <span>35</span>
+            </div>
+          </div>
+          <div class="flex items-center mt-1">
+            <span class="w-8"></span>
+            <div class="px-5 py-1 flex gap-7 text-slate-600">
+              <span>2</span>
+              <span>5</span>
+            </div>
+          </div>
+        </div>
+      `,
+
+      // 短除法符號謎題（求 L.C.M.：2 | ▲  ★ -> 3 | 18  33 -> 6  11）
+      shortDivLCM: () => `
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl px-8 py-5 font-mono text-2xl font-black text-slate-800 inline-block shadow-sm">
+          <div class="flex items-center">
+            <span class="w-8 text-right pr-2 text-indigo-700">2</span>
+            <div class="border-l-2 border-b-2 border-slate-800 px-4 py-1 flex gap-6">
+              <span class="text-rose-600">▲</span>
+              <span class="text-amber-600">★</span>
+            </div>
+          </div>
+          <div class="flex items-center mt-1">
+            <span class="w-8 text-right pr-2 text-indigo-700">3</span>
+            <div class="border-l-2 border-b-2 border-slate-800 px-4 py-1 flex gap-5">
+              <span>18</span>
+              <span>33</span>
+            </div>
+          </div>
+          <div class="flex items-center mt-1">
+            <span class="w-8"></span>
+            <div class="px-5 py-1 flex gap-7 text-slate-600">
+              <span>6</span>
+              <span>11</span>
+            </div>
+          </div>
+        </div>
+      `
+    };
+
+    // =========================================================
+    // 24 道高思考多元題型題庫（完整涵蓋 Ch 14–17，答錯提示不直接透底答案）
+    // =========================================================
+    const QUESTIONS = [
+      // --- 第 14 課：因數 ---
+      {
+        id: 1, part: '第 14 課：因數', type: 'single',
+        prompt: '已知 39 ÷ 13 = 3，下列哪一項描述是「正確」的？',
+        answer: 'C',
+        hint: '在整除算式「被除數 ÷ 除數 = 商」中，較小的除數和商是被除數的因數，較大的被除數是它們的倍數。',
+        options: [
+          { key: 'A', label: '39 是 3 和 13 的因數' },
+          { key: 'B', label: '3 和 13 是 39 的倍數' },
+          { key: 'C', label: '3 和 13 是 39 的因數' },
+          { key: 'D', label: '3 是 13 的因數' }
+        ]
+      },
+      {
+        id: 2, part: '第 14 課：因數', type: 'input',
+        prompt: '84 共有多少個因數？',
+        answer: '12', unit: '個',
+        hint: '用乘法配對法從 1 開始有系統地找：1 × 84、2 × 42、3 × 28、4 × 21、6 × 14、7 × 12，點算共有多少個不重複的數。'
+      },
+      {
+        id: 3, part: '第 14 課：因數', type: 'multi',
+        prompt: '以下哪些數是 78 的因數？（可選多於一項）',
+        answer: ['B', 'C'],
+        hint: '用 78 逐一除以各選項，能剛好整除（沒有餘數）的數便是 78 的因數。',
+        options: [
+          { key: 'A', label: '8' },
+          { key: 'B', label: '13' },
+          { key: 'C', label: '39' },
+          { key: 'D', label: '52' }
+        ]
+      },
+      {
+        id: 4, part: '第 14 課：因數', type: 'dual',
+        prompt: '分別寫出 99 的「最小因數」和「最大因數」。',
+        label1: '最小因數：', label2: '最大因數：',
+        answer1: '1', answer2: '99',
+        hint: '任何大於 1 的整數，最小的因數都是 1，而最大的因數則是該數本身。'
+      },
+      {
+        id: 5, part: '第 14 課：因數', type: 'single',
+        prompt: '某數的所有因數是 1、3、11 和 33，以下哪一個數既是某數的因數，也是某數的倍數？',
+        answer: 'D',
+        hint: '先從列出的因數中找出「某數」本身是多少（最大因數即該數），再留意一個數本身既是自己的因數也是自己的倍數。',
+        options: [
+          { key: 'A', label: '1' },
+          { key: 'B', label: '3' },
+          { key: 'C', label: '11' },
+          { key: 'D', label: '33' }
+        ]
+      },
+      {
+        id: 6, part: '第 14 課：因數', type: 'single',
+        prompt: '以下哪一個數是 20 的因數，也是 20 的倍數？',
+        answer: 'C',
+        hint: '20 的因數全部小於或等於 20，而 20 的倍數全部大於或等於 20，兩者的重疊只有哪一個數？',
+        options: [
+          { key: 'A', label: '1' },
+          { key: 'B', label: '10' },
+          { key: 'C', label: '20' },
+          { key: 'D', label: '40' }
+        ]
+      },
+
+      // --- 第 15 課：質數和合成數 ---
+      {
+        id: 7, part: '第 15 課：質數和合成數', type: 'single',
+        prompt: '36 共有 9 個因數（1、2、3、4、6、9、12、18、36），所以 36 是一個甚麼數？',
+        answer: 'B',
+        hint: '只有 1 和自己兩個因數的數叫質數；有超過兩個因數的數叫合成數。',
+        options: [
+          { key: 'A', label: '質數' },
+          { key: 'B', label: '合成數' },
+          { key: 'C', label: '既不是質數也不是合成數' },
+          { key: 'D', label: '奇數' }
+        ]
+      },
+      {
+        id: 8, part: '第 15 課：質數和合成數', type: 'multi',
+        prompt: '觀察下面的數卡，選出所有「質數」：（可選多於一項，小心陷阱數！）',
+        mainFigure: FM_VISUALS.cards(['13', '37', '49', '91']),
+        answer: ['A', 'B'],
+        hint: '小心檢查能否被 7 整除！49 = 7 × 7，而 91 = 7 × 13，因此只有沒有其他因數的兩個數才是質數。',
+        options: [
+          { key: 'A', label: '13' },
+          { key: 'B', label: '37' },
+          { key: 'C', label: '49' },
+          { key: 'D', label: '91' }
+        ]
+      },
+      {
+        id: 9, part: '第 15 課：質數和合成數', type: 'dual',
+        prompt: '寫出「最小的質數」和「最大的兩位合成數」。',
+        label1: '最小的質數：', label2: '最大的兩位合成數：',
+        answer1: '2', answer2: '99',
+        hint: '1 不是質數，最小的質數是唯一的偶數質數；最大的兩位數是 99（可被 3 整除），檢查它是否合成數。'
+      },
+      {
+        id: 10, part: '第 15 課：質數和合成數', type: 'input',
+        prompt: '在 20 至 35 各數中，共有多少個「質數」？',
+        answer: '3', unit: '個',
+        hint: '先排除所有偶數和 5 的倍數，剩下的奇數有 21、23、27、29、31、33，再剔除 3 的倍數，點算餘下幾個。'
+      },
+      {
+        id: 11, part: '第 15 課：質數和合成數', type: 'input',
+        prompt: '已知 1 至 50 共有 15 個質數，那麼 50 以內共有「合成數」多少個？（提示：留意數字 1 的分類！）',
+        answer: '34', unit: '個',
+        hint: '1 既不是質數，也不是合成數！從 50 個數中減去 15 個質數後，還要減去數字「1」。'
+      },
+      {
+        id: 12, part: '第 15 課：質數和合成數', type: 'single',
+        prompt: '檢查 73 是否 2、3、5 或 7 的倍數後，可以判斷 73 是哪一類數？',
+        answer: 'A',
+        hint: '73 不是偶數（非 2 倍數）、數字和 7 + 3 = 10（非 3 倍數）、個位非 0 或 5（非 5 倍數）、73 ÷ 7 餘 3，代表沒有 1 和 73 以外的因數。',
+        options: [
+          { key: 'A', label: '質數（只有 1 和 73 兩個因數）' },
+          { key: 'B', label: '合成數（是 7 的倍數）' },
+          { key: 'C', label: '合成數（是 3 的倍數）' },
+          { key: 'D', label: '既不是質數也不是合成數' }
+        ]
+      },
+
+      // --- 第 16 課：公因數和最大公因數 (H.C.F.) ---
+      {
+        id: 13, part: '第 16 課：公因數和 H.C.F.', type: 'input',
+        prompt: '48 和 54 共有多少個「公因數」？',
+        answer: '4', unit: '個',
+        hint: '先找出 48 和 54 的最大公因數（H.C.F. 是 6），最大公因數的所有因數就是這兩個數的全部公因數！'
+      },
+      {
+        id: 14, part: '第 16 課：公因數和 H.C.F.', type: 'input',
+        prompt: '求 27 和 45 的最大公因數（H.C.F.）。',
+        answer: '9',
+        hint: '用短除法同時用質數 3 去除 27 和 45 兩次，把左邊的除數相乘。'
+      },
+      {
+        id: 15, part: '第 16 課：公因數和 H.C.F.', type: 'input',
+        prompt: '求 37 和 29 的最大公因數（H.C.F.）。',
+        answer: '1',
+        hint: '觀察 37 和 29，它們都是質數，彼此沒有大於 1 的公因數（互質）。'
+      },
+      {
+        id: 16, part: '第 16 課：公因數和 H.C.F.', type: 'input',
+        prompt: '觀察左面的短除式謎題，★ 和 ● 的最大公因數（H.C.F.）是多少？',
+        mainFigure: FM_VISUALS.shortDivHCF(),
+        answer: '35',
+        hint: '求 H.C.F. 只需把短除式左邊所有公有除數（5 和 7）相乘，不需要知道 ★ 和 ● 的實際數值！'
+      },
+      {
+        id: 17, part: '第 16 課：公因數和 H.C.F.', type: 'input',
+        prompt: '某數的最大因數是 56，這個數和 40 的最大公因數（H.C.F.）是多少？',
+        answer: '8',
+        hint: '先思考「最大因數是 56 的數」就是 56 本身，再求 56 和 40 的 H.C.F.。'
+      },
+      {
+        id: 18, part: '第 16 課：公因數和 H.C.F.', type: 'single',
+        prompt: '甲數和乙數的公因數包括 2 和 3，以下哪一個數「不可能」是甲數和乙數的 H.C.F.？',
+        answer: 'B',
+        hint: '因為 2 和 3 都是公因數，所以 H.C.F. 必須同時是 2 和 3 的倍數（即 6 的倍數）；找出不是偶數的選項！',
+        options: [
+          { key: 'A', label: '6' },
+          { key: 'B', label: '9' },
+          { key: 'C', label: '12' },
+          { key: 'D', label: '24' }
+        ]
+      },
+
+      // --- 第 17 課：公倍數和最小公倍數 (L.C.M.) ---
+      {
+        id: 19, part: '第 17 課：公倍數和 L.C.M.', type: 'dual',
+        prompt: '16 和 64 存在倍數關係，分別寫出它們的「最大公因數」和「最小公倍數」。',
+        label1: '最大公因數 (H.C.F.)：', label2: '最小公倍數 (L.C.M.)：',
+        answer1: '16', answer2: '64',
+        hint: '當大數（64）是小數（16）的倍數時，較小的數就是 H.C.F.，較大的數就是 L.C.M.！'
+      },
+      {
+        id: 20, part: '第 17 課：公倍數和 L.C.M.', type: 'input',
+        prompt: '96 是 3 和 8 的第幾個公倍數？',
+        answer: '4',
+        hint: '先求出 3 和 8 的最小公倍數（24），再用 96 除以最小公倍數即可知道是第幾個。'
+      },
+      {
+        id: 21, part: '第 17 課：公倍數和 L.C.M.', type: 'input',
+        prompt: '觀察左面的短除式謎題，▲ 和 ★ 的最小公倍數（L.C.M.）是多少？',
+        mainFigure: FM_VISUALS.shortDivLCM(),
+        answer: '396',
+        hint: '求 L.C.M. 要把短除式左邊的除數（2、3）和最底下的商（6、11）全部相乘：2 × 3 × 6 × 11。'
+      },
+      {
+        id: 22, part: '第 17 課：公倍數和 L.C.M.', type: 'single',
+        prompt: '某兩個數的最小公倍數是 24，在這兩個數的公倍數中，哪一個數最接近 100？',
+        answer: 'B',
+        hint: '某兩數的所有公倍數都是它們 L.C.M.（24）的倍數，依次列出 24、48、72、96、120，比較哪個與 100 相差最少。',
+        options: [
+          { key: 'A', label: '72' },
+          { key: 'B', label: '96' },
+          { key: 'C', label: '102' },
+          { key: 'D', label: '120' }
+        ]
+      },
+      {
+        id: 23, part: '第 17 課：公倍數和 L.C.M.', type: 'single',
+        prompt: '20 是某數的倍數。20 和某數的第 5 個公倍數是甚麼？',
+        answer: 'C',
+        hint: '既然 20 是某數的倍數，那麼 20 和某數的「最小公倍數」就是 20；第 5 個公倍數就是最小公倍數的 5 倍。',
+        options: [
+          { key: 'A', label: '10' },
+          { key: 'B', label: '20' },
+          { key: 'C', label: '100' },
+          { key: 'D', label: '150' }
+        ]
+      },
+      {
+        id: 24, part: '第 17 課：公倍數和 L.C.M.', type: 'multi',
+        prompt: '以下哪幾組數的最小公倍數（L.C.M.）是 50？（可選多於一項）',
+        answer: ['A', 'C', 'D'],
+        hint: '逐一檢查各組數的 L.C.M.：注意 5 和 10 的 L.C.M. 是 10（不是 50），其餘三組的最小公倍數都是多少？',
+        options: [
+          { key: 'A', label: '10 和 25' },
+          { key: 'B', label: '5 和 10' },
+          { key: 'C', label: '2 和 25' },
+          { key: 'D', label: '25 和 50' }
+        ]
+      }
+    ];
+
+    // =========================================================
+    // 頁面初始化與 SSO 單一登入檢查
+    // =========================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      initScratchpad();
+      const ssoRaw = sessionStorage.getItem('fk1ps_math_user');
+      if (ssoRaw) {
+        try {
+          const parsedUser = JSON.parse(ssoRaw);
+          if (parsedUser && parsedUser.account) {
+            currentUser = parsedUser;
+            applyUserHeader();
+            fetchUserProgressFromCloud();
+            return;
+          }
+        } catch (e) {}
+      }
+      document.getElementById('login-screen').classList.remove('hidden');
+    });
+
+    function applyUserHeader() {
+      document.getElementById('user-badge-area').classList.remove('hidden');
+      document.getElementById('user-display-name').textContent = currentUser.name;
+      const numStr = currentUser.classNum ? ` (${currentUser.classNum})` : '';
+      document.getElementById('user-display-meta').textContent = `${currentUser.className}${numStr}`;
+    }
+
+    function logoutUser() {
+      sessionStorage.removeItem('fk1ps_math_user');
+      window.location.href = 'index.html';
+    }
+
+    async function handleManualLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const acc = document.getElementById('login-account').value.trim();
+      const pwd = document.getElementById('login-password').value.trim();
+      const errBox = document.getElementById('login-error');
+      const btn = document.getElementById('login-submit-btn');
+
+      errBox.classList.add('hidden');
+      btn.disabled = true;
+      btn.textContent = '驗證中...';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'login',
+            mode: 'unit',
+            unitId: UNIT_ID,
+            account: acc,
+            password: pwd
+          })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          currentUser = data.user;
+          sessionStorage.setItem('fk1ps_math_user', JSON.stringify(currentUser));
+          applyUserHeader();
+          document.getElementById('login-screen').classList.add('hidden');
+          applyLoadedProgress(data.progress);
+        } else {
+          errBox.textContent = data.message || '登入失敗，請檢查帳號或密碼。';
+          errBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        errBox.textContent = '網絡連線異常，請稍後再試。';
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '登入並開始練習';
+      }
+    }
+
+    async function fetchUserProgressFromCloud() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('loading-overlay').classList.remove('hidden');
+
+      if (currentUser.role === 'teacher') {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        startQuizAt(0);
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'getStudentDashboard',
+            account: currentUser.account
+          })
+        });
+        const data = await res.json();
+        document.getElementById('loading-overlay').classList.add('hidden');
+        if (data.status === 'success' && data.progressMap && data.progressMap[UNIT_ID]) {
+          applyLoadedProgress(data.progressMap[UNIT_ID]);
+        } else {
+          startQuizAt(0);
+        }
+      } catch (err) {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        startQuizAt(0);
+      }
+    }
+
+    function applyLoadedProgress(prog) {
+      if (!prog || currentUser.role === 'teacher') {
+        startQuizAt(0);
+        return;
+      }
+      firstTryCorrect = Number(prog.firstTryCorrect) || 0;
+      totalAttempts = Number(prog.totalAttempts) || 0;
+      wrongQuestionIds.clear();
+
+      if (prog.wrongList) {
+        String(prog.wrongList).split(',').forEach(item => {
+          const num = parseInt(item.replace(/[^\d]/g, ''), 10);
+          if (!isNaN(num)) wrongQuestionIds.add(num);
+        });
+      }
+
+      const completedFlag = (prog.isCompleted === true || String(prog.isCompleted).toUpperCase() === 'TRUE');
+      const savedCurrentQ = Number(prog.currentQ) || 1;
+
+      if (completedFlag && (firstTryCorrect > 0 || totalAttempts > 0)) {
+        showCertificateScreen();
+      } else {
+        const qIdx = Math.max(0, Math.min(QUESTIONS.length - 1, savedCurrentQ - 1));
+        startQuizAt(qIdx);
+      }
+    }
+
+    // =========================================================
+    // 教師快速選題工具列
+    // =========================================================
+    function initTeacherJumpBar() {
+      const bar = document.getElementById('teacher-jump-bar');
+      const container = document.getElementById('teacher-jump-buttons');
+      const indicator = document.getElementById('teacher-q-indicator');
+      if (!bar || !container) return;
+
+      if (currentUser && currentUser.role === 'teacher') {
+        bar.classList.remove('hidden');
+        if (indicator) indicator.textContent = `目前：第 ${currentIndex + 1} / ${QUESTIONS.length} 題`;
+        container.innerHTML = '';
+        QUESTIONS.forEach((q, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = q.id;
+          const isCurrent = idx === currentIndex;
+          btn.className = 'w-9 h-9 rounded-xl text-sm font-black border transition cursor-pointer ' +
+            (isCurrent
+              ? 'bg-amber-600 text-white border-amber-700 shadow-sm scale-105'
+              : 'bg-white text-amber-900 border-amber-300 hover:bg-amber-100');
+          btn.onclick = () => {
+            currentIndex = idx;
+            renderQuestion();
+          };
+          container.appendChild(btn);
+        });
+      } else {
+        bar.classList.add('hidden');
+      }
+    }
+
+    // =========================================================
+    // 題目渲染與作答檢查邏輯
+    // =========================================================
+    function startQuizAt(idx) {
+      currentIndex = idx;
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      document.getElementById('complete-screen').classList.add('hidden');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[currentIndex];
+      currentQuestionHadWrong = false;
+      isAnsweredCorrectly = false;
+      selectedSingle = null;
+      selectedMulti.clear();
+
+      initTeacherJumpBar();
+
+      document.getElementById('progress-text').textContent = `${currentIndex + 1} / ${QUESTIONS.length}`;
+      const pct = Math.round(((currentIndex + 1) / QUESTIONS.length) * 100);
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+      document.getElementById('stat-first-try').textContent = firstTryCorrect;
+      document.getElementById('stat-attempts').textContent = totalAttempts;
+
+      document.getElementById('q-part-badge').textContent = q.part;
+      document.getElementById('q-number-badge').textContent = `第 ${q.id} 題 / 共 ${QUESTIONS.length} 題`;
+      document.getElementById('q-prompt').textContent = q.prompt;
+
+      const multiBanner = document.getElementById('multi-select-banner');
+      if (q.type === 'multi') multiBanner.classList.remove('hidden');
+      else multiBanner.classList.add('hidden');
+
+      const mainFig = document.getElementById('q-main-figure');
+      if (q.mainFigure) {
+        mainFig.innerHTML = q.mainFigure;
+        mainFig.classList.remove('hidden');
+      } else {
+        mainFig.innerHTML = '';
+        mainFig.classList.add('hidden');
+      }
+
+      const fb = document.getElementById('feedback-box');
+      fb.classList.add('hidden');
+      document.getElementById('submit-btn').classList.remove('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+
+      const optGrid = document.getElementById('q-options-grid');
+      const inputArea = document.getElementById('q-input-area');
+      const dualArea = document.getElementById('q-dual-area');
+
+      optGrid.classList.add('hidden');
+      inputArea.classList.add('hidden');
+      dualArea.classList.add('hidden');
+
+      if (q.type === 'input') {
+        inputArea.classList.remove('hidden');
+        const inp = document.getElementById('q-text-input');
+        inp.value = '';
+        inp.disabled = false;
+        inp.focus();
+        document.getElementById('q-input-unit').textContent = q.unit || '';
+      } else if (q.type === 'dual') {
+        dualArea.classList.remove('hidden');
+        const d1 = document.getElementById('q-dual-input1');
+        const d2 = document.getElementById('q-dual-input2');
+        d1.value = ''; d2.value = '';
+        d1.disabled = false; d2.disabled = false;
+        document.getElementById('q-dual-label1').textContent = q.label1 || '第一項：';
+        document.getElementById('q-dual-label2').textContent = q.label2 || '第二項：';
+        d1.focus();
+      } else {
+        optGrid.classList.remove('hidden');
+        optGrid.innerHTML = '';
+
+        q.options.forEach(opt => {
+          const card = document.createElement('div');
+          card.id = `opt-card-${opt.key}`;
+          card.className = 'option-card cursor-pointer rounded-2xl border-2 border-slate-200 bg-white p-4 flex items-center justify-between gap-3';
+          card.onclick = () => handleOptionClick(opt.key);
+
+          card.innerHTML = `
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">${opt.key}</span>
+              <span class="text-lg font-bold text-slate-800">${opt.label}</span>
+            </div>
+            ${q.type === 'multi' ? `<span id="chk-${opt.key}" class="w-6 h-6 rounded-md border-2 border-slate-300 flex items-center justify-center text-white text-xs font-black shrink-0"></span>` : ''}
+          `;
+          optGrid.appendChild(card);
+        });
+      }
+    }
+
+    function handleOptionClick(key) {
+      if (isAnsweredCorrectly) return;
+      const q = QUESTIONS[currentIndex];
+
+      if (q.type === 'single') {
+        selectedSingle = key;
+        q.options.forEach(o => {
+          const el = document.getElementById(`opt-card-${o.key}`);
+          el.classList.remove('option-selected', 'option-wrong');
+          if (o.key === key) el.classList.add('option-selected');
+        });
+      } else if (q.type === 'multi') {
+        const el = document.getElementById(`opt-card-${key}`);
+        const chk = document.getElementById(`chk-${key}`);
+        el.classList.remove('option-wrong');
+        if (selectedMulti.has(key)) {
+          selectedMulti.delete(key);
+          el.classList.remove('option-selected');
+          chk.classList.remove('bg-indigo-600', 'border-indigo-600');
+          chk.textContent = '';
+        } else {
+          selectedMulti.add(key);
+          el.classList.add('option-selected');
+          chk.classList.add('bg-indigo-600', 'border-indigo-600');
+          chk.textContent = '✓';
+        }
+      }
+    }
+
+    function checkAnswer() {
+      if (isAnsweredCorrectly) return;
+      const q = QUESTIONS[currentIndex];
+
+      if (q.type === 'single' && !selectedSingle) {
+        showFeedback('請先點選一個答案選項！', 'warn');
+        return;
+      }
+      if (q.type === 'multi' && selectedMulti.size === 0) {
+        showFeedback('請先點選至少一個選項！', 'warn');
+        return;
+      }
+      if (q.type === 'input' && !document.getElementById('q-text-input').value.trim()) {
+        showFeedback('請先輸入你的答案！', 'warn');
+        return;
+      }
+      if (q.type === 'dual') {
+        const v1 = document.getElementById('q-dual-input1').value.trim();
+        const v2 = document.getElementById('q-dual-input2').value.trim();
+        if (!v1 || !v2) {
+          showFeedback('請同時填寫兩個空格的答案！', 'warn');
+          return;
+        }
+      }
+
+      totalAttempts++;
+      document.getElementById('stat-attempts').textContent = totalAttempts;
+
+      let isCorrect = false;
+      if (q.type === 'single') {
+        isCorrect = (selectedSingle === q.answer);
+      } else if (q.type === 'multi') {
+        const userArr = Array.from(selectedMulti).sort();
+        const ansArr = [...q.answer].sort();
+        isCorrect = (userArr.length === ansArr.length && userArr.every((v, i) => v === ansArr[i]));
+      } else if (q.type === 'input') {
+        const val = document.getElementById('q-text-input').value.trim().replace(/,/g, '');
+        isCorrect = (val === q.answer);
+      } else if (q.type === 'dual') {
+        const v1 = document.getElementById('q-dual-input1').value.trim();
+        const v2 = document.getElementById('q-dual-input2').value.trim();
+        isCorrect = (v1 === q.answer1 && v2 === q.answer2);
+      }
+
+      if (isCorrect) {
+        isAnsweredCorrectly = true;
+        if (!currentQuestionHadWrong) {
+          firstTryCorrect++;
+          document.getElementById('stat-first-try').textContent = firstTryCorrect;
+        }
+
+        if (q.type === 'single') {
+          document.getElementById(`opt-card-${selectedSingle}`).classList.add('option-correct');
+        } else if (q.type === 'multi') {
+          selectedMulti.forEach(k => document.getElementById(`opt-card-${k}`).classList.add('option-correct'));
+        } else if (q.type === 'input') {
+          document.getElementById('q-text-input').disabled = true;
+        } else if (q.type === 'dual') {
+          document.getElementById('q-dual-input1').disabled = true;
+          document.getElementById('q-dual-input2').disabled = true;
+        }
+
+        showFeedback(`🎉 答對了！${q.hint}`, 'success');
+        document.getElementById('submit-btn').classList.add('hidden');
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.textContent = (currentIndex === QUESTIONS.length - 1) ? '完成並查看成績 🏆' : '下一題 →';
+        nextBtn.classList.remove('hidden');
+
+        if (currentIndex < QUESTIONS.length - 1) {
+          saveProgressToCloud(currentIndex + 2, false);
+        }
+      } else {
+        currentQuestionHadWrong = true;
+        wrongQuestionIds.add(q.id);
+
+        if (q.type === 'single') {
+          document.getElementById(`opt-card-${selectedSingle}`).classList.add('option-wrong');
+        } else if (q.type === 'multi') {
+          selectedMulti.forEach(k => document.getElementById(`opt-card-${k}`).classList.add('option-wrong'));
+        }
+
+        showFeedback(`💡 再想一想！解題提示：${q.hint}`, 'error');
+      }
+    }
+
+    function showFeedback(msg, type) {
+      const fb = document.getElementById('feedback-box');
+      fb.classList.remove('hidden');
+      if (type === 'success') {
+        fb.className = 'mb-6 p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 text-base font-bold';
+      } else if (type === 'error') {
+        fb.className = 'mb-6 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 text-base font-bold';
+      } else {
+        fb.className = 'mb-6 p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-base font-bold';
+      }
+      fb.textContent = msg;
+    }
+
+    function goNextQuestion() {
+      if (currentIndex < QUESTIONS.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        submitFinalRecordToCloud();
+        showCertificateScreen();
+      }
+    }
+
+    function showCertificateScreen() {
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('complete-screen').classList.remove('hidden');
+
+      const numStr = currentUser.classNum ? ` (${currentUser.classNum})` : '';
+      document.getElementById('cert-student-info').textContent = `${currentUser.className}${numStr} ${currentUser.name}`;
+      document.getElementById('cert-score').textContent = `${firstTryCorrect} / ${QUESTIONS.length}`;
+      document.getElementById('cert-attempts').textContent = `${totalAttempts} 次`;
+
+      const wrongArr = Array.from(wrongQuestionIds).sort((a, b) => a - b);
+      const summaryEl = document.getElementById('cert-wrong-summary');
+      if (wrongArr.length === 0) {
+        summaryEl.innerHTML = '🌟 <strong>表現滿分！</strong>所有題目均一次答對，完全掌握倍數、因數、質數、H.C.F. 與 L.C.M.！';
+      } else {
+        summaryEl.innerHTML = `📝 <strong>曾經答錯並已訂正的題號：</strong>第 ${wrongArr.join('、')} 題（建議重温相關概念）。`;
+      }
+    }
+
+    // =========================================================
+    // 雲端資料同步（自動過濾教師帳號，避免污染學生紀錄）
+    // =========================================================
+    async function saveProgressToCloud(nextQNum, isDone) {
+      if (!currentUser || currentUser.role === 'teacher') {
+        document.getElementById('sync-status-text').textContent = '教師檢視模式（不寫入雲端進度）';
+        return;
+      }
+      const syncEl = document.getElementById('sync-status-text');
+      syncEl.textContent = '正在同步進度...';
+      const wrongStr = Array.from(wrongQuestionIds).sort((a, b) => a - b).map(n => `第${n}題`).join(', ');
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'saveProgress',
+            account: currentUser.account,
+            name: currentUser.name,
+            className: currentUser.className,
+            classNum: currentUser.classNum,
+            unitId: UNIT_ID,
+            currentQ: nextQNum,
+            firstTryCorrect: firstTryCorrect,
+            totalAttempts: totalAttempts,
+            wrongList: wrongStr,
+            isCompleted: isDone
+          })
+        });
+        syncEl.textContent = '✓ 已即時同步至雲端';
+      } catch (e) {
+        syncEl.textContent = '⚠ 離線暫存中';
+      }
+    }
+
+    async function submitFinalRecordToCloud() {
+      if (!currentUser || currentUser.role === 'teacher') return;
+      const wrongArr = Array.from(wrongQuestionIds).sort((a, b) => a - b);
+      const wrongDetails = wrongArr.length === 0 ? '全對（無錯題）' : `曾錯題號：${wrongArr.map(n => '第' + n + '題').join('、')}`;
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'submitRecord',
+            account: currentUser.account,
+            name: currentUser.name,
+            className: currentUser.className,
+            classNum: currentUser.classNum,
+            unitId: UNIT_ID,
+            unitName: UNIT_NAME,
+            score: `${firstTryCorrect} / ${QUESTIONS.length}`,
+            wrongDetails: wrongDetails,
+            currentQ: QUESTIONS.length,
+            firstTryCorrect: firstTryCorrect,
+            totalAttempts: totalAttempts,
+            wrongList: wrongArr.map(n => `第${n}題`).join(', ')
+          })
+        });
+      } catch (e) {}
+    }
+
+    async function resetUnitPractice() {
+      firstTryCorrect = 0;
+      totalAttempts = 0;
+      wrongQuestionIds.clear();
+
+      if (currentUser && currentUser.role !== 'teacher') {
+        try {
+          await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'resetProgress',
+              account: currentUser.account,
+              unitId: UNIT_ID
+            })
+          });
+        } catch (e) {}
+      }
+      startQuizAt(0);
+    }
+
+    // =========================================================
+    // 互動短除法草稿畫板
+    // =========================================================
+    let padCtx = null, isDrawing = false, penColor = '#1e293b', padBgMode = 'blank';
+    function initScratchpad() {
+      const canvas = document.getElementById('scratchpad-canvas');
+      if (!canvas) return;
+      padCtx = canvas.getContext('2d');
+      padCtx.lineWidth = 2.5; padCtx.lineCap = 'round'; padCtx.lineJoin = 'round';
+      const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.touches ? e.touches[0].clientX : e.clientX;
+        const cy = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
+      };
+      const start = (e) => { isDrawing = true; const p = getPos(e); padCtx.beginPath(); padCtx.moveTo(p.x, p.y); };
+      const move = (e) => { if (!isDrawing) return; e.preventDefault(); const p = getPos(e); padCtx.strokeStyle = penColor; padCtx.lineTo(p.x, p.y); padCtx.stroke(); };
+      const end = () => { isDrawing = false; };
+      canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+      canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); window.addEventListener('touchend', end);
+    }
+    function toggleScratchpad() {
+      const panel = document.getElementById('scratchpad-panel');
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) drawPadBackground();
+    }
+    function setPenColor(c) { penColor = c; }
+    function setPadBg(mode) {
+      padBgMode = mode;
+      ['blank', 'grid'].forEach(m => {
+        const btn = document.getElementById(`bg-btn-${m}`);
+        btn.className = (m === mode)
+          ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white'
+          : 'px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
+      });
+      clearScratchpad();
+    }
+    function drawPadBackground() {
+      const canvas = document.getElementById('scratchpad-canvas');
+      if (!canvas || !padCtx) return;
+      padCtx.clearRect(0, 0, canvas.width, canvas.height);
+      if (padBgMode === 'grid') {
+        padCtx.strokeStyle = '#e2e8f0'; padCtx.lineWidth = 1;
+        for (let x = 20; x < canvas.width; x += 24) { padCtx.beginPath(); padCtx.moveTo(x, 0); padCtx.lineTo(x, canvas.height); padCtx.stroke(); }
+        for (let y = 20; y < canvas.height; y += 24) { padCtx.beginPath(); padCtx.moveTo(0, y); padCtx.lineTo(canvas.width, y); padCtx.stroke(); }
+      }
+      padCtx.lineWidth = 2.5;
+    }
+    function clearScratchpad() { drawPadBackground(); }
+  </script>
+</body>
+</html>

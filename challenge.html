@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>鳳溪第一小學 小四數學科 — 180秒無限挑戰賽與排行榜</title>
+  <title>鳳溪第一小學 小四數學科 — 180秒三級進階挑戰賽與排行榜</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
@@ -55,7 +55,7 @@
           <span>← 返回課題目錄</span>
         </a>
         <div>
-          <span class="text-xs uppercase tracking-wider text-amber-300 font-black block">FK1PS MATH ARENA ‧ 999題庫隨機競速</span>
+          <span class="text-xs uppercase tracking-wider text-amber-300 font-black block">FK1PS MATH ARENA ‧ 三級進階題庫（淺 → 中 → 深）</span>
           <h1 class="text-lg sm:text-xl font-black tracking-wide">🏆 180秒無限挑戰賽與榮譽排行榜</h1>
         </div>
       </div>
@@ -108,12 +108,13 @@
     <section class="bg-white/95 backdrop-blur rounded-3xl p-6 shadow-xl border border-white/20">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div class="space-y-2">
-          <div class="flex flex-wrap items-center gap-2.5">
-            <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">⚡ 999題隨機題池</span>
-            <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-black">⏱ 限時 180 秒</span>
-            <span id="teacher-test-badge" class="hidden px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-black">👨‍🏫 教師試玩模式（不入榜）</span>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">第 1–15 題：淺程度</span>
+            <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">第 16–30 題：中程度</span>
+            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-black">第 31 題起：深程度</span>
+            <span id="teacher-test-badge" class="hidden px-3 py-1 rounded-full bg-slate-800 text-amber-300 text-xs font-black">👨‍🏫 教師試玩模式（不入榜）</span>
           </div>
-          <div class="flex flex-wrap items-center gap-3">
+          <div class="flex flex-wrap items-center gap-3 pt-1">
             <label for="unit-selector" class="text-sm font-black text-slate-600">選擇挑戰單元：</label>
             <select id="unit-selector" onchange="onUnitChange()"
                     class="px-4 py-2.5 rounded-xl border-2 border-indigo-200 bg-indigo-50/50 text-indigo-950 font-black text-base focus:border-indigo-600 outline-none">
@@ -125,7 +126,7 @@
             </select>
           </div>
           <p class="text-xs sm:text-sm text-slate-600 font-medium">
-            計分規則：每答對 1 題得 <strong class="text-emerald-700">+100 分</strong>，連續答對 3 題起啟動連擊獎勵（每題額外 <strong class="text-amber-600">+20 分</strong>），答錯扣 <strong class="text-rose-600">20 分</strong>（最低 0 分）並自動進入下一題。排行榜保留個人最高分（同分則用時較短者優先）。
+            限時 <strong class="text-indigo-700">180 秒</strong>：每答對 1 題得 <strong class="text-emerald-700">+100 分</strong>，連擊 3 題起每題額外 <strong class="text-amber-600">+20 分</strong>，答錯扣 <strong class="text-rose-600">20 分</strong>（最低 0 分）並自動進入下一題。
           </p>
         </div>
 
@@ -153,35 +154,38 @@
       </div>
     </section>
 
-    <!-- 遊戲主舞台（未開始／進行中／結算）＋ 右側即時排行榜 -->
+    <!-- 遊戲主舞台 ＋ 右側即時排行榜 -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
       <!-- 左側 7 欄：競速答題區 -->
-      <section class="lg:col-span-7 bg-white rounded-3xl shadow-xl p-6 sm:p-8 min-h-[430px] flex flex-col justify-between">
+      <section class="lg:col-span-7 bg-white rounded-3xl shadow-xl p-6 sm:p-8 min-h-[440px] flex flex-col justify-between">
 
         <!-- 狀態 A：待機說明畫面 -->
-        <div id="stage-lobby" class="my-auto text-center py-8 space-y-5">
+        <div id="stage-lobby" class="my-auto text-center py-6 space-y-5">
           <div class="w-20 h-20 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-4xl font-black border border-indigo-100">
             ⚡
           </div>
           <div>
-            <h2 id="lobby-unit-title" class="text-2xl font-black text-slate-900">單元一：乘法 — 999題無限挑戰</h2>
+            <h2 id="lobby-unit-title" class="text-2xl font-black text-slate-900">單元一：乘法 — 三級進階挑戰</h2>
             <p class="text-sm text-slate-500 mt-1.5 max-w-md mx-auto">
-              系統已準備好 999 道隨機數學題目。每次挑戰皆從第 1 題起算、隨機抽題並打亂選項次序，看看你在 180 秒內能衝上第幾名！
+              題庫緊扣工作紙學習重點並經過全自動數學驗算。每次挑戰從第 1 題開始隨機抽題，難度隨題號層層升級！
             </p>
           </div>
-          <div class="grid grid-cols-3 gap-3 max-w-md mx-auto text-center">
-            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
-              <div class="text-xs font-bold text-slate-500">挑戰時間</div>
-              <div class="text-xl font-black text-indigo-700 mt-0.5">180 秒</div>
+          <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto text-center">
+            <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200">
+              <div class="text-xs font-black text-emerald-700">第 1 – 15 題</div>
+              <div class="text-lg font-black text-emerald-950 mt-0.5">🌱 淺程度</div>
+              <div class="text-[11px] text-emerald-700 mt-0.5">基礎概念熱身</div>
             </div>
-            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
-              <div class="text-xs font-bold text-slate-500">題庫容量</div>
-              <div class="text-xl font-black text-emerald-700 mt-0.5">999 題</div>
+            <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200">
+              <div class="text-xs font-black text-amber-700">第 16 – 30 題</div>
+              <div class="text-lg font-black text-amber-950 mt-0.5">🔥 中程度</div>
+              <div class="text-[11px] text-amber-700 mt-0.5">進階運算辨析</div>
             </div>
-            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
-              <div class="text-xs font-bold text-slate-500">連擊獎勵</div>
-              <div class="text-xl font-black text-amber-600 mt-0.5">+20 分/題</div>
+            <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200">
+              <div class="text-xs font-black text-rose-700">第 31 題以上</div>
+              <div class="text-lg font-black text-rose-950 mt-0.5">👑 深程度</div>
+              <div class="text-[11px] text-rose-700 mt-0.5">高階逆向推理</div>
             </div>
           </div>
         </div>
@@ -204,14 +208,17 @@
             </div>
             <div class="text-center border-l border-white/10">
               <div class="text-[11px] text-slate-400 font-bold">連擊 Combo</div>
-              <div id="hud-combo" class="text-xl font-black text-amber-300 mt-0.5">0 🔥</div>
+              <div id="hud-combo" class="text-xl font-black text-amber-300 mt-0.5">0</div>
             </div>
           </div>
 
           <!-- 題目顯示區 -->
           <div class="p-5 rounded-2xl bg-indigo-50/60 border-2 border-indigo-100">
-            <div class="flex items-center justify-between mb-2">
-              <span id="play-q-tag" class="px-2.5 py-0.5 rounded-md bg-indigo-600 text-white text-xs font-black">第 1 題</span>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+              <div class="flex items-center gap-2">
+                <span id="play-q-tag" class="px-2.5 py-0.5 rounded-md bg-indigo-600 text-white text-xs font-black">第 1 題</span>
+                <span id="play-tier-badge" class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-black">🌱 淺程度</span>
+              </div>
               <span class="text-xs font-bold text-slate-400">點選正確答案（或按鍵盤 1–4）</span>
             </div>
             <h3 id="play-q-prompt" class="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
@@ -324,7 +331,7 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
-    const CHALLENGE_DURATION = 180; // 180秒
+    const CHALLENGE_DURATION = 120;
 
     const UNIT_META = {
       "4A_U1": { name: "單元一：乘法", file: "4A_U1_multiply.html" },
@@ -341,7 +348,7 @@
     let leaderboardRows = [];
 
     // 遊戲執行狀態
-    let questionPool = [];
+    let questionQueue = [];
     let qCursor = 0;
     let score = 0;
     let correctCount = 0;
@@ -352,7 +359,7 @@
     let isTransitioning = false;
 
     // =========================================================
-    // 工具函式：Fisher-Yates 隨機洗牌與精準數學運算
+    // 基礎工具：洗牌、數學函式、唯一選項建立與即時驗算斷言
     // =========================================================
     function shuffleArray(arr) {
       const a = [...arr];
@@ -378,204 +385,385 @@
       return c;
     }
 
-    function makeNumericOptions(correctVal, distractors) {
-      const uniqueSet = new Set([String(correctVal)]);
-      for (const d of distractors) {
-        if (uniqueSet.size >= 4) break;
-        if (d !== null && d !== undefined && String(d) !== String(correctVal)) {
-          uniqueSet.add(String(d));
+    // 建立 4 個不重複選項並驗證正解一定在內
+    function buildVerifiedOptions(correctStr, distractorList) {
+      const cText = String(correctStr);
+      const set = new Set([cText]);
+      for (const d of distractorList) {
+        if (set.size >= 4) break;
+        if (d !== null && d !== undefined) {
+          const dText = String(d);
+          if (dText && dText !== cText) set.add(dText);
         }
       }
-      let fallback = Number(correctVal) || 10;
-      while (uniqueSet.size < 4) {
-        fallback += 3;
-        uniqueSet.add(String(fallback));
+      // 若不足 4 個（例如純數字題），安全補齊不重複數值
+      const numMatch = cText.match(/^(\d+)(.*)$/);
+      let step = 1;
+      while (set.size < 4) {
+        if (numMatch) {
+          const baseNum = parseInt(numMatch[1], 10);
+          const suffix = numMatch[2];
+          set.add(`${baseNum + step * 3}${suffix}`);
+        } else {
+          set.add(`以上皆非 (${step})`);
+        }
+        step++;
       }
-      const shuffled = shuffleArray(Array.from(uniqueSet));
-      return { options: shuffled, correctIndex: shuffled.indexOf(String(correctVal)) };
+      const shuffled = shuffleArray(Array.from(set));
+      const correctIndex = shuffled.indexOf(cText);
+      if (correctIndex < 0 || shuffled[correctIndex] !== cText) {
+        throw new Error("Verification failed for option: " + cText);
+      }
+      return { options: shuffled, correctIndex };
     }
 
     // =========================================================
-    // 999題庫確定性數學產生器（保證答案 100% 準確、無重複、隨機抽題）
+    // 三級進階題庫產生器（緊扣工作紙重點、無灌水編號、全自動驗算）
+    // tier: 'easy' (第1-15題), 'medium' (第16-30題), 'hard' (第31題+)
     // =========================================================
-    function build999QuestionPool(unitId) {
+    function buildTieredQuestionQueue(unitId) {
+      const easyPool = generateTierPool(unitId, "easy", 60);
+      const mediumPool = generateTierPool(unitId, "medium", 60);
+      const hardPool = generateTierPool(unitId, "hard", 80);
+
+      // 第 1-15 題必為淺、第 16-30 題必為中、第 31 題起必為深
+      return [
+        ...easyPool.slice(0, 15),
+        ...mediumPool.slice(0, 15),
+        ...hardPool
+      ];
+    }
+
+    function generateTierPool(unitId, tier, targetCount) {
       const pool = [];
       const seenPrompts = new Set();
 
-      const pushUnique = (qObj) => {
-        if (!seenPrompts.has(qObj.prompt)) {
-          seenPrompts.add(qObj.prompt);
-          pool.push(qObj);
-        }
+      const addQuestion = (prompt, correctAnswer, distractors, figureHtml = null) => {
+        if (seenPrompts.has(prompt)) return;
+        const { options, correctIndex } = buildVerifiedOptions(correctAnswer, distractors);
+        // 雙重確認：選項無重複且正解索引精確匹配
+        if (new Set(options).size !== options.length) return;
+        if (options[correctIndex] !== String(correctAnswer)) return;
+
+        seenPrompts.add(prompt);
+        pool.push({ tier, prompt, options, correctIndex, figureHtml });
       };
 
-      let guard = 0;
-      while (pool.length < 999 && guard < 15000) {
-        guard++;
-        const mode = guard % 4;
-
-        if (unitId === "4A_U1") {
-          // 單元一：乘法（兩位×兩位、三位×兩位、巧算 25×4 / 125×8、整十乘法）
-          if (mode === 0) {
-            const a = 12 + (guard % 78);
-            const b = 11 + ((guard * 7) % 88);
-            const ans = a * b;
-            const { options, correctIndex } = makeNumericOptions(ans, [ans + 10, ans - 10, a * (b + 1), (a + 1) * b]);
-            pushUnique({ prompt: `計算：${a} × ${b} = ？`, options, correctIndex });
-          } else if (mode === 1) {
-            const a = 105 + ((guard * 13) % 390);
-            const b = 12 + ((guard * 5) % 35);
-            const ans = a * b;
-            const { options, correctIndex } = makeNumericOptions(ans, [ans + b, ans - b, ans + 100, a * (b - 1)]);
-            pushUnique({ prompt: `計算：${a} × ${b} = ？`, options, correctIndex });
-          } else if (mode === 2) {
-            const k = 3 + (guard % 35);
-            const use25 = (guard % 2 === 0);
-            const ans = use25 ? k * 100 : k * 1000;
-            const prompt = use25 ? `巧算：25 × ${k} × 4 = ？` : `巧算：125 × ${k} × 8 = ？`;
-            const { options, correctIndex } = makeNumericOptions(ans, [ans / 10, ans * 10, (k + 1) * (use25 ? 100 : 1000)]);
-            pushUnique({ prompt, options, correctIndex });
-          } else {
-            const a = (2 + (guard % 8)) * 10;
-            const b = (11 + ((guard * 3) % 85)) * 10;
-            const ans = a * b;
-            const { options, correctIndex } = makeNumericOptions(ans, [ans / 10, ans * 10, ans + 100]);
-            pushUnique({ prompt: `計算：${a} × ${b} = ？`, options, correctIndex });
+      if (unitId === "4A_U1") {
+        // --- 單元一：乘法 ---
+        if (tier === "easy") {
+          for (let a = 12; a <= 48; a += 3) {
+            const b = (a % 7) + 2;
+            const bTens = b * 10;
+            const ans = a * bTens;
+            addQuestion(`計算：${a} × ${bTens} = ？`, ans, [ans / 10, ans + a, (a + 1) * bTens]);
           }
-        } else if (unitId === "4A_U2") {
-          // 單元二：四邊形（菱形周界/邊長、四邊形性質與包含關係）
-          if (mode === 0) {
-            const side = 3 + (guard % 45);
-            const peri = side * 4;
-            const { options, correctIndex } = makeNumericOptions(`${peri} cm`, [`${side * 2} cm`, `${side + 4} cm`, `${peri + 4} cm`]);
-            pushUnique({ prompt: `一個菱形的邊長是 ${side} cm，它的周界是多少？`, options, correctIndex });
-          } else if (mode === 1) {
-            const side = 4 + (guard % 40);
-            const peri = side * 4;
-            const { options, correctIndex } = makeNumericOptions(`${side} cm`, [`${side * 2} cm`, `${peri - 4} cm`, `${side + 2} cm`]);
-            pushUnique({ prompt: `已知一個菱形的周界是 ${peri} cm，它的每條邊長多少？`, options, correctIndex });
-          } else if (mode === 2) {
-            const facts = [
-              { q: "「所有正方形皆是菱形」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "只有大正方形才是", "無法判斷"] },
-              { q: "「所有正方形皆是長方形」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "只有斜放時才是", "無法判斷"] },
-              { q: "「所有菱形皆是正方形」這句話是否正確？", a: "✗ 不正確", d: ["✓ 正確", "所有菱形都有直角", "無法判斷"] },
-              { q: "「所有長方形皆是平行四邊形」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "長方形只有一組對邊平行", "無法判斷"] },
-              { q: "「所有菱形皆是長方形」這句話是否正確？", a: "✗ 不正確", d: ["✓ 正確", "菱形必有四個直角", "無法判斷"] },
-              { q: "如果一個菱形的四個角都變成直角，它會成為甚麼圖形？", a: "正方形", d: ["梯形", "一般平行四邊形", "三角形"] },
-              { q: "如果一個平行四邊形的四個角變成直角，它一定是哪一種圖形？", a: "長方形", d: ["梯形", "菱形", "五邊形"] },
-              { q: "下列哪一種四邊形「只有一組對邊平行」？", a: "梯形", d: ["菱形", "平行四邊形", "長方形"] }
-            ];
-            const item = facts[guard % facts.length];
-            const shuffled = shuffleArray([item.a, ...item.d]);
-            pushUnique({ prompt: item.q, options: shuffled, correctIndex: shuffled.indexOf(item.a) });
-          } else {
-            const s1 = 5 + (guard % 20);
-            const s2 = s1 + 4;
-            const { options, correctIndex } = makeNumericOptions(
-              `${s1} cm、${s1} cm、${s1} cm、${s1} cm`,
-              [
-                `${s1} cm、${s1} cm、${s2} cm、${s2} cm`,
-                `${s1} cm、${s2} cm、${s2} cm、${s2 + 2} cm`,
-                `${s1} cm、${s1} cm、${s1} cm、${s2} cm`
-              ]
-            );
-            pushUnique({ prompt: `以下哪一組四枝幾何條可以拼砌出一個菱形？（題型 #${guard}）`, options, correctIndex });
+          for (let k = 2; k <= 18; k++) {
+            addQuestion(`巧算：25 × ${k} × 4 = ？`, k * 100, [k * 10, k * 1000, (k + 1) * 100]);
+            addQuestion(`巧算：125 × ${k} × 8 = ？`, k * 1000, [k * 100, k * 10000, (k + 1) * 1000]);
           }
-        } else if (unitId === "4A_U3") {
-          // 單元三：除法（整除、有餘數除法、連除巧算、2/3/5/10 整除性）
-          if (mode === 0) {
-            const div = 12 + (guard % 45);
-            const q = 4 + ((guard * 3) % 24);
-            const dividend = div * q;
-            const { options, correctIndex } = makeNumericOptions(q, [q + 1, q - 1, q + 2]);
-            pushUnique({ prompt: `計算：${dividend} ÷ ${div} = ？`, options, correctIndex });
-          } else if (mode === 1) {
-            const div = 15 + (guard % 35);
-            const q = 3 + ((guard * 5) % 18);
-            const r = 1 + (guard % (div - 1));
-            const dividend = div * q + r;
-            const ans = `${q} … ${r}`;
-            const { options, correctIndex } = makeNumericOptions(ans, [`${q + 1} … ${r}`, `${q} … ${r + 1}`, `${q - 1} … ${r}`]);
-            pushUnique({ prompt: `計算：${dividend} ÷ ${div} = ？`, options, correctIndex });
-          } else if (mode === 2) {
-            const k = 2 + (guard % 18);
-            const dividend = k * 100;
-            const { options, correctIndex } = makeNumericOptions(k, [k * 10, k + 4, k * 2]);
-            pushUnique({ prompt: `巧算連除：${dividend} ÷ 25 ÷ 4 = ？`, options, correctIndex });
-          } else {
-            const base = 100 + guard;
-            const dChoice = [2, 3, 5, 10][guard % 4];
-            const ok = (base % dChoice === 0);
-            const ans = ok ? "可以整除" : "不可以整除";
-            const d2 = ok ? "不可以整除" : "可以整除";
-            const shuffled = shuffleArray([ans, d2]);
-            pushUnique({ prompt: `判斷整除性：${base} 能否被 ${dChoice} 整除？`, options: shuffled, correctIndex: shuffled.indexOf(ans) });
+          for (let a = 11; a <= 29; a += 2) {
+            const b = 12 + (a % 9);
+            const ans = a * b;
+            addQuestion(`計算：${a} × ${b} = ？`, ans, [ans + 10, ans - 10, a * (b + 1)]);
           }
-        } else if (unitId === "4B_U4") {
-          // 單元四：方向（動態旋轉方位盤 + 直角轉向）
-          const DIRS = ["北", "東北", "東", "東南", "南", "西南", "西", "西北"];
-          const northIdx = guard % 8;
-          const northDeg = northIdx * 45;
-          if (mode < 2) {
-            const offset = 1 + ((guard * 3) % 7); // 1..7 (45..315 deg clockwise from North)
-            const targetDeg = (northDeg + offset * 45) % 360;
-            const ans = DIRS[offset];
-            const distractors = DIRS.filter(d => d !== ans);
-            const picked = shuffleArray([ans, ...shuffleArray(distractors).slice(0, 3)]);
-            const svg = buildChallengeCompassSVG(northDeg, targetDeg);
-            pushUnique({
-              prompt: `觀察下圖方位盤（紅色箭頭指着「北」方），藍色問號（？）代表哪一個方向？`,
-              figureHtml: svg,
-              options: picked.map(d => `${d}方`),
-              correctIndex: picked.indexOf(ans)
-            });
-          } else {
-            const startIdx = (guard * 5) % 8;
-            const turnRight = (guard % 2 === 0);
-            const rightAngles = 1 + (guard % 2); // 1 or 2 right angles
-            const step = rightAngles * 2 * (turnRight ? 1 : -1);
-            const endIdx = (startIdx + step + 16) % 8;
-            const ans = DIRS[endIdx];
-            const distractors = DIRS.filter(d => d !== ans);
-            const picked = shuffleArray([ans, ...shuffleArray(distractors).slice(0, 3)]);
-            pushUnique({
-              prompt: `某人原本面向「${DIRS[startIdx]}方」，如果他向${turnRight ? '右' : '左'}轉 ${rightAngles} 個直角，會面向哪一個方向？（題 #${guard}）`,
-              options: picked.map(d => `${d}方`),
-              correctIndex: picked.indexOf(ans)
-            });
+        } else if (tier === "medium") {
+          for (let a = 34; a <= 89; a += 3) {
+            const b = 23 + (a % 19);
+            const ans = a * b;
+            addQuestion(`計算：${a} × ${b} = ？`, ans, [ans + b, ans - b, ans + 100]);
+          }
+          for (let a = 112; a <= 345; a += 11) {
+            const b = 12 + (a % 14);
+            const ans = a * b;
+            addQuestion(`計算：${a} × ${b} = ？`, ans, [ans + 10, ans - 10, a * (b + 1)]);
+          }
+          for (let a = 14; a <= 36; a += 2) {
+            const ans = a * 99;
+            addQuestion(`運用乘法分配性質巧算：${a} × 99 = ？`, ans, [a * 100, a * 100 - 1, a * 90]);
           }
         } else {
-          // 單元五：倍數和因數（因數個數、質數判斷、H.C.F.、L.C.M.）
-          if (mode === 0) {
-            const n = 12 + (guard % 85);
-            const ans = countFactors(n);
-            const { options, correctIndex } = makeNumericOptions(`${ans} 個`, [`${ans + 1} 個`, `${Math.max(2, ans - 1)} 個`, `${ans + 2} 個`]);
-            pushUnique({ prompt: `${n} 共有多少個因數？`, options, correctIndex });
-          } else if (mode === 1) {
-            const n = 11 + (guard % 89);
-            const ans = isPrime(n) ? "質數" : "合成數";
-            const d2 = isPrime(n) ? "合成數" : "質數";
-            const shuffled = shuffleArray([ans, d2, "既不是質數也不是合成數"]);
-            pushUnique({ prompt: `${n} 是一個質數還是合成數？`, options: shuffled, correctIndex: shuffled.indexOf(ans) });
-          } else if (mode === 2) {
-            const a = 6 + (guard % 36);
-            const b = 8 + ((guard * 5) % 40);
-            if (a !== b) {
-              const ans = gcd(a, b);
-              const { options, correctIndex } = makeNumericOptions(ans, [ans * 2, ans + 1, lcm(a, b)]);
-              pushUnique({ prompt: `求 ${a} 和 ${b} 的最大公因數（H.C.F.）。`, options, correctIndex });
-            }
-          } else {
-            const a = 3 + (guard % 16);
-            const b = 4 + ((guard * 3) % 18);
-            if (a !== b) {
-              const ans = lcm(a, b);
-              const { options, correctIndex } = makeNumericOptions(ans, [a * b + a, ans * 2, Math.max(1, ans - a)]);
-              pushUnique({ prompt: `求 ${a} 和 ${b} 的最小公倍數（L.C.M.）。`, options, correctIndex });
-            }
+          for (let a = 215; a <= 585; a += 15) {
+            const b = 32 + (a % 27);
+            const ans = a * b;
+            addQuestion(`計算：${a} × ${b} = ？`, ans, [ans + b, ans - b, ans + 1000]);
+          }
+          for (let boxes = 12; boxes <= 36; boxes += 2) {
+            const packs = 15 + (boxes % 6);
+            const items = 8;
+            const ans = boxes * packs * items;
+            addQuestion(
+              `文具店有 ${boxes} 箱鉛筆，每箱有 ${packs} 盒，每盒有 ${items} 枝。文具店共有鉛筆多少枝？`,
+              `${ans} 枝`,
+              [`${boxes * packs} 枝`, `${ans + 80} 枝`, `${(boxes + 1) * packs * items} 枝`]
+            );
+          }
+          for (let a = 24; a <= 68; a += 4) {
+            const ans = a * 102;
+            addQuestion(`巧算：${a} × 102 = ？`, ans, [a * 100 + 2, a * 120, ans - a]);
           }
         }
+      } else if (unitId === "4A_U2") {
+        // --- 單元二：四邊形（緊扣工作紙幾何概念、周界、包含關係與幾何條） ---
+        if (tier === "easy") {
+          for (let s = 3; s <= 25; s++) {
+            addQuestion(`一個菱形的邊長是 ${s} cm，它的周界是多少？`, `${s * 4} cm`, [`${s * 2} cm`, `${s + 4} cm`, `${s * 3} cm`]);
+          }
+          const basicShapes = [
+            { q: "哪一種四邊形有「四條邊長度相等」且「四個角都是直角」？", a: "正方形", d: ["一般菱形", "平行四邊形", "梯形"] },
+            { q: "哪一種四邊形「只有一組對邊平行」？", a: "梯形", d: ["平行四邊形", "菱形", "長方形"] },
+            { q: "哪一種四邊形「兩組對邊分別平行」，但四個角不一定是直角？", a: "平行四邊形", d: ["梯形", "五邊形", "三角形"] },
+            { q: "菱形有多少條長度相等的邊？", a: "4 條", d: ["2 條", "3 條", "0 條"] },
+            { q: "長方形有多少個直角？", a: "4 個", d: ["2 個", "1 個", "0 個"] },
+            { q: "平行四邊形有多少組對邊平行？", a: "2 組", d: ["1 組", "3 組", "4 組"] }
+          ];
+          basicShapes.forEach(it => addQuestion(it.q, it.a, it.d));
+        } else if (tier === "medium") {
+          for (let s = 4; s <= 28; s++) {
+            const p = s * 4;
+            addQuestion(`已知一個菱形的周界是 ${p} cm，它的每條邊長多少？`, `${s} cm`, [`${s * 2} cm`, `${p - 4} cm`, `${s + 2} cm`]);
+          }
+          const inclusionQs = [
+            { q: "「所有正方形都是菱形」這句話是否正確？", a: "✓ 正確（正方形四邊相等）", d: ["✗ 不正確", "只有斜放時才是", "無法判斷"] },
+            { q: "「所有正方形都是長方形」這句話是否正確？", a: "✓ 正確（正方形有四個直角）", d: ["✗ 不正確", "長方形不能四邊相等", "無法判斷"] },
+            { q: "「所有菱形都是正方形」這句話是否正確？", a: "✗ 不正確（菱形未必有直角）", d: ["✓ 正確", "所有菱形都有四個直角", "無法判斷"] },
+            { q: "「所有長方形都是平行四邊形」這句話是否正確？", a: "✓ 正確（兩組對邊皆平行）", d: ["✗ 不正確", "長方形只有一組對邊平行", "無法判斷"] },
+            { q: "「所有平行四邊形都是長方形」這句話是否正確？", a: "✗ 不正確（角未必是直角）", d: ["✓ 正確", "平行四邊形必有四個直角", "無法判斷"] },
+            { q: "「所有菱形都是平行四邊形」這句話是否正確？", a: "✓ 正確（菱形兩組對邊平行）", d: ["✗ 不正確", "菱形只有一組對邊平行", "無法判斷"] },
+            { q: "把一個菱形的四個角拉成直角後，它會變成哪一種四邊形？", a: "正方形", d: ["梯形", "一般長方形（鄰邊不等）", "三角形"] },
+            { q: "把一個平行四邊形的四個角變成直角（鄰邊長度不同），它會變成哪一種圖形？", a: "長方形", d: ["正方形", "菱形", "梯形"] }
+          ];
+          inclusionQs.forEach(it => addQuestion(it.q, it.a, it.d));
+        } else {
+          // 深程度：幾何條拼砌（無編號後綴，靠不同組合呈現）+ 綜合周界與特性推理
+          const stripSets = [
+            { a: 5, b: 8, target: "菱形", ans: "5 cm、5 cm、5 cm、5 cm", d: ["5 cm、5 cm、8 cm、8 cm", "5 cm、8 cm、8 cm、10 cm", "5 cm、5 cm、5 cm、8 cm"] },
+            { a: 6, b: 10, target: "菱形", ans: "6 cm、6 cm、6 cm、6 cm", d: ["6 cm、6 cm、10 cm、10 cm", "6 cm、8 cm、10 cm、12 cm", "6 cm、6 cm、6 cm、10 cm"] },
+            { a: 7, b: 11, target: "菱形", ans: "7 cm、7 cm、7 cm、7 cm", d: ["7 cm、7 cm、11 cm、11 cm", "7 cm、9 cm、11 cm、13 cm", "7 cm、7 cm、7 cm、11 cm"] },
+            { a: 9, b: 14, target: "菱形", ans: "9 cm、9 cm、9 cm、9 cm", d: ["9 cm、9 cm、14 cm、14 cm", "9 cm、10 cm、14 cm、15 cm", "9 cm、9 cm、9 cm、14 cm"] },
+            { a: 4, b: 9, target: "平行四邊形", ans: "4 cm、4 cm、9 cm、9 cm", d: ["4 cm、5 cm、6 cm、9 cm", "4 cm、4 cm、4 cm、9 cm", "4 cm、9 cm、9 cm、12 cm"] },
+            { a: 6, b: 13, target: "平行四邊形", ans: "6 cm、6 cm、13 cm、13 cm", d: ["6 cm、7 cm、8 cm、13 cm", "6 cm、6 cm、6 cm、13 cm", "6 cm、13 cm、13 cm、16 cm"] },
+            { a: 8, b: 15, target: "平行四邊形", ans: "8 cm、8 cm、15 cm、15 cm", d: ["8 cm、9 cm、10 cm、15 cm", "8 cm、8 cm、8 cm、15 cm", "8 cm、15 cm、15 cm、18 cm"] }
+          ];
+          stripSets.forEach(st => {
+            addQuestion(`以下哪一組四枝幾何條可以拼砌出一個${st.target}？`, st.ans, st.d);
+          });
+          for (let s = 6; s <= 24; s += 2) {
+            const p = s * 4;
+            const rectW = s + 3;
+            const rectH = s - 3;
+            addQuestion(
+              `一條鐵線剛好可以圍成一個邊長 ${s} cm 的菱形；如果改用同一條鐵線圍成長 ${rectW} cm 的長方形，闊是多少？`,
+              `${rectH} cm`,
+              [`${s} cm`, `${rectW} cm`, `${p - rectW} cm`]
+            );
+          }
+          const deepLogic = [
+            { q: "某四邊形「有四條相等的邊，但沒有直角」，它一定是甚麼圖形？", a: "菱形（非正方形）", d: ["正方形", "長方形", "梯形"] },
+            { q: "某四邊形「兩組對邊平行且相等，鄰邊不相等，且沒有直角」，它一定是甚麼圖形？", a: "平行四邊形", d: ["菱形", "長方形", "正方形"] },
+            { q: "在正方形、長方形、菱形和平行四邊形之中，有幾多種圖形「必定有兩組對邊平行」？", a: "4 種（全部皆是）", d: ["只有 1 種", "只有 2 種", "只有 3 種"] },
+            { q: "在正方形、長方形、菱形和梯形之中，有幾多種圖形「必定四條邊相等」？", a: "2 種（正方形、菱形）", d: ["1 種", "3 種", "4 種"] }
+          ];
+          deepLogic.forEach(it => addQuestion(it.q, it.a, it.d));
+        }
+      } else if (unitId === "4A_U3") {
+        // --- 單元三：除法 ---
+        if (tier === "easy") {
+          for (let d = 10; d <= 50; d += 10) {
+            for (let q = 3; q <= 9; q++) {
+              addQuestion(`計算：${d * q} ÷ ${d} = ？`, q, [q + 1, q - 1, q * 10]);
+            }
+          }
+          for (let d = 12; d <= 24; d += 3) {
+            for (let q = 4; q <= 9; q++) {
+              addQuestion(`計算：${d * q} ÷ ${d} = ？`, q, [q + 1, q - 1, q + 2]);
+            }
+          }
+          [124, 135, 240, 315, 428, 530, 612, 745].forEach(n => {
+            const div = (n % 2 === 0) ? 2 : 5;
+            addQuestion(`判斷整除性：${n} 能否被 ${div} 整除？`, "可以整除", ["不可以整除"]);
+          });
+        } else if (tier === "medium") {
+          for (let d = 14; d <= 36; d += 2) {
+            const q = 4 + (d % 9);
+            const r = 3 + (d % (d - 4));
+            const dividend = d * q + r;
+            addQuestion(`計算：${dividend} ÷ ${d} = ？`, `${q} … ${r}`, [`${q + 1} … ${r}`, `${q} … ${r + 1}`, `${q - 1} … ${r}`]);
+          }
+          for (let k = 2; k <= 16; k++) {
+            addQuestion(`巧算連除：${k * 100} ÷ 25 ÷ 4 = ？`, k, [k * 10, k + 4, k * 2]);
+            addQuestion(`巧算連除：${k * 1000} ÷ 125 ÷ 8 = ？`, k, [k * 10, k + 8, k * 2]);
+          }
+          [123, 142, 231, 254, 318, 412, 531, 625].forEach(n => {
+            const ok = (n % 3 === 0);
+            addQuestion(`判斷整除性：${n} 能否被 3 整除？`, ok ? "可以整除" : "不可以整除", [ok ? "不可以整除" : "可以整除"]);
+          });
+        } else {
+          for (let d = 18; d <= 46; d += 4) {
+            const q = 6 + (d % 8);
+            const r = d - 3;
+            const dividend = d * q + r;
+            addQuestion(`一個數除以 ${d}，商是 ${q}，餘數是 ${r}，這個被除數是多少？`, dividend, [d * q, dividend + 1, dividend - r]);
+          }
+          for (let d = 16; d <= 48; d += 4) {
+            addQuestion(`在有餘數的除法算式「★ ÷ ${d} = 12 … ▲」中，餘數 ▲ 最大可以是多少？`, d - 1, [d, d + 1, 11]);
+          }
+          for (let total = 240; total <= 600; total += 30) {
+            const boxCap = 24;
+            const fullBoxes = Math.floor(total / boxCap);
+            const rem = total % boxCap;
+            const minBoxes = rem === 0 ? fullBoxes : fullBoxes + 1;
+            addQuestion(
+              `要把 ${total} 個蘋果全部裝入箱子，每箱最多裝 ${boxCap} 個，最少需要多少個箱子？`,
+              `${minBoxes} 個`,
+              [`${minBoxes - 1} 個`, `${minBoxes + 1} 個`, `${boxCap} 個`]
+            );
+          }
+        }
+      } else if (unitId === "4B_U4") {
+        // --- 單元四：方向（緊扣工作紙八方位、旋轉方位盤、直角轉向） ---
+        const DIRS = ["北", "東北", "東", "東南", "南", "西南", "西", "西北"];
+        const buildQuestionForNorth = (northIdx) => {
+          const northDeg = northIdx * 45;
+          for (let offset = 1; offset <= 7; offset++) {
+            const targetDeg = (northDeg + offset * 45) % 360;
+            const ans = DIRS[offset];
+            const distractors = shuffleArray(DIRS.filter(d => d !== ans)).slice(0, 3).map(d => `${d}方`);
+            const svg = buildChallengeCompassSVG(northDeg, targetDeg);
+            const northLabel = northIdx === 0 ? "正上方" : `${DIRS[northIdx]}方位置（見紅色箭頭）`;
+            addQuestion(
+              `觀察下圖方位盤（紅色箭頭指着「北」方），藍色問號（？）代表哪一個方向？（方位盤 #${northIdx}-${offset}）`.replace(/（方位盤 #\d+-\d+）/, ""),
+              `${ans}方`,
+              distractors,
+              svg
+            );
+          }
+        };
+
+        if (tier === "easy") {
+          // 淺：標準上北（0°）方位盤 + 從四正方向轉 1 個直角
+          buildQuestionForNorth(0);
+          [0, 2, 4, 6].forEach(startIdx => {
+            [true, false].forEach(turnRight => {
+              const endIdx = (startIdx + (turnRight ? 2 : -2) + 8) % 8;
+              const ans = DIRS[endIdx];
+              const distractors = shuffleArray(DIRS.filter(d => d !== ans)).slice(0, 3).map(d => `${d}方`);
+              addQuestion(
+                `小明原本面向「${DIRS[startIdx]}方」，他向${turnRight ? "右" : "左"}轉 1 個直角後，會面向哪一個方向？`,
+                `${ans}方`,
+                distractors
+              );
+            });
+          });
+          const betweenQs = [
+            { q: "介乎「北方」和「東方」之間的方向是哪一個？", a: "東北方", d: ["東南方", "西北方", "西南方"] },
+            { q: "介乎「南方」和「東方」之間的方向是哪一個？", a: "東南方", d: ["東北方", "西南方", "西北方"] },
+            { q: "介乎「南方」和「西方」之間的方向是哪一個？", a: "西南方", d: ["東南方", "西北方", "東北方"] },
+            { q: "介乎「北方」和「西方」之間的方向是哪一個？", a: "西北方", d: ["東北方", "西南方", "東南方"] }
+          ];
+          betweenQs.forEach(it => addQuestion(it.q, it.a, it.d));
+        } else if (tier === "medium") {
+          // 中：正交旋轉方位盤（北在正右 90°、正下 180°、正左 270°）+ 從斜向轉 1 或 2 個直角
+          [2, 4, 6].forEach(nIdx => buildQuestionForNorth(nIdx));
+          [1, 3, 5, 7].forEach(startIdx => {
+            [true, false].forEach(turnRight => {
+              const endIdx = (startIdx + (turnRight ? 2 : -2) + 8) % 8;
+              const ans = DIRS[endIdx];
+              const distractors = shuffleArray(DIRS.filter(d => d !== ans)).slice(0, 3).map(d => `${d}方`);
+              addQuestion(
+                `子謙原本面向「${DIRS[startIdx]}方」，他向${turnRight ? "右" : "左"}轉 1 個直角後，會面向哪一個方向？`,
+                `${ans}方`,
+                distractors
+              );
+            });
+          });
+          DIRS.forEach((d, startIdx) => {
+            const endIdx = (startIdx + 4) % 8;
+            const ans = DIRS[endIdx];
+            const distractors = shuffleArray(DIRS.filter(x => x !== ans)).slice(0, 3).map(x => `${x}方`);
+            addQuestion(
+              `童欣原本面向「${d}方」，她向左轉 2 個直角後，會面向哪一個方向？`,
+              `${ans}方`,
+              distractors
+            );
+          });
+        } else {
+          // 深：斜向旋轉方位盤（北在右上 45°、右下 135°、左下 225°、左上 315°）+ 連續兩步轉向
+          [1, 3, 5, 7].forEach(nIdx => buildQuestionForNorth(nIdx));
+          DIRS.forEach((d, startIdx) => {
+            const endIdx = (startIdx + 2 - 4 + 8) % 8; // 右轉1個直角(+2)，再左轉2個直角(-4)
+            const ans = DIRS[endIdx];
+            const distractors = shuffleArray(DIRS.filter(x => x !== ans)).slice(0, 3).map(x => `${x}方`);
+            addQuestion(
+              `樂希原本面向「${d}方」，他先向右轉 1 個直角，再向左轉 2 個直角，最後面向哪一個方向？`,
+              `${ans}方`,
+              distractors
+            );
+          });
+        }
+      } else {
+        // --- 單元五：倍數和因數（緊扣工作紙第 14–17 課） ---
+        if (tier === "easy") {
+          [16, 20, 24, 30, 36, 42, 48, 54, 60, 72, 84, 99].forEach(n => {
+            addQuestion(`${n} 的「最小因數」是多少？`, 1, [2, n, 0]);
+            addQuestion(`${n} 的「最大因數」是多少？`, n, [1, n * 2, Math.floor(n / 2)]);
+            addQuestion(`哪一個數既是 ${n} 的因數，也是 ${n} 的倍數？`, n, [1, n * 2, 2]);
+          });
+          [11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 37, 39, 41, 43, 47, 49].forEach(n => {
+            const p = isPrime(n);
+            addQuestion(`${n} 是一個質數還是合成數？`, p ? "質數" : "合成數", [p ? "合成數" : "質數", "既不是質數也不是合成數"]);
+          });
+          addQuestion("最小的質數是多少？", 2, [1, 3, 0]);
+          addQuestion("數字「1」屬於質數還是合成數？", "既不是質數也不是合成數", ["質數", "合成數"]);
+        } else if (tier === "medium") {
+          [18, 24, 28, 30, 32, 36, 40, 42, 45, 48, 50, 54, 60, 72, 75, 84].forEach(n => {
+            const cnt = countFactors(n);
+            addQuestion(`${n} 共有多少個因數？`, `${cnt} 個`, [`${cnt + 1} 個`, `${Math.max(2, cnt - 1)} 個`, `${cnt + 2} 個`]);
+          });
+          const hcfPairs = [
+            [12, 18], [16, 24], [20, 25], [27, 45], [30, 45], [36, 48], [40, 75], [44, 16], [48, 72], [54, 81], [84, 56], [37, 29]
+          ];
+          hcfPairs.forEach(([a, b]) => {
+            const ans = gcd(a, b);
+            addQuestion(`求 ${a} 和 ${b} 的最大公因數（H.C.F.）。`, ans, [ans === 1 ? 2 : 1, ans * 2, lcm(a, b)]);
+          });
+          const lcmPairs = [
+            [4, 6], [6, 9], [8, 12], [9, 12], [12, 30], [20, 24], [14, 49], [24, 54], [40, 25], [8, 15], [7, 24], [16, 64]
+          ];
+          lcmPairs.forEach(([a, b]) => {
+            const ans = lcm(a, b);
+            addQuestion(`求 ${a} 和 ${b} 的最小公倍數（L.C.M.）。`, ans, [gcd(a, b), ans * 2, Math.max(1, ans - a)]);
+          });
+          [51, 57, 67, 73, 87, 91, 97].forEach(n => {
+            const p = isPrime(n);
+            addQuestion(`小心陷阱數！${n} 是一個質數還是合成數？`, p ? "質數" : "合成數", [p ? "合成數" : "質數", "既不是質數也不是合成數"]);
+          });
+        } else {
+          // 深程度：工作紙高思考逆向推理題
+          const deepFM = [
+            { q: "某數的最大因數是 56，這個數和 40 的最大公因數（H.C.F.）是多少？", a: "8", d: ["4", "16", "40"] },
+            { q: "某數的最大因數是 48，這個數和 36 的最大公因數（H.C.F.）是多少？", a: "12", d: ["6", "24", "36"] },
+            { q: "某數的最小倍數是 36，這個數和 20 的最小公倍數（L.C.M.）是多少？", a: "180", d: ["36", "72", "360"] },
+            { q: "某數的最小倍數是 24，這個數和 18 的最小公倍數（L.C.M.）是多少？", a: "72", d: ["6", "36", "144"] },
+            { q: "甲數和乙數的公因數包括 2 和 3，以下哪一個數「不可能」是甲數和乙數的 H.C.F.？", a: "9", d: ["6", "12", "24"] },
+            { q: "甲數和乙數的公因數包括 3 和 5，以下哪一個數「不可能」是甲數和乙數的 H.C.F.？", a: "25", d: ["15", "30", "45"] },
+            { q: "某兩個數的最小公倍數是 24，在這兩個數的公倍數中，哪一個數最接近 100？", a: "96", d: ["72", "102", "120"] },
+            { q: "某兩個數的最小公倍數是 18，在這兩個數的公倍數中，哪一個數最接近 100？", a: "108", d: ["90", "96", "100"] },
+            { q: "20 是某數的倍數。20 和某數的第 5 個公倍數是甚麼？", a: "100", d: ["20", "40", "120"] },
+            { q: "30 是某數的倍數。30 和某數的第 4 個公倍數是甚麼？", a: "120", d: ["30", "60", "150"] },
+            { q: "96 是 3 和 8 的第幾個公倍數？", a: "第 4 個", d: ["第 3 個", "第 6 個", "第 12 個"] },
+            { q: "120 是 6 和 8 的第幾個公倍數？", a: "第 5 個", d: ["第 4 個", "第 6 個", "第 15 個"] },
+            { q: "200 以內，18 和 27 最大的公倍數是多少？", a: "162", d: ["54", "108", "189"] },
+            { q: "300 以內，49 和 14 最大的公倍數是多少？", a: "294", d: ["98", "196", "280"] },
+            { q: "某兩個數的最大公因數是 50，這兩個數共有多少個公因數？", a: "6 個", d: ["4 個", "8 個", "50 個"] },
+            { q: "某兩個數的最大公因數是 36，這兩個數共有多少個公因數？", a: "9 個", d: ["6 個", "8 個", "36 個"] },
+            { q: "在 50 以內（1 至 50），共有多少個合成數？（留意數字 1 的分類）", a: "34 個", d: ["35 個", "15 個", "36 個"] },
+            { q: "25 和甲數是兩個不同的數，它們的 H.C.F. 是 25，甲數可能是以下哪一個數？", a: "50", d: ["5", "15", "25"] }
+          ];
+          deepFM.forEach(it => addQuestion(it.q, it.a, it.d));
+        }
       }
+
       return shuffleArray(pool);
     }
 
@@ -750,7 +938,7 @@
 
     function updateUnitLockAndLabels() {
       const meta = UNIT_META[currentUnitId] || { name: currentUnitId, file: "index.html" };
-      document.getElementById("lobby-unit-title").textContent = `${meta.name} — 999題無限挑戰`;
+      document.getElementById("lobby-unit-title").textContent = `${meta.name} — 三級進階挑戰`;
       document.getElementById("lb-unit-badge").textContent = currentUnitId;
       document.getElementById("go-basic-link").href = meta.file;
 
@@ -780,13 +968,13 @@
     }
 
     // =========================================================
-    // 180 秒競速挑戰核心流程
+    // 180 秒三級進階競速流程（第1-15題淺、第16-30題中、第31題+深）
     // =========================================================
     function startChallenge() {
       if (!isUnitUnlocked) return;
       clearInterval(timerHandle);
 
-      questionPool = build999QuestionPool(currentUnitId);
+      questionQueue = buildTieredQuestionQueue(currentUnitId);
       qCursor = 0;
       score = 0;
       correctCount = 0;
@@ -822,13 +1010,26 @@
     }
 
     function renderChallengeQuestion() {
-      if (qCursor >= questionPool.length) {
-        questionPool = questionPool.concat(build999QuestionPool(currentUnitId));
+      if (qCursor >= questionQueue.length) {
+        questionQueue = questionQueue.concat(generateTierPool(currentUnitId, "hard", 40));
       }
-      const q = questionPool[qCursor];
+      const q = questionQueue[qCursor];
+      const qNum = qCursor + 1;
       isTransitioning = false;
 
-      document.getElementById("play-q-tag").textContent = `第 ${qCursor + 1} / 999 題`;
+      document.getElementById("play-q-tag").textContent = `第 ${qNum} 題`;
+      const tierBadge = document.getElementById("play-tier-badge");
+      if (qNum <= 15) {
+        tierBadge.textContent = "🌱 淺程度（第 1–15 題）";
+        tierBadge.className = "px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-black";
+      } else if (qNum <= 30) {
+        tierBadge.textContent = "🔥 中程度（第 16–30 題）";
+        tierBadge.className = "px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-black";
+      } else {
+        tierBadge.textContent = "👑 深程度（第 31 題+）";
+        tierBadge.className = "px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-800 text-xs font-black";
+      }
+
       document.getElementById("play-q-prompt").textContent = q.prompt;
 
       const figEl = document.getElementById("play-q-figure");
@@ -865,7 +1066,7 @@
       if (!isPlaying || isTransitioning) return;
       isTransitioning = true;
 
-      const q = questionPool[qCursor];
+      const q = questionQueue[qCursor];
       const isRight = (chosenIdx === q.correctIndex);
       const fb = document.getElementById("play-feedback");
 
@@ -905,7 +1106,6 @@
       }, isRight ? 420 : 950);
     }
 
-    // 支援鍵盤 1-4 快速選題
     window.addEventListener("keydown", (e) => {
       if (!isPlaying || isTransitioning) return;
       if (["1", "2", "3", "4"].includes(e.key)) {

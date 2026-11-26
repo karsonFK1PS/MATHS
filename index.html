@@ -295,8 +295,8 @@
       { unitId: "4A_U2", term: "4上A", unitName: "單元二：四邊形", topicCode: "4S1 四邊形(三)", lessons: "第4-5課", totalQuestions: 18, status: "開放中" },
       { unitId: "4A_U3", term: "4上A", unitName: "單元三：除法", topicCode: "4N2 除法(二)", lessons: "第6-9課", totalQuestions: 30, status: "籌備中" },
       { unitId: "4A_E1", term: "4上A", unitName: "增潤：分類圖表", topicCode: "4E2 分類圖表", lessons: "第10課", totalQuestions: 15, status: "籌備中" },
-      { unitId: "4B_U4", term: "4上B", unitName: "單元四：方向", topicCode: "4S3 方向和位置(三)", lessons: "第11-12課", totalQuestions: 20, status: "籌備中" },
-      { unitId: "4B_U5", term: "4上B", unitName: "單元五：倍數和因數", topicCode: "4N3, 4N4", lessons: "第13-17課", totalQuestions: 30, status: "籌備中" },
+      { unitId: "4B_U4", term: "4上B", unitName: "單元四：方向", topicCode: "4S3 方向和位置(三)", lessons: "第11-12課", totalQuestions: 19, status: "籌備中" },
+      { unitId: "4B_U5", term: "4上B", unitName: "單元五：倍數和因數", topicCode: "4N3, 4N4", lessons: "第13-17課", totalQuestions: 24, status: "籌備中" },
       { unitId: "4B_U6", term: "4上B", unitName: "單元六：圖形分割和拼砌", topicCode: "4S2 圖形分割和拼砌", lessons: "第18-19課", totalQuestions: 20, status: "籌備中" },
       { unitId: "4B_E2", term: "4上B", unitName: "增潤：一筆畫", topicCode: "4E1 一筆畫", lessons: "第20課", totalQuestions: 15, status: "籌備中" },
       { unitId: "4BA_U1", term: "4下A", unitName: "單元一：四則運算", topicCode: "4N5 四則運算(二)", lessons: "第1-4課", totalQuestions: 30, status: "籌備中" },
@@ -306,6 +306,8 @@
       { unitId: "4BB_U5", term: "4下B", unitName: "單元五：小數", topicCode: "4N7, 4N8", lessons: "第18-21課", totalQuestions: 30, status: "籌備中" },
       { unitId: "4BB_U6", term: "4下B", unitName: "單元六：棒形圖", topicCode: "4D1 棒形圖(二)", lessons: "第22-23課", totalQuestions: 20, status: "籌備中" }
     ];
+
+    const CHALLENGE_UNITS = ["4A_U1", "4A_U2", "4A_U3", "4B_U4", "4B_U5"];
 
     let currentUser = null;
     let unitsData = [...DEFAULT_UNITS];
@@ -376,12 +378,12 @@
 
       if (isTeacher) {
         document.getElementById("user-welcome-title").textContent = `${currentUser.name}（教師帳號）`;
-        document.getElementById("user-welcome-sub").textContent = "您可直接檢視全級各單元的學生完成率、平均分與錯題分析，亦可點選任何單元預覽題目。";
+        document.getElementById("user-welcome-sub").textContent = "您可直接檢視全級各單元的學生完成率、平均分與錯題分析，亦可點選任何單元預覽題目或試玩挑戰賽。";
         document.getElementById("teacher-analytics-section").classList.remove("hidden");
       } else {
         const numStr = currentUser.classNum ? ` (${currentUser.classNum}號)` : "";
         document.getElementById("user-welcome-title").textContent = `${currentUser.className} 班${numStr} ${currentUser.name}`;
-        document.getElementById("user-welcome-sub").textContent = "點擊下方「開放中」的課題卡片即可直接開始、繼續或再次練習，無需重複輸入密碼！";
+        document.getElementById("user-welcome-sub").textContent = "點擊下方「開放中」的課題卡片即可直接開始、繼續或再次練習，完成基礎任務後更可解鎖 180 秒限時挑戰榜！";
         document.getElementById("teacher-analytics-section").classList.add("hidden");
       }
     }
@@ -567,6 +569,7 @@
         const isCompleted = Boolean(prog && prog.isCompleted === true);
         const isInProgress = !isCompleted && Boolean(prog && (Number(prog.currentQ) > 1 || Number(prog.totalAttempts) > 0));
         const targetFile = UNIT_FILE_MAP[u.unitId] || `${u.unitId}.html`;
+        const hasChallenge = CHALLENGE_UNITS.includes(u.unitId);
 
         let statusBadgeHtml = "";
         if (isCompleted) {
@@ -600,17 +603,33 @@
         let actionBtnHtml = "";
         if (isTeacher) {
           actionBtnHtml = `
-            <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', false)"
-                    class="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-sm shadow transition">
-              👨‍🏫 教師預覽與快速選題 →
-            </button>
+            <div class="space-y-2">
+              <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', false)"
+                      class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-sm shadow transition">
+                👨‍🏫 教師預覽與快速選題 →
+              </button>
+              ${hasChallenge ? `
+                <a href="challenge.html?unit=${u.unitId}"
+                   class="block text-center w-full py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-black text-xs transition">
+                  🏆 180秒無限挑戰與排行榜（教師試玩）
+                </a>
+              ` : ""}
+            </div>
           `;
         } else if (isCompleted) {
           actionBtnHtml = `
-            <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', true)"
-                    class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow transition">
-              ↻ 再次開始練習
-            </button>
+            <div class="space-y-2">
+              ${hasChallenge ? `
+                <a href="challenge.html?unit=${u.unitId}"
+                   class="block text-center w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-sm shadow transition">
+                  🏆 限時挑戰榜（180秒競速）→
+                </a>
+              ` : ""}
+              <button type="button" onclick="openUnitPage('${u.unitId}', '${targetFile}', true)"
+                      class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow transition">
+                ↻ 再次開始練習
+              </button>
+            </div>
           `;
         } else if (isInProgress) {
           actionBtnHtml = `
@@ -665,7 +684,7 @@
       });
     }
 
-   async function openUnitPage(unitId, filename, isRestart) {
+    async function openUnitPage(unitId, filename, isRestart) {
       if (isRestart && currentUser && currentUser.role !== "teacher") {
         // 先寫入本地狀態為「進行中第 1 題」，避免返回時快取仍顯示已完成
         progressMap[unitId] = {
@@ -916,7 +935,8 @@
         lines.push([stu.className, stu.classNum, stu.name, stu.account, unitId, statusTxt, firstTry, totalQ, attempts, wrongList, updatedAt].join(","));
       });
 
-      const csvText = lines.join("\n");
+      const csvText = lines.join("
+");
       const blob = new Blob(["﻿" + csvText], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

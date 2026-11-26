@@ -109,9 +109,9 @@
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div class="space-y-2">
           <div class="flex flex-wrap items-center gap-2">
-            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">第 1–15 題：淺程度</span>
-            <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">第 16–30 題：中程度</span>
-            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-black">第 31 題起：深程度</span>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">第 1–6 題：初階 (+80分)</span>
+            <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">第 7–12 題：中階 (+120分)</span>
+            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-black">第 13 題起：高階 (+180分)</span>
             <span id="teacher-test-badge" class="hidden px-3 py-1 rounded-full bg-slate-800 text-amber-300 text-xs font-black">👨‍🏫 教師試玩模式（不入榜）</span>
           </div>
           <div class="flex flex-wrap items-center gap-3 pt-1">
@@ -126,7 +126,7 @@
             </select>
           </div>
           <p class="text-xs sm:text-sm text-slate-600 font-medium">
-            限時 <strong class="text-indigo-700">60 秒</strong>：答對 <strong class="text-emerald-700">+100 分</strong>（連擊 3 題起額外 <strong class="text-amber-600">+20 分</strong>），答錯扣 <strong class="text-rose-600">50 分</strong>並鎖定冷卻 2.5 秒；<strong class="text-indigo-700">準確率達 60% 或以上</strong>方可登上榮譽榜。
+            限時 <strong class="text-indigo-700">60 秒</strong>：初階 <strong class="text-emerald-700">+80 分</strong>、中階 <strong class="text-amber-700">+120 分</strong>、高階 <strong class="text-rose-700">+180 分</strong>（連擊 3 題起額外 <strong class="text-amber-600">+20 分</strong>），答錯扣 <strong class="text-rose-600">50 分</strong>並冷卻 2.5 秒；<strong class="text-indigo-700">準確率達 60% 或以上</strong>方可上榜。
           </p>
         </div>
 
@@ -154,13 +154,6 @@
       </div>
     </section>
 
-
-    <!-- 題庫生成與糾錯提示 -->
-    <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-sm font-black shadow-md flex items-center gap-2.5">
-      <span class="text-lg shrink-0">⚠️</span>
-      <span>提示：題目由AI系統自動生成。若遇到答案出錯，請先截圖保存，再通知老師修正。</span>
-    </div>
-
     <!-- 遊戲主舞台 ＋ 右側即時排行榜 -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
@@ -180,19 +173,19 @@
           </div>
           <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto text-center">
             <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200">
-              <div class="text-xs font-black text-emerald-700">第 1 – 15 題</div>
-              <div class="text-lg font-black text-emerald-950 mt-0.5">🌱 淺程度</div>
+              <div class="text-xs font-black text-emerald-700">第 1 – 6 題</div>
+              <div class="text-lg font-black text-emerald-950 mt-0.5">🌱 初階 (+80)</div>
               <div class="text-[11px] text-emerald-700 mt-0.5">基礎概念熱身</div>
             </div>
             <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200">
-              <div class="text-xs font-black text-amber-700">第 16 – 30 題</div>
-              <div class="text-lg font-black text-amber-950 mt-0.5">🔥 中程度</div>
+              <div class="text-xs font-black text-amber-700">第 7 – 12 題</div>
+              <div class="text-lg font-black text-amber-950 mt-0.5">🔥 中階 (+120)</div>
               <div class="text-[11px] text-amber-700 mt-0.5">進階運算辨析</div>
             </div>
             <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200">
-              <div class="text-xs font-black text-rose-700">第 31 題以上</div>
-              <div class="text-lg font-black text-rose-950 mt-0.5">👑 深程度</div>
-              <div class="text-[11px] text-rose-700 mt-0.5">高階逆向推理</div>
+              <div class="text-xs font-black text-rose-700">第 13 題以上</div>
+              <div class="text-lg font-black text-rose-950 mt-0.5">👑 高階 (+180)</div>
+              <div class="text-[11px] text-rose-700 mt-0.5">最高得分挑戰</div>
             </div>
           </div>
         </div>
@@ -217,6 +210,12 @@
               <div class="text-[11px] text-slate-400 font-bold">連擊 Combo</div>
               <div id="hud-combo" class="text-xl font-black text-amber-300 mt-0.5">0</div>
             </div>
+          </div>
+
+          <!-- 題庫生成與糾錯提示（計時與分數下方、題目上方，放大字體） -->
+          <div class="px-4 py-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-base sm:text-lg font-black flex items-center gap-2.5 shadow-sm">
+            <span class="text-xl shrink-0">⚠️</span>
+            <span>提示：題目由AI系統自動生成。若遇到答案出錯，請先截圖保存，再通知老師修正。</span>
           </div>
 
           <!-- 題目顯示區 -->
@@ -428,17 +427,17 @@
 
     // =========================================================
     // 三級進階題庫產生器（緊扣工作紙重點、無灌水編號、全自動驗算）
-    // tier: 'easy' (第1-15題), 'medium' (第16-30題), 'hard' (第31題+)
+    // tier: 'easy' (第1-6題), 'medium' (第7-12題), 'hard' (第13題+)
     // =========================================================
     function buildTieredQuestionQueue(unitId) {
       const easyPool = generateTierPool(unitId, "easy", 60);
       const mediumPool = generateTierPool(unitId, "medium", 60);
       const hardPool = generateTierPool(unitId, "hard", 80);
 
-      // 第 1-15 題必為淺、第 16-30 題必為中、第 31 題起必為深
+      // 第 1-6 題必為初階、第 7-12 題必為中階、第 13 題起必為高階
       return [
-        ...easyPool.slice(0, 15),
-        ...mediumPool.slice(0, 15),
+        ...easyPool.slice(0, 6),
+        ...mediumPool.slice(0, 6),
         ...hardPool
       ];
     }
@@ -450,7 +449,6 @@
       const addQuestion = (prompt, correctAnswer, distractors, figureHtml = null) => {
         if (seenPrompts.has(prompt)) return;
         const { options, correctIndex } = buildVerifiedOptions(correctAnswer, distractors);
-        // 雙重確認：選項無重複且正解索引精確匹配
         if (new Set(options).size !== options.length) return;
         if (options[correctIndex] !== String(correctAnswer)) return;
 
@@ -459,7 +457,6 @@
       };
 
       if (unitId === "4A_U1") {
-        // --- 單元一：乘法 ---
         if (tier === "easy") {
           for (let a = 12; a <= 48; a += 3) {
             const b = (a % 7) + 2;
@@ -513,9 +510,7 @@
           }
         }
       } else if (unitId === "4A_U2") {
-        // --- 單元二：四邊形（參考 4上A 第4課《菱形》及第5課《四邊形之間的關係》工作紙，不含周界，多設 SVG 圖形題） ---
         const buildRhombusSideSVG = (sideVal, highlightEdge) => {
-          // 菱形頂點 A(120,28) 上, B(55,88) 左, C(120,148) 下, D(185,88) 右
           const isAB = highlightEdge === "AB";
           const isBC = highlightEdge === "BC";
           const isCD = highlightEdge === "CD";
@@ -539,7 +534,6 @@
         };
 
         const buildParallelEdgesSVG = (askSide) => {
-          // 四邊形 PQRS：P(70,35), S(185,35), R(160,135), Q(45,135) -> PS 平行 QR，PQ 平行 SR
           const hlPS = askSide === "PS";
           const hlPQ = askSide === "PQ";
           return `
@@ -556,9 +550,6 @@
         };
 
         const buildGeoboardRhombusSVG = (variantIdx) => {
-          // 5x5 釘板網格：x = 45 + c*35 (c=0..4), y = 25 + r*32 (r=0..4)
-          // variant 0: 菱形 P(c=2,r=0), S(c=4,r=2), T(c=2,r=4), R(c=0,r=2) -> 2x2 斜菱形，四邊相等
-          // variant 1: 菱形 A(c=2,r=0), B(c=3,r=2), C(c=1,r=1), D(c=0,r=3) -> 參考工作紙釘板菱形
           const gx = c => 45 + c * 35;
           const gy = r => 25 + r * 32;
           let dots = '';
@@ -580,7 +571,6 @@
               </svg>
             `;
           } else {
-            // A(3,0), B(1,1), C(1,3), D(3,2) -> dx=-2, dy=+1 (length sqrt(5)), dx=0, dy=+2 (length 2) -> let's use exact rhombus A(2,0), B(4,1), C(2,2), D(0,1)
             const pts = `${gx(2)},${gy(0)} ${gx(4)},${gy(1)} ${gx(2)},${gy(2)} ${gx(0)},${gy(1)}`;
             return `
               <svg viewBox="0 0 230 175" class="w-56 h-40 bg-white rounded-2xl border border-slate-200 shadow-sm">
@@ -596,7 +586,6 @@
         };
 
         const buildShapeCardSVG = (kind) => {
-          // kind: 'rhombus' | 'rect' | 'square' | 'parallelogram' | 'trapezoid'
           if (kind === "rhombus") {
             return `<svg viewBox="0 0 220 140" class="w-52 h-32 bg-white rounded-2xl border border-slate-200 shadow-sm"><polygon points="110,18 182,70 110,122 38,70" fill="#dbeafe" stroke="#1e40af" stroke-width="2.5"/></svg>`;
           }
@@ -613,7 +602,6 @@
         };
 
         if (tier === "easy") {
-          // 淺程度：不用直尺度量看圖寫邊長、辨認菱形與四邊形基本特徵
           for (let s = 2; s <= 15; s++) {
             const edge = ["BC", "CD", "DA", "AB"][s % 4];
             addQuestion(
@@ -630,7 +618,6 @@
           addQuestion("觀察下圖，這是一個甚麼平面圖形？", "梯形", ["正方形", "長方形", "菱形"], buildShapeCardSVG("trapezoid"));
           addQuestion("菱形的四條邊長度有甚麼關係？", "四條邊長度相等", ["只有兩條邊相等", "四條邊都不相等", "只有上下邊相等"]);
         } else if (tier === "medium") {
-          // 中程度：看圖找互相平行的邊、工作紙四邊形之間的關係（正方形／長方形／菱形／平行四邊形）
           addQuestion(
             "觀察下圖四邊形 PQRS，哪一條邊與 PS 互相平行？",
             "QR",
@@ -670,7 +657,6 @@
             );
           }
         } else {
-          // 深程度：釘板圖形辨認、幾何條組配與四邊形包含關係深度辨析
           addQuestion(
             "觀察下圖釘板上的四邊形 PRST，它屬於哪一種平面圖形？",
             "菱形",
@@ -700,7 +686,6 @@
           deepQuadQs.forEach(it => addQuestion(it.q, it.a, it.d));
         }
       } else if (unitId === "4A_U3") {
-        // --- 單元三：除法 ---
         if (tier === "easy") {
           for (let d = 10; d <= 50; d += 10) {
             for (let q = 3; q <= 9; q++) {
@@ -754,7 +739,6 @@
           }
         }
       } else if (unitId === "4B_U4") {
-        // --- 單元四：方向（緊扣工作紙八方位、旋轉方位盤、直角轉向） ---
         const DIRS = ["北", "東北", "東", "東南", "南", "西南", "西", "西北"];
         const buildQuestionForNorth = (northIdx) => {
           const northDeg = northIdx * 45;
@@ -763,9 +747,8 @@
             const ans = DIRS[offset];
             const distractors = shuffleArray(DIRS.filter(d => d !== ans)).slice(0, 3).map(d => `${d}方`);
             const svg = buildChallengeCompassSVG(northDeg, targetDeg);
-            const northLabel = northIdx === 0 ? "正上方" : `${DIRS[northIdx]}方位置（見紅色箭頭）`;
             addQuestion(
-              `觀察下圖方位盤（紅色箭頭指着「北」方），藍色問號（？）代表哪一個方向？（方位盤 #${northIdx}-${offset}）`.replace(/（方位盤 #\d+-\d+）/, ""),
+              `觀察下圖方位盤（紅色箭頭指着「北」方），藍色問號（？）代表哪一個方向？`,
               `${ans}方`,
               distractors,
               svg
@@ -774,7 +757,6 @@
         };
 
         if (tier === "easy") {
-          // 淺：標準上北（0°）方位盤 + 從四正方向轉 1 個直角
           buildQuestionForNorth(0);
           [0, 2, 4, 6].forEach(startIdx => {
             [true, false].forEach(turnRight => {
@@ -796,7 +778,6 @@
           ];
           betweenQs.forEach(it => addQuestion(it.q, it.a, it.d));
         } else if (tier === "medium") {
-          // 中：正交旋轉方位盤（北在正右 90°、正下 180°、正左 270°）+ 從斜向轉 1 或 2 個直角
           [2, 4, 6].forEach(nIdx => buildQuestionForNorth(nIdx));
           [1, 3, 5, 7].forEach(startIdx => {
             [true, false].forEach(turnRight => {
@@ -821,10 +802,9 @@
             );
           });
         } else {
-          // 深：斜向旋轉方位盤（北在右上 45°、右下 135°、左下 225°、左上 315°）+ 連續兩步轉向
           [1, 3, 5, 7].forEach(nIdx => buildQuestionForNorth(nIdx));
           DIRS.forEach((d, startIdx) => {
-            const endIdx = (startIdx + 2 - 4 + 8) % 8; // 右轉1個直角(+2)，再左轉2個直角(-4)
+            const endIdx = (startIdx + 2 - 4 + 8) % 8;
             const ans = DIRS[endIdx];
             const distractors = shuffleArray(DIRS.filter(x => x !== ans)).slice(0, 3).map(x => `${x}方`);
             addQuestion(
@@ -835,7 +815,6 @@
           });
         }
       } else {
-        // --- 單元五：倍數和因數（緊扣工作紙第 14–17 課） ---
         if (tier === "easy") {
           [16, 20, 24, 30, 36, 42, 48, 54, 60, 72, 84, 99].forEach(n => {
             addQuestion(`${n} 的「最小因數」是多少？`, 1, [2, n, 0]);
@@ -872,7 +851,6 @@
             addQuestion(`小心陷阱數！${n} 是一個質數還是合成數？`, p ? "質數" : "合成數", [p ? "合成數" : "質數", "既不是質數也不是合成數"]);
           });
         } else {
-          // 深程度：工作紙高思考逆向推理題
           const deepFM = [
             { q: "某數的最大因數是 56，這個數和 40 的最大公因數（H.C.F.）是多少？", a: "8", d: ["4", "16", "40"] },
             { q: "某數的最大因數是 48，這個數和 36 的最大公因數（H.C.F.）是多少？", a: "12", d: ["6", "24", "36"] },
@@ -1100,9 +1078,6 @@
       document.getElementById(`stage-${stageName}`).classList.remove("hidden");
     }
 
-    // =========================================================
-    // 60 秒三級進階競速流程（第1-15題淺、第16-30題中、第31題+深）
-    // =========================================================
     function startChallenge() {
       if (!isUnitUnlocked) return;
       clearInterval(timerHandle);
@@ -1155,14 +1130,14 @@
 
       document.getElementById("play-q-tag").textContent = `第 ${qNum} 題`;
       const tierBadge = document.getElementById("play-tier-badge");
-      if (qNum <= 15) {
-        tierBadge.textContent = "🌱 淺程度（第 1–15 題）";
+      if (qNum <= 6) {
+        tierBadge.textContent = "🌱 初階（第 1–6 題 ‧ +80分）";
         tierBadge.className = "px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-black";
-      } else if (qNum <= 30) {
-        tierBadge.textContent = "🔥 中程度（第 16–30 題）";
+      } else if (qNum <= 12) {
+        tierBadge.textContent = "🔥 中階（第 7–12 題 ‧ +120分）";
         tierBadge.className = "px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-black";
       } else {
-        tierBadge.textContent = "👑 深程度（第 31 題+）";
+        tierBadge.textContent = "👑 高階（第 13 題+ ‧ +180分）";
         tierBadge.className = "px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-800 text-xs font-black";
       }
 
@@ -1215,15 +1190,17 @@
         combo++;
         wrongStreak = 0;
         correctCount++;
+        const qNumNow = qCursor + 1;
+        const basePts = qNumNow <= 6 ? 80 : (qNumNow <= 12 ? 120 : 180);
         const bonus = combo >= 3 ? 20 : 0;
-        const gained = 100 + bonus;
+        const gained = basePts + bonus;
         score += gained;
 
         document.getElementById(`c-opt-${chosenIdx}`).classList.add("opt-correct");
         fb.className = "h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-emerald-100 text-emerald-900";
         fb.textContent = bonus > 0
-          ? `🎉 答對！+${gained} 分（含連擊獎勵 +20 分）`
-          : `✅ 答對！+100 分`;
+          ? `🎉 答對！+${gained} 分（基礎 ${basePts} 分 + 連擊 +20 分）`
+          : `✅ 答對！+${basePts} 分`;
       } else {
         combo = 0;
         wrongStreak++;
@@ -1320,9 +1297,6 @@
       }
     }
 
-    // =========================================================
-    // 排行榜載入、篩選與教師重置（密碼 FK1PS）
-    // =========================================================
     async function loadLeaderboard(showLoading) {
       const tbody = document.getElementById("lb-tbody");
       if (showLoading) {

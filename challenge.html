@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>鳳溪第一小學 小四數學科 — 180秒無限挑戰賽與排行榜</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      user-select: none;
+    }
+    .opt-btn {
+      transition: all 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .opt-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.25);
+    }
+    .opt-correct {
+      background-color: #16a34a !important;
+      color: #ffffff !important;
+      border-color: #15803d !important;
+    }
+    .opt-wrong {
+      background-color: #dc2626 !important;
+      color: #ffffff !important;
+      border-color: #b91c1c !important;
+      animation: shake 0.3s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    @keyframes pulseFast {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+    .timer-urgent {
+      animation: pulseFast 0.6s infinite;
+      color: #ef4444 !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+  <!-- 頂部導覽列 -->
+  <header class="bg-slate-900/90 backdrop-blur-md border-b border-white/10 text-white sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-bold transition">
+          <span>← 返回課題目錄</span>
+        </a>
+        <div>
+          <span class="text-xs uppercase tracking-wider text-amber-300 font-black block">FK1PS MATH ARENA ‧ 999題庫隨機競速</span>
+          <h1 class="text-lg sm:text-xl font-black tracking-wide">🏆 180秒無限挑戰賽與榮譽排行榜</h1>
+        </div>
+      </div>
+
+      <div id="header-user-box" class="hidden flex items-center gap-3">
+        <div class="text-right">
+          <div id="hdr-user-name" class="text-sm font-black text-white">學生姓名</div>
+          <div id="hdr-user-meta" class="text-xs text-indigo-300">班別學號</div>
+        </div>
+        <button onclick="handleLogout()" class="px-3 py-1.5 rounded-xl bg-rose-500/80 hover:bg-rose-500 text-xs font-bold transition">
+          登出
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. 獨立登入畫面（若未從 index.html SSO 登入則顯示） -->
+  <main id="login-view" class="hidden flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3 text-3xl font-black">
+          🏆
+        </div>
+        <h2 class="text-2xl font-black text-slate-900">登入進入無限挑戰賽</h2>
+        <p class="text-sm text-slate-500 mt-1">完成基礎任務即可解鎖對應單元的 180 秒競速挑戰！</p>
+      </div>
+      <form action="javascript:void(0);" onsubmit="handleDirectLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">校內帳號</label>
+          <input type="text" id="login-acc" required placeholder="例如：B23001@fk1ps.hk"
+                 class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-500 outline-none font-medium" />
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">密碼</label>
+          <input type="password" id="login-pwd" required placeholder="請輸入密碼"
+                 class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-500 outline-none font-medium" />
+        </div>
+        <div id="login-err" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold"></div>
+        <button type="submit" id="login-btn" class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black shadow-lg transition">
+          登入挑戰賽 →
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- 2. 主挑戰與排行榜大廳 -->
+  <main id="arena-view" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+
+    <!-- 單元選擇與規則橫幅 -->
+    <section class="bg-white/95 backdrop-blur rounded-3xl p-6 shadow-xl border border-white/20">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div class="space-y-2">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">⚡ 999題隨機題池</span>
+            <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-black">⏱ 限時 180 秒</span>
+            <span id="teacher-test-badge" class="hidden px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-black">👨‍🏫 教師試玩模式（不入榜）</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <label for="unit-selector" class="text-sm font-black text-slate-600">選擇挑戰單元：</label>
+            <select id="unit-selector" onchange="onUnitChange()"
+                    class="px-4 py-2.5 rounded-xl border-2 border-indigo-200 bg-indigo-50/50 text-indigo-950 font-black text-base focus:border-indigo-600 outline-none">
+              <option value="4A_U1">4A_U1 單元一：乘法</option>
+              <option value="4A_U2">4A_U2 單元二：四邊形</option>
+              <option value="4A_U3">4A_U3 單元三：除法</option>
+              <option value="4B_U4">4B_U4 單元四：方向</option>
+              <option value="4B_U5">4B_U5 單元五：倍數和因數</option>
+            </select>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 font-medium">
+            計分規則：每答對 1 題得 <strong class="text-emerald-700">+100 分</strong>，連續答對 3 題起啟動連擊獎勵（每題額外 <strong class="text-amber-600">+20 分</strong>），答錯扣 <strong class="text-rose-600">20 分</strong>（最低 0 分）並自動進入下一題。排行榜保留個人最高分（同分則用時較短者優先）。
+          </p>
+        </div>
+
+        <div class="shrink-0 flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-2.5">
+          <div class="px-4 py-2 rounded-2xl bg-slate-100 border border-slate-200 text-right">
+            <div class="text-[11px] font-bold text-slate-500">本單元個人最佳紀錄</div>
+            <div id="my-best-record" class="text-lg font-black text-indigo-700">暫無紀錄</div>
+          </div>
+          <button id="start-challenge-btn" onclick="startChallenge()"
+                  class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-base shadow-lg shadow-orange-500/30 transition">
+            🚀 立即開始 180 秒挑戰
+          </button>
+        </div>
+      </div>
+
+      <!-- 未解鎖提示橫幅 -->
+      <div id="locked-warning" class="hidden mt-4 p-4 rounded-2xl bg-rose-50 border-2 border-rose-200 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 text-rose-800 font-bold text-sm">
+          <span class="text-xl">🔒</span>
+          <span>你尚未完成此單元的「基礎練習任務」，完成後即可自動解鎖無限挑戰模式！</span>
+        </div>
+        <a id="go-basic-link" href="index.html" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black transition">
+          前往完成基礎練習 →
+        </a>
+      </div>
+    </section>
+
+    <!-- 遊戲主舞台（未開始／進行中／結算）＋ 右側即時排行榜 -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- 左側 7 欄：競速答題區 -->
+      <section class="lg:col-span-7 bg-white rounded-3xl shadow-xl p-6 sm:p-8 min-h-[430px] flex flex-col justify-between">
+
+        <!-- 狀態 A：待機說明畫面 -->
+        <div id="stage-lobby" class="my-auto text-center py-8 space-y-5">
+          <div class="w-20 h-20 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-4xl font-black border border-indigo-100">
+            ⚡
+          </div>
+          <div>
+            <h2 id="lobby-unit-title" class="text-2xl font-black text-slate-900">單元一：乘法 — 999題無限挑戰</h2>
+            <p class="text-sm text-slate-500 mt-1.5 max-w-md mx-auto">
+              系統已準備好 999 道隨機數學題目。每次挑戰皆從第 1 題起算、隨機抽題並打亂選項次序，看看你在 180 秒內能衝上第幾名！
+            </p>
+          </div>
+          <div class="grid grid-cols-3 gap-3 max-w-md mx-auto text-center">
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-xs font-bold text-slate-500">挑戰時間</div>
+              <div class="text-xl font-black text-indigo-700 mt-0.5">180 秒</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-xs font-bold text-slate-500">題庫容量</div>
+              <div class="text-xl font-black text-emerald-700 mt-0.5">999 題</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+              <div class="text-xs font-bold text-slate-500">連擊獎勵</div>
+              <div class="text-xl font-black text-amber-600 mt-0.5">+20 分/題</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 狀態 B：180 秒競速作答中 -->
+        <div id="stage-playing" class="hidden space-y-5">
+          <!-- 頂部即時儀表 -->
+          <div class="grid grid-cols-4 gap-2.5 bg-slate-900 text-white p-3.5 rounded-2xl">
+            <div class="text-center">
+              <div class="text-[11px] text-slate-400 font-bold">剩餘時間</div>
+              <div id="hud-timer" class="text-2xl font-black text-amber-400 font-mono">180s</div>
+            </div>
+            <div class="text-center border-l border-white/10">
+              <div class="text-[11px] text-slate-400 font-bold">目前得分</div>
+              <div id="hud-score" class="text-2xl font-black text-emerald-400 font-mono">0</div>
+            </div>
+            <div class="text-center border-l border-white/10">
+              <div class="text-[11px] text-slate-400 font-bold">題號 / 答對</div>
+              <div id="hud-qcount" class="text-xl font-black text-white mt-0.5">第1題 (0對)</div>
+            </div>
+            <div class="text-center border-l border-white/10">
+              <div class="text-[11px] text-slate-400 font-bold">連擊 Combo</div>
+              <div id="hud-combo" class="text-xl font-black text-amber-300 mt-0.5">0 🔥</div>
+            </div>
+          </div>
+
+          <!-- 題目顯示區 -->
+          <div class="p-5 rounded-2xl bg-indigo-50/60 border-2 border-indigo-100">
+            <div class="flex items-center justify-between mb-2">
+              <span id="play-q-tag" class="px-2.5 py-0.5 rounded-md bg-indigo-600 text-white text-xs font-black">第 1 題</span>
+              <span class="text-xs font-bold text-slate-400">點選正確答案（或按鍵盤 1–4）</span>
+            </div>
+            <h3 id="play-q-prompt" class="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
+              題目載入中...
+            </h3>
+            <div id="play-q-figure" class="hidden mt-4 flex justify-center"></div>
+          </div>
+
+          <!-- 4 個隨機洗牌選項 -->
+          <div id="play-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+
+          <!-- 即時回饋條 -->
+          <div id="play-feedback" class="h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-slate-50 text-slate-500">
+            準備作答，把握每一秒！
+          </div>
+
+          <div class="flex justify-end">
+            <button type="button" onclick="finishChallenge(true)" class="text-xs font-bold text-slate-400 hover:text-rose-600 transition">
+              提前結束並結算成績
+            </button>
+          </div>
+        </div>
+
+        <!-- 狀態 C：結算成績畫面 -->
+        <div id="stage-result" class="hidden my-auto text-center py-6 space-y-5">
+          <div class="text-5xl">🎉</div>
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">挑戰時間結束！</h2>
+            <p id="res-subtitle" class="text-sm text-slate-500 font-bold mt-1">成績已自動上傳至雲端排行榜</p>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto">
+            <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+              <div class="text-xs font-bold text-indigo-700">最終得分</div>
+              <div id="res-score" class="text-3xl font-black text-indigo-950 mt-1">0</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+              <div class="text-xs font-bold text-emerald-700">答對題數</div>
+              <div id="res-correct" class="text-3xl font-black text-emerald-950 mt-1">0 題</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+              <div class="text-xs font-bold text-amber-700">挑戰用時</div>
+              <div id="res-time" class="text-3xl font-black text-amber-950 mt-1">180 秒</div>
+            </div>
+          </div>
+
+          <div id="res-upload-status" class="text-xs font-bold text-indigo-600">☁️ 正在同步排行榜名次...</div>
+
+          <div class="flex flex-wrap justify-center gap-3 pt-2">
+            <button onclick="startChallenge()" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black shadow transition">
+              ↻ 再挑戰一次（重新抽題）
+            </button>
+            <a href="index.html" class="px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+              ← 返回課題目錄
+            </a>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 右側 5 欄：單元榮譽排行榜 -->
+      <section class="lg:col-span-5 bg-white rounded-3xl shadow-xl p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="text-lg font-black text-slate-900 flex items-center gap-1.5">
+              <span>🏅 榮譽排行榜</span>
+              <span id="lb-unit-badge" class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-black">4A_U1</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">按最高分排序（同分則用時較短者優先）</p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="loadLeaderboard(true)" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+              🔄 刷新
+            </button>
+            <button type="button" onclick="promptResetLeaderboard()" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition">
+              🗑️ 重置榜單
+            </button>
+          </div>
+        </div>
+
+        <!-- 班別篩選 -->
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-bold text-slate-500">檢視範圍：</span>
+          <select id="lb-class-filter" onchange="renderLeaderboardTable()"
+                  class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 bg-white outline-none">
+            <option value="ALL">全級 Top 20</option>
+          </select>
+        </div>
+
+        <!-- 排行榜列表 -->
+        <div class="overflow-x-auto border border-slate-200 rounded-2xl max-h-[420px] overflow-y-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 bg-slate-100 text-slate-700 text-xs font-black border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3 w-14 text-center">名次</th>
+                <th class="py-2.5 px-3">班別 / 姓名</th>
+                <th class="py-2.5 px-3 text-right">最高分</th>
+                <th class="py-2.5 px-3 text-right">用時</th>
+              </tr>
+            </thead>
+            <tbody id="lb-tbody" class="divide-y divide-slate-100 text-sm">
+              <tr><td colspan="4" class="py-8 text-center text-slate-400 font-bold">正在載入排行榜...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxTcgvuLQ8K0h5-J6UGbTUScrHB5bB90UOaaeBXcp_3pXoUBgl5O7O2TbKyz4n_Bc1a/exec";
+    const CHALLENGE_DURATION = 180; // 180秒
+
+    const UNIT_META = {
+      "4A_U1": { name: "單元一：乘法", file: "4A_U1_multiply.html" },
+      "4A_U2": { name: "單元二：四邊形", file: "4A_U2_quadrilaterals.html" },
+      "4A_U3": { name: "單元三：除法", file: "4A_U3_divide.html" },
+      "4B_U4": { name: "單元四：方向", file: "4B_U4_direction.html" },
+      "4B_U5": { name: "單元五：倍數和因數", file: "4B_U5_factors_multiples.html" }
+    };
+
+    let currentUser = null;
+    let progressMap = {};
+    let currentUnitId = "4A_U1";
+    let isUnitUnlocked = false;
+    let leaderboardRows = [];
+
+    // 遊戲執行狀態
+    let questionPool = [];
+    let qCursor = 0;
+    let score = 0;
+    let correctCount = 0;
+    let combo = 0;
+    let timeLeft = CHALLENGE_DURATION;
+    let timerHandle = null;
+    let isPlaying = false;
+    let isTransitioning = false;
+
+    // =========================================================
+    // 工具函式：Fisher-Yates 隨機洗牌與精準數學運算
+    // =========================================================
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+    function lcm(a, b) { return (a * b) / gcd(a, b); }
+    function isPrime(n) {
+      if (n < 2) return false;
+      for (let i = 2; i * i <= n; i++) if (n % i === 0) return false;
+      return true;
+    }
+    function countFactors(n) {
+      let c = 0;
+      for (let i = 1; i * i <= n; i++) {
+        if (n % i === 0) c += (i * i === n ? 1 : 2);
+      }
+      return c;
+    }
+
+    function makeNumericOptions(correctVal, distractors) {
+      const uniqueSet = new Set([String(correctVal)]);
+      for (const d of distractors) {
+        if (uniqueSet.size >= 4) break;
+        if (d !== null && d !== undefined && String(d) !== String(correctVal)) {
+          uniqueSet.add(String(d));
+        }
+      }
+      let fallback = Number(correctVal) || 10;
+      while (uniqueSet.size < 4) {
+        fallback += 3;
+        uniqueSet.add(String(fallback));
+      }
+      const shuffled = shuffleArray(Array.from(uniqueSet));
+      return { options: shuffled, correctIndex: shuffled.indexOf(String(correctVal)) };
+    }
+
+    // =========================================================
+    // 999題庫確定性數學產生器（保證答案 100% 準確、無重複、隨機抽題）
+    // =========================================================
+    function build999QuestionPool(unitId) {
+      const pool = [];
+      const seenPrompts = new Set();
+
+      const pushUnique = (qObj) => {
+        if (!seenPrompts.has(qObj.prompt)) {
+          seenPrompts.add(qObj.prompt);
+          pool.push(qObj);
+        }
+      };
+
+      let guard = 0;
+      while (pool.length < 999 && guard < 15000) {
+        guard++;
+        const mode = guard % 4;
+
+        if (unitId === "4A_U1") {
+          // 單元一：乘法（兩位×兩位、三位×兩位、巧算 25×4 / 125×8、整十乘法）
+          if (mode === 0) {
+            const a = 12 + (guard % 78);
+            const b = 11 + ((guard * 7) % 88);
+            const ans = a * b;
+            const { options, correctIndex } = makeNumericOptions(ans, [ans + 10, ans - 10, a * (b + 1), (a + 1) * b]);
+            pushUnique({ prompt: `計算：${a} × ${b} = ？`, options, correctIndex });
+          } else if (mode === 1) {
+            const a = 105 + ((guard * 13) % 390);
+            const b = 12 + ((guard * 5) % 35);
+            const ans = a * b;
+            const { options, correctIndex } = makeNumericOptions(ans, [ans + b, ans - b, ans + 100, a * (b - 1)]);
+            pushUnique({ prompt: `計算：${a} × ${b} = ？`, options, correctIndex });
+          } else if (mode === 2) {
+            const k = 3 + (guard % 35);
+            const use25 = (guard % 2 === 0);
+            const ans = use25 ? k * 100 : k * 1000;
+            const prompt = use25 ? `巧算：25 × ${k} × 4 = ？` : `巧算：125 × ${k} × 8 = ？`;
+            const { options, correctIndex } = makeNumericOptions(ans, [ans / 10, ans * 10, (k + 1) * (use25 ? 100 : 1000)]);
+            pushUnique({ prompt, options, correctIndex });
+          } else {
+            const a = (2 + (guard % 8)) * 10;
+            const b = (11 + ((guard * 3) % 85)) * 10;
+            const ans = a * b;
+            const { options, correctIndex } = makeNumericOptions(ans, [ans / 10, ans * 10, ans + 100]);
+            pushUnique({ prompt: `計算：${a} × ${b} = ？`, options, correctIndex });
+          }
+        } else if (unitId === "4A_U2") {
+          // 單元二：四邊形（菱形周界/邊長、四邊形性質與包含關係）
+          if (mode === 0) {
+            const side = 3 + (guard % 45);
+            const peri = side * 4;
+            const { options, correctIndex } = makeNumericOptions(`${peri} cm`, [`${side * 2} cm`, `${side + 4} cm`, `${peri + 4} cm`]);
+            pushUnique({ prompt: `一個菱形的邊長是 ${side} cm，它的周界是多少？`, options, correctIndex });
+          } else if (mode === 1) {
+            const side = 4 + (guard % 40);
+            const peri = side * 4;
+            const { options, correctIndex } = makeNumericOptions(`${side} cm`, [`${side * 2} cm`, `${peri - 4} cm`, `${side + 2} cm`]);
+            pushUnique({ prompt: `已知一個菱形的周界是 ${peri} cm，它的每條邊長多少？`, options, correctIndex });
+          } else if (mode === 2) {
+            const facts = [
+              { q: "「所有正方形皆是菱形」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "只有大正方形才是", "無法判斷"] },
+              { q: "「所有正方形皆是長方形」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "只有斜放時才是", "無法判斷"] },
+              { q: "「所有菱形皆是正方形」這句話是否正確？", a: "✗ 不正確", d: ["✓ 正確", "所有菱形都有直角", "無法判斷"] },
+              { q: "「所有長方形皆是平行四邊形」這句話是否正確？", a: "✓ 正確", d: ["✗ 不正確", "長方形只有一組對邊平行", "無法判斷"] },
+              { q: "「所有菱形皆是長方形」這句話是否正確？", a: "✗ 不正確", d: ["✓ 正確", "菱形必有四個直角", "無法判斷"] },
+              { q: "如果一個菱形的四個角都變成直角，它會成為甚麼圖形？", a: "正方形", d: ["梯形", "一般平行四邊形", "三角形"] },
+              { q: "如果一個平行四邊形的四個角變成直角，它一定是哪一種圖形？", a: "長方形", d: ["梯形", "菱形", "五邊形"] },
+              { q: "下列哪一種四邊形「只有一組對邊平行」？", a: "梯形", d: ["菱形", "平行四邊形", "長方形"] }
+            ];
+            const item = facts[guard % facts.length];
+            const shuffled = shuffleArray([item.a, ...item.d]);
+            pushUnique({ prompt: item.q, options: shuffled, correctIndex: shuffled.indexOf(item.a) });
+          } else {
+            const s1 = 5 + (guard % 20);
+            const s2 = s1 + 4;
+            const { options, correctIndex } = makeNumericOptions(
+              `${s1} cm、${s1} cm、${s1} cm、${s1} cm`,
+              [
+                `${s1} cm、${s1} cm、${s2} cm、${s2} cm`,
+                `${s1} cm、${s2} cm、${s2} cm、${s2 + 2} cm`,
+                `${s1} cm、${s1} cm、${s1} cm、${s2} cm`
+              ]
+            );
+            pushUnique({ prompt: `以下哪一組四枝幾何條可以拼砌出一個菱形？（題型 #${guard}）`, options, correctIndex });
+          }
+        } else if (unitId === "4A_U3") {
+          // 單元三：除法（整除、有餘數除法、連除巧算、2/3/5/10 整除性）
+          if (mode === 0) {
+            const div = 12 + (guard % 45);
+            const q = 4 + ((guard * 3) % 24);
+            const dividend = div * q;
+            const { options, correctIndex } = makeNumericOptions(q, [q + 1, q - 1, q + 2]);
+            pushUnique({ prompt: `計算：${dividend} ÷ ${div} = ？`, options, correctIndex });
+          } else if (mode === 1) {
+            const div = 15 + (guard % 35);
+            const q = 3 + ((guard * 5) % 18);
+            const r = 1 + (guard % (div - 1));
+            const dividend = div * q + r;
+            const ans = `${q} … ${r}`;
+            const { options, correctIndex } = makeNumericOptions(ans, [`${q + 1} … ${r}`, `${q} … ${r + 1}`, `${q - 1} … ${r}`]);
+            pushUnique({ prompt: `計算：${dividend} ÷ ${div} = ？`, options, correctIndex });
+          } else if (mode === 2) {
+            const k = 2 + (guard % 18);
+            const dividend = k * 100;
+            const { options, correctIndex } = makeNumericOptions(k, [k * 10, k + 4, k * 2]);
+            pushUnique({ prompt: `巧算連除：${dividend} ÷ 25 ÷ 4 = ？`, options, correctIndex });
+          } else {
+            const base = 100 + guard;
+            const dChoice = [2, 3, 5, 10][guard % 4];
+            const ok = (base % dChoice === 0);
+            const ans = ok ? "可以整除" : "不可以整除";
+            const d2 = ok ? "不可以整除" : "可以整除";
+            const shuffled = shuffleArray([ans, d2]);
+            pushUnique({ prompt: `判斷整除性：${base} 能否被 ${dChoice} 整除？`, options: shuffled, correctIndex: shuffled.indexOf(ans) });
+          }
+        } else if (unitId === "4B_U4") {
+          // 單元四：方向（動態旋轉方位盤 + 直角轉向）
+          const DIRS = ["北", "東北", "東", "東南", "南", "西南", "西", "西北"];
+          const northIdx = guard % 8;
+          const northDeg = northIdx * 45;
+          if (mode < 2) {
+            const offset = 1 + ((guard * 3) % 7); // 1..7 (45..315 deg clockwise from North)
+            const targetDeg = (northDeg + offset * 45) % 360;
+            const ans = DIRS[offset];
+            const distractors = DIRS.filter(d => d !== ans);
+            const picked = shuffleArray([ans, ...shuffleArray(distractors).slice(0, 3)]);
+            const svg = buildChallengeCompassSVG(northDeg, targetDeg);
+            pushUnique({
+              prompt: `觀察下圖方位盤（紅色箭頭指着「北」方），藍色問號（？）代表哪一個方向？`,
+              figureHtml: svg,
+              options: picked.map(d => `${d}方`),
+              correctIndex: picked.indexOf(ans)
+            });
+          } else {
+            const startIdx = (guard * 5) % 8;
+            const turnRight = (guard % 2 === 0);
+            const rightAngles = 1 + (guard % 2); // 1 or 2 right angles
+            const step = rightAngles * 2 * (turnRight ? 1 : -1);
+            const endIdx = (startIdx + step + 16) % 8;
+            const ans = DIRS[endIdx];
+            const distractors = DIRS.filter(d => d !== ans);
+            const picked = shuffleArray([ans, ...shuffleArray(distractors).slice(0, 3)]);
+            pushUnique({
+              prompt: `某人原本面向「${DIRS[startIdx]}方」，如果他向${turnRight ? '右' : '左'}轉 ${rightAngles} 個直角，會面向哪一個方向？（題 #${guard}）`,
+              options: picked.map(d => `${d}方`),
+              correctIndex: picked.indexOf(ans)
+            });
+          }
+        } else {
+          // 單元五：倍數和因數（因數個數、質數判斷、H.C.F.、L.C.M.）
+          if (mode === 0) {
+            const n = 12 + (guard % 85);
+            const ans = countFactors(n);
+            const { options, correctIndex } = makeNumericOptions(`${ans} 個`, [`${ans + 1} 個`, `${Math.max(2, ans - 1)} 個`, `${ans + 2} 個`]);
+            pushUnique({ prompt: `${n} 共有多少個因數？`, options, correctIndex });
+          } else if (mode === 1) {
+            const n = 11 + (guard % 89);
+            const ans = isPrime(n) ? "質數" : "合成數";
+            const d2 = isPrime(n) ? "合成數" : "質數";
+            const shuffled = shuffleArray([ans, d2, "既不是質數也不是合成數"]);
+            pushUnique({ prompt: `${n} 是一個質數還是合成數？`, options: shuffled, correctIndex: shuffled.indexOf(ans) });
+          } else if (mode === 2) {
+            const a = 6 + (guard % 36);
+            const b = 8 + ((guard * 5) % 40);
+            if (a !== b) {
+              const ans = gcd(a, b);
+              const { options, correctIndex } = makeNumericOptions(ans, [ans * 2, ans + 1, lcm(a, b)]);
+              pushUnique({ prompt: `求 ${a} 和 ${b} 的最大公因數（H.C.F.）。`, options, correctIndex });
+            }
+          } else {
+            const a = 3 + (guard % 16);
+            const b = 4 + ((guard * 3) % 18);
+            if (a !== b) {
+              const ans = lcm(a, b);
+              const { options, correctIndex } = makeNumericOptions(ans, [a * b + a, ans * 2, Math.max(1, ans - a)]);
+              pushUnique({ prompt: `求 ${a} 和 ${b} 的最小公倍數（L.C.M.）。`, options, correctIndex });
+            }
+          }
+        }
+      }
+      return shuffleArray(pool);
+    }
+
+    function buildChallengeCompassSVG(northDeg, targetDeg) {
+      const cx = 130, cy = 115, r = 56;
+      let spokes = '';
+      for (let i = 0; i < 8; i++) {
+        const deg = i * 45;
+        const rad = (deg - 90) * Math.PI / 180;
+        const x2 = cx + r * Math.cos(rad);
+        const y2 = cy + r * Math.sin(rad);
+        const isNorth = (deg === northDeg);
+        const isTarget = (deg === targetDeg);
+        const stroke = isNorth ? "#dc2626" : (isTarget ? "#4f46e5" : "#94a3b8");
+        const w = (isNorth || isTarget) ? 3.5 : 1.8;
+        spokes += `<line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${stroke}" stroke-width="${w}"/>`;
+
+        if (isNorth) {
+          const ax1 = cx + (r - 12) * Math.cos(rad - 0.18), ay1 = cy + (r - 12) * Math.sin(rad - 0.18);
+          const ax2 = cx + (r - 12) * Math.cos(rad + 0.18), ay2 = cy + (r - 12) * Math.sin(rad + 0.18);
+          const lx = cx + (r + 22) * Math.cos(rad), ly = cy + (r + 22) * Math.sin(rad) + 5;
+          spokes += `<polygon points="${x2.toFixed(1)},${y2.toFixed(1)} ${ax1.toFixed(1)},${ay1.toFixed(1)} ${ax2.toFixed(1)},${ay2.toFixed(1)}" fill="#dc2626"/>`;
+          spokes += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" font-size="15" font-weight="900" fill="#dc2626">北</text>`;
+        } else if (isTarget) {
+          const lx = cx + (r + 22) * Math.cos(rad), ly = cy + (r + 22) * Math.sin(rad);
+          spokes += `<rect x="${(lx - 16).toFixed(1)}" y="${(ly - 13).toFixed(1)}" width="32" height="26" rx="6" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>`;
+          spokes += `<text x="${lx.toFixed(1)}" y="${(ly + 6).toFixed(1)}" text-anchor="middle" font-size="15" font-weight="900" fill="#4338ca">?</text>`;
+        }
+      }
+      return `<svg viewBox="0 0 260 230" class="w-56 h-48 bg-white rounded-2xl border border-slate-200 shadow-sm"><circle cx="${cx}" cy="${cy}" r="38" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>${spokes}<circle cx="${cx}" cy="${cy}" r="4" fill="#0f172a"/></svg>`;
+    }
+
+    // =========================================================
+    // 初始化與登入驗證
+    // =========================================================
+    window.addEventListener("DOMContentLoaded", async () => {
+      const params = new URLSearchParams(window.location.search);
+      const uParam = params.get("unit");
+      if (uParam && UNIT_META[uParam]) {
+        currentUnitId = uParam;
+      }
+      const sel = document.getElementById("unit-selector");
+      if (sel) sel.value = currentUnitId;
+
+      const ssoRaw = sessionStorage.getItem("fk1ps_math_user");
+      if (!ssoRaw) {
+        document.getElementById("login-view").classList.remove("hidden");
+        return;
+      }
+
+      try {
+        currentUser = JSON.parse(ssoRaw);
+        if (!currentUser || !currentUser.account) {
+          document.getElementById("login-view").classList.remove("hidden");
+          return;
+        }
+      } catch (e) {
+        document.getElementById("login-view").classList.remove("hidden");
+        return;
+      }
+
+      const cachedProg = sessionStorage.getItem("fk1ps_math_progress");
+      if (cachedProg) {
+        try { progressMap = JSON.parse(cachedProg) || {}; } catch (e) {}
+      }
+
+      enterArenaView();
+      await syncProgressAndLeaderboard();
+    });
+
+    async function handleDirectLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const acc = document.getElementById("login-acc").value.trim();
+      const pwd = document.getElementById("login-pwd").value.trim();
+      const errEl = document.getElementById("login-err");
+      const btn = document.getElementById("login-btn");
+
+      errEl.classList.add("hidden");
+      btn.disabled = true;
+      btn.textContent = "驗證中...";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "login",
+            mode: "portal",
+            account: acc,
+            password: pwd
+          })
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          currentUser = data.user;
+          progressMap = data.progressMap || {};
+          sessionStorage.setItem("fk1ps_math_user", JSON.stringify(currentUser));
+          sessionStorage.setItem("fk1ps_math_progress", JSON.stringify(progressMap));
+          document.getElementById("login-view").classList.add("hidden");
+          enterArenaView();
+          await loadLeaderboard(false);
+        } else {
+          errEl.textContent = data.message || "帳號或密碼錯誤！";
+          errEl.classList.remove("hidden");
+        }
+      } catch (err) {
+        errEl.textContent = "連線失敗，請檢查網絡後重試。";
+        errEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "登入挑戰賽 →";
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem("fk1ps_math_user");
+      window.location.href = "index.html";
+    }
+
+    function enterArenaView() {
+      document.getElementById("arena-view").classList.remove("hidden");
+      document.getElementById("header-user-box").classList.remove("hidden");
+      document.getElementById("hdr-user-name").textContent = currentUser.name;
+      const numStr = currentUser.classNum ? ` (${currentUser.classNum}號)` : "";
+      document.getElementById("hdr-user-meta").textContent =
+        currentUser.role === "teacher" ? "教師帳號" : `${currentUser.className} 班${numStr}`;
+
+      if (currentUser.role === "teacher") {
+        document.getElementById("teacher-test-badge").classList.remove("hidden");
+      }
+      updateUnitLockAndLabels();
+    }
+
+    async function syncProgressAndLeaderboard() {
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "getStudentDashboard",
+            account: currentUser.account
+          })
+        });
+        const data = await res.json();
+        if (data.status === "success" && data.progressMap) {
+          progressMap = data.progressMap;
+          sessionStorage.setItem("fk1ps_math_progress", JSON.stringify(progressMap));
+          updateUnitLockAndLabels();
+        }
+      } catch (e) {}
+      await loadLeaderboard(false);
+    }
+
+    function onUnitChange() {
+      if (isPlaying) {
+        if (!confirm("目前正在進行限時挑戰，切換單元將放棄本局成績，確定要切換嗎？")) {
+          document.getElementById("unit-selector").value = currentUnitId;
+          return;
+        }
+        clearInterval(timerHandle);
+        isPlaying = false;
+      }
+      currentUnitId = document.getElementById("unit-selector").value;
+      const url = new URL(window.location);
+      url.searchParams.set("unit", currentUnitId);
+      window.history.replaceState({}, "", url);
+
+      showStage("lobby");
+      updateUnitLockAndLabels();
+      loadLeaderboard(true);
+    }
+
+    function updateUnitLockAndLabels() {
+      const meta = UNIT_META[currentUnitId] || { name: currentUnitId, file: "index.html" };
+      document.getElementById("lobby-unit-title").textContent = `${meta.name} — 999題無限挑戰`;
+      document.getElementById("lb-unit-badge").textContent = currentUnitId;
+      document.getElementById("go-basic-link").href = meta.file;
+
+      const prog = progressMap[currentUnitId];
+      const completed = Boolean(prog && (prog.isCompleted === true || String(prog.isCompleted).toUpperCase() === "TRUE"));
+      isUnitUnlocked = (currentUser && currentUser.role === "teacher") || completed;
+
+      const startBtn = document.getElementById("start-challenge-btn");
+      const warnBox = document.getElementById("locked-warning");
+
+      if (isUnitUnlocked) {
+        warnBox.classList.add("hidden");
+        startBtn.disabled = false;
+        startBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      } else {
+        warnBox.classList.remove("hidden");
+        startBtn.disabled = true;
+        startBtn.classList.add("opacity-50", "cursor-not-allowed");
+      }
+    }
+
+    function showStage(stageName) {
+      document.getElementById("stage-lobby").classList.add("hidden");
+      document.getElementById("stage-playing").classList.add("hidden");
+      document.getElementById("stage-result").classList.add("hidden");
+      document.getElementById(`stage-${stageName}`).classList.remove("hidden");
+    }
+
+    // =========================================================
+    // 180 秒競速挑戰核心流程
+    // =========================================================
+    function startChallenge() {
+      if (!isUnitUnlocked) return;
+      clearInterval(timerHandle);
+
+      questionPool = build999QuestionPool(currentUnitId);
+      qCursor = 0;
+      score = 0;
+      correctCount = 0;
+      combo = 0;
+      timeLeft = CHALLENGE_DURATION;
+      isPlaying = true;
+      isTransitioning = false;
+
+      showStage("playing");
+      updateHud();
+      renderChallengeQuestion();
+
+      timerHandle = setInterval(() => {
+        timeLeft--;
+        updateHud();
+        if (timeLeft <= 0) {
+          timeLeft = 0;
+          updateHud();
+          finishChallenge(false);
+        }
+      }, 1000);
+    }
+
+    function updateHud() {
+      const tEl = document.getElementById("hud-timer");
+      tEl.textContent = `${timeLeft}s`;
+      if (timeLeft <= 20) tEl.classList.add("timer-urgent");
+      else tEl.classList.remove("timer-urgent");
+
+      document.getElementById("hud-score").textContent = score;
+      document.getElementById("hud-qcount").textContent = `第${qCursor + 1}題 (${correctCount}對)`;
+      document.getElementById("hud-combo").textContent = combo >= 3 ? `${combo} 🔥 (+20)` : `${combo}`;
+    }
+
+    function renderChallengeQuestion() {
+      if (qCursor >= questionPool.length) {
+        questionPool = questionPool.concat(build999QuestionPool(currentUnitId));
+      }
+      const q = questionPool[qCursor];
+      isTransitioning = false;
+
+      document.getElementById("play-q-tag").textContent = `第 ${qCursor + 1} / 999 題`;
+      document.getElementById("play-q-prompt").textContent = q.prompt;
+
+      const figEl = document.getElementById("play-q-figure");
+      if (q.figureHtml) {
+        figEl.innerHTML = q.figureHtml;
+        figEl.classList.remove("hidden");
+      } else {
+        figEl.innerHTML = "";
+        figEl.classList.add("hidden");
+      }
+
+      const grid = document.getElementById("play-options-grid");
+      grid.innerHTML = "";
+      const keys = ["A", "B", "C", "D"];
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.id = `c-opt-${idx}`;
+        btn.className = "opt-btn p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-400 text-left flex items-center gap-3 shadow-sm";
+        btn.onclick = () => submitChallengeOption(idx);
+        btn.innerHTML = `
+          <span class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 font-black text-sm flex items-center justify-center shrink-0">${keys[idx] || idx + 1}</span>
+          <span class="text-lg font-black text-slate-800">${optText}</span>
+        `;
+        grid.appendChild(btn);
+      });
+
+      const fb = document.getElementById("play-feedback");
+      fb.className = "h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-slate-50 text-slate-500";
+      fb.textContent = "請選擇正確答案！";
+    }
+
+    function submitChallengeOption(chosenIdx) {
+      if (!isPlaying || isTransitioning) return;
+      isTransitioning = true;
+
+      const q = questionPool[qCursor];
+      const isRight = (chosenIdx === q.correctIndex);
+      const fb = document.getElementById("play-feedback");
+
+      document.querySelectorAll("#play-options-grid button").forEach(b => b.disabled = true);
+
+      if (isRight) {
+        combo++;
+        correctCount++;
+        const bonus = combo >= 3 ? 20 : 0;
+        const gained = 100 + bonus;
+        score += gained;
+
+        document.getElementById(`c-opt-${chosenIdx}`).classList.add("opt-correct");
+        fb.className = "h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-emerald-100 text-emerald-900";
+        fb.textContent = bonus > 0
+          ? `🎉 答對！+${gained} 分（含連擊獎勵 +20 分）`
+          : `✅ 答對！+100 分`;
+      } else {
+        combo = 0;
+        score = Math.max(0, score - 20);
+
+        document.getElementById(`c-opt-${chosenIdx}`).classList.add("opt-wrong");
+        const rightBtn = document.getElementById(`c-opt-${q.correctIndex}`);
+        if (rightBtn) rightBtn.classList.add("opt-correct");
+
+        fb.className = "h-11 flex items-center justify-center rounded-xl text-sm font-black px-4 bg-rose-100 text-rose-900";
+        fb.textContent = `❌ 答錯（-20 分），正確答案是：${q.options[q.correctIndex]}`;
+      }
+
+      updateHud();
+
+      setTimeout(() => {
+        if (!isPlaying) return;
+        qCursor++;
+        updateHud();
+        renderChallengeQuestion();
+      }, isRight ? 420 : 950);
+    }
+
+    // 支援鍵盤 1-4 快速選題
+    window.addEventListener("keydown", (e) => {
+      if (!isPlaying || isTransitioning) return;
+      if (["1", "2", "3", "4"].includes(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
+        const btn = document.getElementById(`c-opt-${idx}`);
+        if (btn && !btn.disabled) submitChallengeOption(idx);
+      }
+    });
+
+    async function finishChallenge(isEarlyQuit) {
+      clearInterval(timerHandle);
+      isPlaying = false;
+      const timeUsedSec = Math.max(1, CHALLENGE_DURATION - timeLeft);
+
+      showStage("result");
+      document.getElementById("res-score").textContent = `${score} 分`;
+      document.getElementById("res-correct").textContent = `${correctCount} 題`;
+      document.getElementById("res-time").textContent = `${timeUsedSec} 秒`;
+
+      const statusEl = document.getElementById("res-upload-status");
+      if (!currentUser || currentUser.role === "teacher") {
+        statusEl.textContent = "👨‍🏫 教師試玩模式：成績不會寫入學生排行榜";
+        return;
+      }
+
+      statusEl.textContent = "☁️ 正在上傳成績至雲端排行榜...";
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "submitChallengeScore",
+            account: currentUser.account,
+            name: currentUser.name,
+            className: currentUser.className,
+            classNum: currentUser.classNum,
+            unitId: currentUnitId,
+            score: score,
+            timeUsedSec: timeUsedSec,
+            correctCount: correctCount
+          })
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          statusEl.textContent = data.isNewBest
+            ? "🏆 刷新個人最高分紀錄！已更新排行榜！"
+            : "✅ 成績已紀錄（排行榜保留你的更高個人最佳紀錄）";
+          await loadLeaderboard(false);
+        } else {
+          statusEl.textContent = "⚠️ 排行榜同步異常，請稍後按刷新檢查";
+        }
+      } catch (err) {
+        statusEl.textContent = "⚠️ 網絡連線繁忙，未能上傳成績";
+      }
+    }
+
+    // =========================================================
+    // 排行榜載入、篩選與教師重置（密碼 FK1PS）
+    // =========================================================
+    async function loadLeaderboard(showLoading) {
+      const tbody = document.getElementById("lb-tbody");
+      if (showLoading) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-indigo-600 font-bold">🔄 正在更新排行榜...</td></tr>`;
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "getLeaderboard",
+            unitId: currentUnitId
+          })
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          leaderboardRows = Array.isArray(data.leaderboard) ? data.leaderboard : [];
+          populateLbClassFilter();
+          renderLeaderboardTable();
+          updateMyBestDisplay();
+        } else {
+          throw new Error(data.message || "API error");
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-rose-600 font-bold text-xs">⚠️ 無法讀取排行榜，請確認 Code.gs 已更新並重新部署。</td></tr>`;
+      }
+    }
+
+    function populateLbClassFilter() {
+      const sel = document.getElementById("lb-class-filter");
+      const prev = sel.value;
+      const classes = Array.from(new Set(leaderboardRows.map(r => r.className).filter(Boolean))).sort();
+      sel.innerHTML = `<option value="ALL">全級 Top 20 (${leaderboardRows.length}人上榜)</option>`;
+      classes.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = `${c} 班`;
+        sel.appendChild(opt);
+      });
+      if (prev && Array.from(sel.options).some(o => o.value === prev)) sel.value = prev;
+    }
+
+    function updateMyBestDisplay() {
+      const box = document.getElementById("my-best-record");
+      if (!currentUser || currentUser.role === "teacher") {
+        box.textContent = "教師試玩模式";
+        return;
+      }
+      const mine = leaderboardRows.find(r => String(r.account).toLowerCase() === String(currentUser.account).toLowerCase());
+      if (mine) {
+        box.textContent = `${mine.score} 分（${mine.timeUsedSec} 秒）`;
+      } else {
+        box.textContent = "尚未上榜（快來挑戰！）";
+      }
+    }
+
+    function renderLeaderboardTable() {
+      const tbody = document.getElementById("lb-tbody");
+      const clsFilter = document.getElementById("lb-class-filter").value;
+      const list = leaderboardRows
+        .filter(r => clsFilter === "ALL" || r.className === clsFilter)
+        .slice(0, 20);
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-slate-400 font-bold">此單元暫時未有挑戰紀錄，快搶佔第一名！</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map((row, idx) => {
+        const rank = idx + 1;
+        const medal = rank === 1 ? "🥇" : (rank === 2 ? "🥈" : (rank === 3 ? "🥉" : `#${rank}`));
+        const isMe = currentUser && String(row.account).toLowerCase() === String(currentUser.account).toLowerCase();
+        const numStr = row.classNum ? `(${row.classNum})` : "";
+        return `
+          <tr class="${isMe ? 'bg-indigo-50/90 font-black' : 'hover:bg-slate-50'}">
+            <td class="py-2.5 px-3 text-center font-black ${rank <= 3 ? 'text-lg' : 'text-slate-500 text-xs'}">${medal}</td>
+            <td class="py-2.5 px-3">
+              <div class="font-black text-slate-900 text-sm">${row.name} ${isMe ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600 text-white ml-1">我</span>' : ''}</div>
+              <div class="text-[11px] text-slate-500 font-bold">${row.className} ${numStr}</div>
+            </td>
+            <td class="py-2.5 px-3 text-right font-black text-indigo-700">${row.score} 分</td>
+            <td class="py-2.5 px-3 text-right font-mono text-xs text-slate-500">${row.timeUsedSec}s</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function promptResetLeaderboard() {
+      const pwd = prompt(`請輸入教師管理密碼以清空「${currentUnitId}」排行榜：`);
+      if (pwd === null) return;
+      if (pwd.trim() !== "FK1PS") {
+        alert("密碼不正確，無法清空排行榜！");
+        return;
+      }
+      if (!confirm(`確定要永久清空 ${currentUnitId} 的所有排行榜紀錄嗎？此操作無法復原。`)) return;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "resetLeaderboard",
+            unitId: currentUnitId,
+            adminPassword: pwd.trim()
+          })
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          alert("已成功清空本單元排行榜！");
+          await loadLeaderboard(true);
+        } else {
+          alert(data.message || "重置失敗");
+        }
+      } catch (e) {
+        alert("連線失敗，請稍後再試。");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -383,7 +383,7 @@
     ];
 
     // 暫時暫停開放挑戰模式按鈕（2026-11-27 16:00 開放時改回 ["4A_U1", "4A_U2", "4A_U3", "4B_U4", "4B_U5"]）
-    const CHALLENGE_UNITS = [];
+    const CHALLENGE_UNITS = ["4A_U1", "4A_U2", "4A_U3", "4B_U4", "4B_U5"];
 
     let currentUser = null;
     let unitsData = [...DEFAULT_UNITS];
@@ -474,9 +474,9 @@
         document.getElementById("teacher-analytics-section").classList.add("hidden");
       }
 
-      if (!sessionStorage.getItem("fk1ps_challenge_notice_seen")) {
-        openChallengeAnnounceModal();
-      }
+      //if (!sessionStorage.getItem("fk1ps_challenge_notice_seen")) {
+      //  openChallengeAnnounceModal();
+      // }
     }
 
     function handleLogout() {
